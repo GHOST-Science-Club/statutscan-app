@@ -1,0 +1,31 @@
+version: '3.13'
+services:
+  app:
+    build: .
+    volumes:
+      - .:/statutscan-project
+      - static_volume:/app/staticfiles
+      - media_volume:/app/media
+    ports:
+      - 8000:8000
+    env_file:
+      - .env
+    image: statutscan-project:django
+    container_name: statutscan_project_django_container
+    command: python manage.py runserver 0.0.0.0:8000
+    depends_on:
+      - db
+  db:
+    image: postgres
+    volumes:
+      - ./data/db:/var/lib/postgresql/data
+    environment:
+      # Variables for postgresql database are temporary.
+      # In finall deployment we will use variables from Azure postgresql database.
+      - POSTGRES_DB=postgres
+      - POSTGRES_USER=postgres
+      - POSTGRES_PASSWORD=postgres
+    container_name: postgres_db
+volumes:
+  static_volume:
+  media_volume:

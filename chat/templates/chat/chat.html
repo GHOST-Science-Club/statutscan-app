@@ -1,0 +1,29 @@
+{% extends 'main.html' %}
+{% load static %}
+
+{% block extra_head %}
+    <link rel="stylesheet" type="text/css" href="{% static 'styles/github-markdown-dark.css' %}">
+    <link rel="stylesheet" type="text/css" href="{% static 'styles/chat-dark.css' %}?v=1.0">
+{% endblock extra_head %}
+
+{% block content %}
+<div id="body" class="chat-container markdown-body"></div>
+<div style="height: 90vh;"></div>
+
+<div class="post-container">
+    <form action="#">
+        <textarea id="input" rows="1" placeholder="Zapytaj o co chcesz"></textarea>
+        <button id="send-btn" type="button">
+            <img src="{% static 'images/icons/arrow-dark.svg' %}" alt="⬆">
+        </button>
+    </form>
+</div>
+<div class="footer">
+    Agent może popełniać błędy. Weryfikuj informacje.
+</div>
+
+<script src="{% static 'scripts/post-textarea-size.js' %}"></script>
+<script src="{% static 'scripts/marked.min.js' %}"></script>
+<script src="{% static 'scripts/text-streaming.js' %}"></script>
+<script src="{% static 'scripts/clear-textarea-content.js' %}"></script>
+{% endblock content %}
