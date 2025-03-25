@@ -2,8 +2,8 @@ import json
 from openai import OpenAI
 from abc import abstractmethod
 from typing import List
-from .tools import ToolInterface
-from .memories import Memory
+from .tools_old import ToolInterface
+from .memories_old import Memory
 
 
 class AgentInterface:

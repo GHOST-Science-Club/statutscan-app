@@ -9,6 +9,10 @@ RUN apt-get update && \
 # This option will send all errors to terminal
 ENV PYTHONUNBUFFERED=1
 
+ENV MONGO_HOST="mongodb://localhost:27017/"
+ENV MONGO_DATABASE="document_db"
+ENV MONGO_CHAT_HISTORY="chat_history"
+
 # Set working directory
 WORKDIR /statutscan-project
 
