@@ -1,13 +1,55 @@
 {% extends 'main.html' %}
 {% load static %}
 
+{% block title %}
+{% if title %}
+    {{ title }}
+{% else %}
+    StatutScan
+{% endif %}
+{% endblock title %}
+
 {% block extra_head %}
     <link rel="stylesheet" type="text/css" href="{% static 'styles/github-markdown-dark.css' %}">
     <link rel="stylesheet" type="text/css" href="{% static 'styles/chat-dark.css' %}?v=1.0">
 {% endblock extra_head %}
 
 {% block content %}
-<div id="body" class="chat-container markdown-body"></div>
+<div id="body" class="chat-container markdown-body">
+{% if chat %}
+    {% for message in chat %}
+        {% if message["role"] == "user" %}
+            <div class="user-message">
+                {{ message["content"] }}
+            </div>
+        {% elif message["role"] == "assistant" %}
+            <div class="assistant-message">
+                <div class="text-response">
+                    {{ message["content"] }}
+                </div>
+                {% if ("metadata" in message) and ("sources" in message["metadata"]) %}
+                    <div class="sources-response">
+                        {% for source in message["metadata"]["sources"] %}
+                            <div class="sources-item">
+                            <a href="{{ source['source'] }}" target="_blank">
+                            <div>
+                                <img src="/static/images/icons/link-light.svg" alt="LinkImg">
+                                {% if "title" in source %}
+                                    {{ source["title"] }}
+                                {% else %}
+                                    {{ source["source"] }}
+                                {% endif %}
+                            </div>
+                            </a>
+                            </div>
+                        {% endfor %}
+                    </div>
+                {% endif %}
+            </div>
+        {% endif %}
+    {% endfor %}
+{% endif %}
+</div>
 <div style="height: 90vh;"></div>
 
 <div class="post-container">
@@ -22,8 +64,7 @@
     Agent może popełniać błędy. Weryfikuj informacje.
 </div>
 
-<script src="{% static 'scripts/post-textarea-size.js' %}"></script>
 <script src="{% static 'scripts/marked.min.js' %}"></script>
 <script src="{% static 'scripts/text-streaming.js' %}"></script>
-<script src="{% static 'scripts/clear-textarea-content.js' %}"></script>
+<script src="{% static 'scripts/post-textarea.js' %}"></script>
 {% endblock content %}

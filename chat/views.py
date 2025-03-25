@@ -3,30 +3,33 @@ import os
 from django.shortcuts import render
 from django.http import StreamingHttpResponse
 from django.views.decorators.csrf import csrf_exempt
-
 from openai import OpenAI
-from .agent.memories import Memory
+from .agent.chat_history import ChatHistory
 from .agent.tools import KnowledgeBaseTool
-from .agent.agents import Agent
+from .agent.agent import Agent
 
-
-# --------------------------------------------------------------------------------------------------------
-# This segment is temporary, only for demonstration purposes.
-# In final deployment we will use MongoDB for storing chat history.
 BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 PERSISTENT_DIRECTORY = os.path.join(BASE_DIR, 'data', 'vector_db', 'chroma_1000signs')
 
 client = OpenAI()
-memory = Memory("Jesteś asystente, który ma za zadanie pomagać studentom w problemach administracyjnych.")
+chat_history = ChatHistory()
 kb_tool = KnowledgeBaseTool(PERSISTENT_DIRECTORY, "example", n_reuslts=1)
-agent = Agent(client, memory)
+agent = Agent(client, chat_history, model="gpt-4o-mini")
 agent.add_tool(kb_tool)
-# --------------------------------------------------------------------------------------------------------
 
 
-def chat(request):
+def chat(request, chat_id=None):
     context = {}
-    return render(request, 'chat/chat.html', context)
+
+    if chat_id is None:
+        context["chat_history"] = []
+        messages, title = chat_history.get_chat_history(chat_id)
+        context["title"] = title
+        for message in messages:
+            if message["role"] in ["user", "assistant"]:
+                context["chat_history"].append(message)
+
+    return render(request, 'chat.html', context=context)
 
 
 def generate_response(question):
