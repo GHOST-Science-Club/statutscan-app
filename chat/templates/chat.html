@@ -16,31 +16,33 @@
 
 {% block content %}
 <div id="body" class="chat-container markdown-body">
-{% if chat %}
-    {% for message in chat %}
-        {% if message["role"] == "user" %}
+{% if chat_history %}
+    {% for message in chat_history %}
+        {% if message.role == "user" %}
             <div class="user-message">
-                {{ message["content"] }}
+                <div class="user-question">
+                    {{ message.content }}
+                </div>
             </div>
-        {% elif message["role"] == "assistant" %}
+        {% elif message.role == "assistant" %}
             <div class="assistant-message">
                 <div class="text-response">
-                    {{ message["content"] }}
+                    {{ message.content }}
                 </div>
-                {% if ("metadata" in message) and ("sources" in message["metadata"]) %}
+                {% if message.metadata and message.metadata.sources %}
                     <div class="sources-response">
-                        {% for source in message["metadata"]["sources"] %}
+                        {% for source in message.metadata.sources %}
                             <div class="sources-item">
-                            <a href="{{ source['source'] }}" target="_blank">
-                            <div>
-                                <img src="/static/images/icons/link-light.svg" alt="LinkImg">
-                                {% if "title" in source %}
-                                    {{ source["title"] }}
-                                {% else %}
-                                    {{ source["source"] }}
-                                {% endif %}
-                            </div>
-                            </a>
+                                <a href="{{ source.source }}" target="_blank">
+                                    <div>
+                                        <img src="/static/images/icons/link-light.svg" alt="LinkImg">
+                                        {% if source.title %}
+                                            {{ source.title }}
+                                        {% else %}
+                                            {{ source.source }}
+                                        {% endif %}
+                                    </div>
+                                </a>
                             </div>
                         {% endfor %}
                     </div>
@@ -50,6 +52,7 @@
     {% endfor %}
 {% endif %}
 </div>
+    
 <div style="height: 90vh;"></div>
 
 <div class="post-container">
@@ -65,6 +68,5 @@
 </div>
 
 <script src="{% static 'scripts/marked.min.js' %}"></script>
-<script src="{% static 'scripts/text-streaming.js' %}"></script>
-<script src="{% static 'scripts/post-textarea.js' %}"></script>
+<script src="{% static 'scripts/chat.js' %}"></script>
 {% endblock content %}

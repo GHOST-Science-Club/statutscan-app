@@ -1,4 +1,4 @@
-version: '3.13'
+version: '3.12'
 services:
   app:
     build: .
@@ -11,8 +11,10 @@ services:
     env_file:
       - .env
     image: statutscan-project:django
-    container_name: statutscan_project_django_container
-    command: python manage.py runserver 0.0.0.0:8000
+    container_name: statutscan_project_container
+    depends_on:
+      - mongo
+    command: /bin/bash /statutscan-project/build.sh
 
   mongo:
     image: mongo:latest

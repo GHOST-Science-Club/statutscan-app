@@ -1,6 +1,6 @@
 import json
 import os
-from django.shortcuts import render
+from django.shortcuts import render, redirect, HttpResponse
 from django.http import StreamingHttpResponse
 from django.views.decorators.csrf import csrf_exempt
 from openai import OpenAI
@@ -21,10 +21,16 @@ agent.add_tool(kb_tool)
 def chat(request, chat_id=None):
     context = {}
 
-    if chat_id is None:
+    if chat_id is not None:
+        if not chat_history.chat_exist(chat_id):
+            return HttpResponse("Chat doesn't exist.")
+
         context["chat_history"] = []
-        messages, title = chat_history.get_chat_history(chat_id)
-        context["title"] = title
+        messages, title = chat_history.get_chat_history_for_html(chat_id)
+        
+        if title:
+            context["title"] = title
+
         for message in messages:
             if message["role"] in ["user", "assistant"]:
                 context["chat_history"].append(message)
@@ -32,15 +38,23 @@ def chat(request, chat_id=None):
     return render(request, 'chat.html', context=context)
 
 
-def generate_response(question):
-    stream = agent.ask(question, model="gpt-4o-mini", stream_answer=True)
+def generate_response(question, chat_id):
+    stream = agent.ask(question, chat_id)
     for chunk in stream:
         yield json.dumps(chunk)
 
 
 @csrf_exempt
 def answer(request):
-    data = json.loads(request.body)
-    message = data["message"]
-    response = StreamingHttpResponse(generate_response(message), status=200, content_type="text/plain")
-    return response
+    response = json.loads(request.body)
+    question = response["question"]
+    chat_id = response["chat_id"]
+    user_id = "87ie47sfhgr" # in future it should be an id from user session
+
+    if chat_id is not None:
+        response = StreamingHttpResponse(generate_response(question, chat_id), status=200, content_type="text/plain")
+        return response
+    else:
+        new_chat_id = chat_history.create_new_chat(user_id, question)
+        response = HttpResponse(json.dumps({"redirect": f"/chat/{new_chat_id}/"}), content_type="application/json")
+        return response

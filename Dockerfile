@@ -27,4 +27,5 @@ COPY . .
 RUN python manage.py collectstatic --noinput
 
 # Run server
-CMD ["bash", "build.sh"]
+RUN chmod +x build.sh
+CMD ["./build.sh"]

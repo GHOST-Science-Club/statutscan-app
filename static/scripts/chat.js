@@ -1,11 +1,12 @@
 const body = document.getElementById('body');
-const submit_btn = document.getElementById('send-btn');
+const submitBtn = document.getElementById('send-btn');
 const input = document.getElementById('input');
+const postContainer = document.getSelection('.post-container');
 
-function addElement(jsonData, output, textDiv, sourcesDiv) {
+function addElement(jsonData, output, textResponse, sourcesResponse) {
     if ("chunk" in jsonData) {
         output += jsonData["chunk"];
-        textDiv.innerHTML = marked.parse(output);
+        textResponse.innerHTML = marked.parse(output);
     }
     else if ("sources" in jsonData) {
         console.log("sources works");
@@ -35,7 +36,7 @@ function addElement(jsonData, output, textDiv, sourcesDiv) {
 
             sourceLink.appendChild(sourceLinkTextContainer);
             sourceItem.appendChild(sourceLink)
-            sourcesDiv.appendChild(sourceItem);
+            sourcesResponse.appendChild(sourceItem);
         }
     }
 
@@ -85,26 +86,47 @@ function detectAdjacentDictionaries(str) {
 }
 
 
-submit_btn.addEventListener("click", async (e) => {
+submitBtn.addEventListener("click", async (e) => {
     e.preventDefault();
 
+    const pathname = window.location.pathname;
+    const match = pathname.match(/^\/chat\/([^\/]+)\/?$/);
+    let chatId = match ? match[1] : null;
+    const question = input.value.trim();
+
+    // add question to body
+    let userMessage = document.createElement("div");
+    let userQuestion = document.createElement("div");
+    userMessage.className = "user-message";
+    userQuestion.className = "user-question";
+    userQuestion.innerHTML = question;
+    userMessage.appendChild(userQuestion);
+    body.appendChild(userMessage);
+
+    // get answer
     const response = await fetch("/answer/", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ message: input.value })
+        body: JSON.stringify({
+            question: question,
+            chat_id: chatId
+        })
     });
 
     input.value = "";
     let output = "";
 
+    // add answer to body
     const reader = response.body.getReader();
-    let textDiv = document.createElement("div");
-    textDiv.className = "text-response";
-    body.appendChild(textDiv);
-
-    let sourcesDiv = document.createElement("div");
-    sourcesDiv.className = "sources-response";
-    body.appendChild(sourcesDiv);
+    let assistantMessage = document.createElement("div");
+    let textResponse = document.createElement("div");
+    let sourcesResponse = document.createElement("div");
+    assistantMessage.className = "assistant-message"
+    textResponse.className = "text-response";
+    sourcesResponse.className = "sources-response";
+    assistantMessage.appendChild(textResponse);
+    assistantMessage.appendChild(sourcesResponse);
+    body.appendChild(assistantMessage);
 
     while (true) {
         const { done, value } = await reader.read();
@@ -116,14 +138,22 @@ submit_btn.addEventListener("click", async (e) => {
             const chunks = splitJsonStrings(chunk);
             chunks.forEach((obj) => {
                 const jsonData = JSON.parse(obj);
-                output = addElement(jsonData, output, textDiv, sourcesDiv);
+                output = addElement(jsonData, output, textResponse, sourcesResponse);
             })
         }
         else {
             const jsonData = JSON.parse(chunk);
-            output = addElement(jsonData, output, textDiv, sourcesDiv);
+            output = addElement(jsonData, output, textResponse, sourcesResponse);
         }
 
         if (done) break;
     }
+});
+
+input.addEventListener('input', function () {
+    this.style.height = 'auto';
+    let post_height = this.scrollHeight;
+    post_height = Math.min(post_height, 200);
+    this.style.height = post_height + 'px';
+    postContainer.style.height = post_height + 'px';
 });
