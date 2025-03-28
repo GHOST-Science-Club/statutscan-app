@@ -1,6 +1,13 @@
 from openai import OpenAI
 
 def generate_chat_title(message:str) -> str:
+    """
+    Generates a short (max 32 characters) title for a conversation based on the provided user message 
+    using the OpenAI API.
+
+    Returns:
+        str: A 32-character or shorter title.
+    """
     client = OpenAI()
     
     response = client.chat.completions.create(

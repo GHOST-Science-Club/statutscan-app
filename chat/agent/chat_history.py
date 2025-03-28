@@ -15,6 +15,17 @@ class ChatHistory:
         self.chat_history = self.mongo_connection.get_chat_history()
 
     def create_new_chat(self, user_id: str, question: str) -> str:
+        """
+        Creates a new chat entry in the database, generating a unique chat ID, 
+        a title based on the user's question, and storing the initial message.
+
+        Args:
+            user_id (str): The user ID initiating the chat.
+            question (str): The initial question/message from the user.
+
+        Returns:
+            str: The generated chat ID.
+        """
         chat_id = generate_id()
         chat_title = generate_chat_title(question)
         creation_date = datetime.now()
@@ -32,12 +43,28 @@ class ChatHistory:
         return chat_id
 
     def add_new_message(self, chat_id: str, message: dict):
+        """
+        Adds a new message to an existing chat.
+
+        Args:
+            chat_id (str): The chat ID to which the message should be added.
+            message (dict): The message to be added to the chat.
+        """
         self.chat_history.update_one(
             {"_id": ObjectId(chat_id)},
             {"$push": {"messages": message}}
         )
 
     def chat_exist(self, chat_id: str) -> bool:
+        """
+        Checks if a chat exists by verifying its ID.
+
+        Args:
+            chat_id (str): The chat ID to check.
+
+        Returns:
+            bool: True if the chat exists, False otherwise.
+        """
         # check if id is valid
         if len(chat_id) != 24:
             return False
@@ -51,6 +78,15 @@ class ChatHistory:
         return bool(chat_data)
 
     def get_chat_history_for_agent(self, chat_id: str) -> List[dict]:
+        """
+        Retrieves the chat history for a specific chat, formatting it for the agent's view.
+
+        Args:
+            chat_id (str): The chat ID for which to retrieve the history.
+
+        Returns:
+            List[dict]: A list of messages formatted for the agent.
+        """
         chat_data = self.chat_history.find_one(
             {"_id": ObjectId(chat_id)},
             {"messages": 1}
@@ -68,6 +104,15 @@ class ChatHistory:
         return []
 
     def get_chat_history_for_html(self, chat_id: str) -> Tuple[List[dict], str]:
+        """
+        Retrieves the chat history for a specific chat, transforming it for HTML display.
+
+        Args:
+            chat_id (str): The chat ID for which to retrieve the history.
+
+        Returns:
+            Tuple[List[dict], str]: A tuple containing the list of transformed messages and the chat title.
+        """
         chat_data = self.chat_history.find_one(
             {"_id": ObjectId(chat_id)},
             {"messages": 1, "title": 1}
@@ -112,6 +157,15 @@ class ChatHistory:
         return transformed_messages, title
 
     def get_user_chats(self, user_id: str) -> List[dict]:
+        """
+        Retrieves a list of chat summaries for a specific user, including chat ID, title, and creation date.
+
+        Args:
+            user_id (str): The user ID for which to retrieve chat summaries.
+
+        Returns:
+            List[dict]: A list of chat summaries for the user.
+        """
         chats = self.chat_history.find(
             {"user_id": user_id},
             {"_id": 1, "title": 1, "creation_date": 1}
@@ -119,6 +173,12 @@ class ChatHistory:
         return list(chats)
 
     def delete_chat(self, chat_id: str):
+        """
+        Deletes a specific chat from the database.
+
+        Args:
+            chat_id (str): The chat ID to delete.
+        """
         self.chat_history.delete_one(
             {"_id": ObjectId(chat_id)}
         )
