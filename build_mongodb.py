@@ -13,6 +13,7 @@ db = client[os.environ["MONGO_DATABASE"]]
 chat_history_collection = db[os.environ["MONGO_CHAT_HISTORY"]]
 
 example_chat_history_data = [
+  {"_id": ObjectId("41d9f95cb83b546fc3f29472"), "user_id": "41d9f95cb83b64d601f7e60f", "messages": [{"role": "user", "content": "Kim jesteś?"}, {"role": "assistant", "content": "Jestem asystentem służącym do pomocy studentom w sprawach administracyjnych."}]},
   {"_id": ObjectId("41d9f95cb83b546fc3f2b142"), "user_id": "41d9f95cb83b64d601f7e60f", "messages": [{"role": "user", "content": "How to cook egg?"}, {"role": "assistant", "content": "You have to put egg to boiling water and wait 8 minutes."}]},
   {"_id": ObjectId("41d9f95cb83b546fbb6834f2"), "user_id": "41d9f95cb83b64d6cb49ea6c", "messages": [{"role": "user", "content": "How do I make a cup of tea?"}, {"role": "assistant", "content": "Boil water, then pour it over the tea bag and steep for 3-5 minutes."}]},
   {"_id": ObjectId("41d9f95cb83b546f2d2b5bfd"), "user_id": "41d9f95cb83b64d6618c486e", "messages": [{"role": "user", "content": "What is the capital of France?"}, {"role": "assistant", "content": "The capital of France is Paris."}]},

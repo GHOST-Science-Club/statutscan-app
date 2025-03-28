@@ -28,12 +28,10 @@ def chat(request, chat_id=None):
         context["chat_history"] = []
         messages, title = chat_history.get_chat_history_for_html(chat_id)
         
+        context["chat_history"] = messages
+
         if title:
             context["title"] = title
-
-        for message in messages:
-            if message["role"] in ["user", "assistant"]:
-                context["chat_history"].append(message)
 
     return render(request, 'chat.html', context=context)
 

@@ -104,11 +104,11 @@ class ChatHistory:
                     continue
 
                 if metadata:
-                    new_message = message
-                    new_message["metadata"] = metadata
-                    transformed_messages.append(new_message)
+                    message["metadata"] = metadata
                     metadata = {"sources": []}
 
+                transformed_messages.append(message)
+                
         return transformed_messages, title
 
     def get_user_chats(self, user_id: str) -> List[dict]:

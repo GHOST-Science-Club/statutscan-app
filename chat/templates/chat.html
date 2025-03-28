@@ -20,15 +20,11 @@
     {% for message in chat_history %}
         {% if message.role == "user" %}
             <div class="user-message">
-                <div class="user-question">
-                    {{ message.content }}
-                </div>
+                <div class="user-question">{{ message.content }}</div>
             </div>
         {% elif message.role == "assistant" %}
             <div class="assistant-message">
-                <div class="text-response">
-                    {{ message.content }}
-                </div>
+                <div class="text-response">{{ message.content }}</div>
                 {% if message.metadata and message.metadata.sources %}
                     <div class="sources-response">
                         {% for source in message.metadata.sources %}

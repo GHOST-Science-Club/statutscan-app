@@ -3,14 +3,13 @@ const submitBtn = document.getElementById('send-btn');
 const input = document.getElementById('input');
 const postContainer = document.getSelection('.post-container');
 
+
 function addElement(jsonData, output, textResponse, sourcesResponse) {
     if ("chunk" in jsonData) {
         output += jsonData["chunk"];
         textResponse.innerHTML = marked.parse(output);
     }
     else if ("sources" in jsonData) {
-        console.log("sources works");
-
         const sources = jsonData["sources"];
         for (let src of sources) {
             const sourceItem = document.createElement("div");
@@ -86,6 +85,13 @@ function detectAdjacentDictionaries(str) {
 }
 
 
+document.addEventListener("DOMContentLoaded", () => {    
+    document.querySelectorAll(".text-response").forEach(div => {
+        div.innerHTML = marked.parse(div.innerHTML);
+    });
+});
+
+
 submitBtn.addEventListener("click", async (e) => {
     e.preventDefault();
 
@@ -93,6 +99,7 @@ submitBtn.addEventListener("click", async (e) => {
     const match = pathname.match(/^\/chat\/([^\/]+)\/?$/);
     let chatId = match ? match[1] : null;
     const question = input.value.trim();
+    input.value = "";
 
     // add question to body
     let userMessage = document.createElement("div");
@@ -113,7 +120,6 @@ submitBtn.addEventListener("click", async (e) => {
         })
     });
 
-    input.value = "";
     let output = "";
 
     // add answer to body
@@ -132,8 +138,6 @@ submitBtn.addEventListener("click", async (e) => {
         const { done, value } = await reader.read();
         const chunk = new TextDecoder('utf-8', { fatal: true }).decode(value).replace(/^\uFEFF/, '');
 
-        console.log(chunk);
-
         if (detectAdjacentDictionaries(chunk)) {
             const chunks = splitJsonStrings(chunk);
             chunks.forEach((obj) => {
@@ -149,6 +153,7 @@ submitBtn.addEventListener("click", async (e) => {
         if (done) break;
     }
 });
+
 
 input.addEventListener('input', function () {
     this.style.height = 'auto';
