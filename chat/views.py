@@ -1,7 +1,7 @@
 import json
 import os
-from django.shortcuts import render, redirect, HttpResponse
-from django.http import StreamingHttpResponse
+from django.shortcuts import render, HttpResponse
+from django.http import StreamingHttpResponse, JsonResponse
 from django.views.decorators.csrf import csrf_exempt
 from openai import OpenAI
 from .agent.chat_history import ChatHistory
@@ -36,23 +36,24 @@ def chat(request, chat_id=None):
     return render(request, 'chat.html', context=context)
 
 
-def generate_response(question, chat_id):
-    stream = agent.ask(question, chat_id)
-    for chunk in stream:
-        yield json.dumps(chunk)
-
-
 @csrf_exempt
 def answer(request):
     response = json.loads(request.body)
-    question = response["question"]
-    chat_id = response["chat_id"]
-    user_id = "87ie47sfhgr" # in future it should be an id from user session
+
+    chat_id = response["chat_id"] if "chat_id" in response else None
+    question = response["question"] if "question" in response else None
+    new_chat_redirection = response["new_chat_redirection"] if "new_chat_redirection" in response else None
+    user_id = "41d9f95cb83b64d6c47988e4" # in future it should be an id from user session
+
+    if new_chat_redirection:
+        response = StreamingHttpResponse(agent.ask_quietly(chat_id), status=200, content_type="text/plain")
+        response["X-Response-Type"] = "text"
+        return response
 
     if chat_id is not None:
-        response = StreamingHttpResponse(generate_response(question, chat_id), status=200, content_type="text/plain")
+        response = StreamingHttpResponse(agent.ask(question, chat_id), status=200, content_type="text/plain")
+        response["X-Response-Type"] = "text"
         return response
     else:
         new_chat_id = chat_history.create_new_chat(user_id, question)
-        response = HttpResponse(json.dumps({"redirect": f"/chat/{new_chat_id}/"}), content_type="application/json")
-        return response
+        return JsonResponse({"redirect_url": f"/chat/{new_chat_id}?new_chat_redirection=true"})

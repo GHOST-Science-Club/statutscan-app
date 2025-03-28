@@ -85,16 +85,76 @@ function detectAdjacentDictionaries(str) {
 }
 
 
-document.addEventListener("DOMContentLoaded", () => {    
+document.addEventListener("DOMContentLoaded", async () => {
+    // convert markdown to HTML
     document.querySelectorAll(".text-response").forEach(div => {
         div.innerHTML = marked.parse(div.innerHTML);
     });
+
+    // generate answer after redirection
+    const urlParams  = new URLSearchParams(window.location.search);
+    const isNewChatRedirection = urlParams.get('new_chat_redirection') === 'true';
+
+    if (isNewChatRedirection) {
+        // remove url param from url address
+        urlParams.delete('new_chat_redirection');
+        const newUrl = window.location.pathname + (urlParams.toString() ? '?' + urlParams.toString() : '');
+        history.replaceState(null, '', newUrl);
+
+        // get chat id
+        const pathname = window.location.pathname;
+        const match = pathname.match(/^\/chat\/([^\/]+)\/?$/);
+        let chatId = match ? match[1] : null;
+
+        // get answer
+        const response = await fetch("/answer/", {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({
+                chat_id: chatId,
+                new_chat_redirection: true
+            })
+        });
+
+        // add answer to the body
+        let output = "";
+        const reader = response.body.getReader();
+        let assistantMessage = document.createElement("div");
+        let textResponse = document.createElement("div");
+        let sourcesResponse = document.createElement("div");
+        assistantMessage.className = "assistant-message";
+        textResponse.className = "text-response";
+        sourcesResponse.className = "sources-response";
+        assistantMessage.appendChild(textResponse);
+        assistantMessage.appendChild(sourcesResponse);
+        body.appendChild(assistantMessage);
+
+        // process response chunks and append the answer
+        while (true) {
+            const { done, value } = await reader.read();
+            const chunk = new TextDecoder('utf-8', { fatal: true }).decode(value).replace(/^\uFEFF/, '');
+
+            if (detectAdjacentDictionaries(chunk)) {
+                const chunks = splitJsonStrings(chunk);
+                chunks.forEach((obj) => {
+                    const jsonData = JSON.parse(obj);
+                    output = addElement(jsonData, output, textResponse, sourcesResponse);
+                })
+            } else {
+                const jsonData = JSON.parse(chunk);
+                output = addElement(jsonData, output, textResponse, sourcesResponse);
+            }
+
+            if (done) break;
+        }
+    }
 });
 
 
 submitBtn.addEventListener("click", async (e) => {
     e.preventDefault();
 
+    // get chat id and question
     const pathname = window.location.pathname;
     const match = pathname.match(/^\/chat\/([^\/]+)\/?$/);
     let chatId = match ? match[1] : null;
@@ -119,10 +179,20 @@ submitBtn.addEventListener("click", async (e) => {
             chat_id: chatId
         })
     });
+    
+    // redirect user
+    const responseType = response.headers.get('X-Response-Type');
 
-    let output = "";
+    if (!(responseType === 'text')) {
+        const data = await response.json();
 
+        if (data.redirect_url) {
+            window.location.href = data.redirect_url;
+        }
+    }
+    
     // add answer to body
+    let output = "";
     const reader = response.body.getReader();
     let assistantMessage = document.createElement("div");
     let textResponse = document.createElement("div");
@@ -134,6 +204,7 @@ submitBtn.addEventListener("click", async (e) => {
     assistantMessage.appendChild(sourcesResponse);
     body.appendChild(assistantMessage);
 
+    // process response chunks and append the answer
     while (true) {
         const { done, value } = await reader.read();
         const chunk = new TextDecoder('utf-8', { fatal: true }).decode(value).replace(/^\uFEFF/, '');

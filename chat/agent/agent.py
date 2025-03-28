@@ -37,21 +37,6 @@ class AgentInterface:
         """
         pass
 
-    @abstractmethod
-    def ask_first_question(self, question:str):
-        """
-        The method to ask agent a question. Agent will create new chat
-        in database and invoke question to OpenAI API.
-
-        Parameters:
-            question (str): a question in text
-        """
-        pass
-
-    @abstractmethod
-    def _process_question(self, question:str):
-        pass
-
 
 class AgentBase(AgentInterface):
     def __init__(self, client:OpenAI, chat_history:ChatHistory, model:str="gpt-4o-mini"):
@@ -78,10 +63,33 @@ class AgentBase(AgentInterface):
 
 class Agent(AgentBase):    
     def ask(self, question:str, chat_id:str):
+        """
+        The method to ask agent a question. Agent will add question
+        to chat history and invoke question to OpenAI API.
+
+        Parameters:
+            question (str): a question in text
+            chat_id (str): chat id to get access to chat history
+        """
         # 1. Add new message to database
         message = {"role": "user", "content": question}
         self._chat_history.add_new_message(chat_id, message)
 
+        for chunk in self.__process_question(chat_id):
+            yield json.dumps(chunk)
+
+    def ask_quietly(self, chat_id:str):
+        """
+        The method to ask agent a question. Agent invoke question to
+        OpenAI API without adding question to database.
+
+        Parameters:
+            chat_id (str): chat id to get access to chat history
+        """
+        for chunk in self.__process_question(chat_id):
+            yield json.dumps(chunk)
+
+    def __process_question(self, chat_id:str):
         # 2. Invoke OpenAi API (make decision which tool use)
         completion = self._client.chat.completions.create(
             model=self._model,

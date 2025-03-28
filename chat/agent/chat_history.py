@@ -14,13 +14,13 @@ class ChatHistory:
         self.mongo_connection = apps.get_app_config('chat').mongo_connection
         self.chat_history = self.mongo_connection.get_chat_history()
 
-    def create_new_chat(self, user_id: str, message: dict) -> str:
+    def create_new_chat(self, user_id: str, question: str) -> str:
         chat_id = generate_id()
-        chat_title = generate_chat_title(message)
+        chat_title = generate_chat_title(question)
         creation_date = datetime.now()
         messages = [{
             "role": "user",
-            "content": message
+            "content": question
         }]
         self.chat_history.insert_one({
             "_id": ObjectId(chat_id),
