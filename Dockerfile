@@ -1,5 +1,5 @@
 # Set operator system (linux)
-FROM python:3.13-slim
+FROM python:3.12-slim
 
 # Additional dependencies required for chromadb
 RUN apt-get update && \
@@ -8,6 +8,9 @@ RUN apt-get update && \
 
 # This option will send all errors to terminal
 ENV PYTHONUNBUFFERED=1
+ENV MONGO_HOST=mongodb://mongodb:27017/
+ENV MONGO_DATABASE=document_db
+ENV MONGO_CHAT_HISTORY=chat_history
 
 # Set working directory
 WORKDIR /statutscan-project
@@ -24,4 +27,5 @@ COPY . .
 RUN python manage.py collectstatic --noinput
 
 # Run server
-CMD ["python3", "manage.py", "runserver", "0.0.0.0:8000"]
+RUN chmod +x build.sh
+CMD ["./build.sh"]

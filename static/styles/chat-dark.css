@@ -15,6 +15,7 @@
     --code-background-color-dark: #545454;
     --source-item-color-dark: #4a4a4a;
     --source-item-color-hover-dark: #474747;
+    --user-message-background_color: #484848;
 }
 
 .chat-container {
@@ -130,4 +131,21 @@
     margin-right: 2px;
     position: relative;
     bottom: 1px;
+}
+
+.user-message {
+    text-align: right;
+    margin-bottom: 25px;
+}
+
+.user-question {
+    display: inline-block;
+    background-color: var(--user-message-background_color);
+    width: max-content;
+    padding: 10px;
+    border-radius: 10px;
+}
+
+.assistant-message {
+    margin-bottom: 25px;
 }

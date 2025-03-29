@@ -1,43 +1,59 @@
 import json
 import os
-from django.shortcuts import render
-from django.http import StreamingHttpResponse
+from django.shortcuts import render, HttpResponse
+from django.http import StreamingHttpResponse, JsonResponse
 from django.views.decorators.csrf import csrf_exempt
-
 from openai import OpenAI
-from .agent.memories import Memory
+from .agent.chat_history import ChatHistory
 from .agent.tools import KnowledgeBaseTool
-from .agent.agents import Agent
+from .agent.agent import Agent
 
-
-# --------------------------------------------------------------------------------------------------------
-# This segment is temporary, only for demonstration purposes.
-# In final deployment we will use MongoDB for storing chat history.
 BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 PERSISTENT_DIRECTORY = os.path.join(BASE_DIR, 'data', 'vector_db', 'chroma_1000signs')
 
 client = OpenAI()
-memory = Memory("Jesteś asystente, który ma za zadanie pomagać studentom w problemach administracyjnych.")
+chat_history = ChatHistory()
 kb_tool = KnowledgeBaseTool(PERSISTENT_DIRECTORY, "example", n_reuslts=1)
-agent = Agent(client, memory)
+agent = Agent(client, chat_history, model="gpt-4o-mini")
 agent.add_tool(kb_tool)
-# --------------------------------------------------------------------------------------------------------
 
 
-def chat(request):
+def chat(request, chat_id=None):
     context = {}
-    return render(request, 'chat/chat.html', context)
 
+    if chat_id is not None:
+        if not chat_history.chat_exist(chat_id):
+            return HttpResponse("Chat doesn't exist.")
 
-def generate_response(question):
-    stream = agent.ask(question, model="gpt-4o-mini", stream_answer=True)
-    for chunk in stream:
-        yield json.dumps(chunk)
+        context["chat_history"] = []
+        messages, title = chat_history.get_chat_history_for_html(chat_id)
+        
+        context["chat_history"] = messages
+
+        if title:
+            context["title"] = title
+
+    return render(request, 'chat.html', context=context)
 
 
 @csrf_exempt
 def answer(request):
-    data = json.loads(request.body)
-    message = data["message"]
-    response = StreamingHttpResponse(generate_response(message), status=200, content_type="text/plain")
-    return response
+    response = json.loads(request.body)
+
+    chat_id = response["chat_id"] if "chat_id" in response else None
+    question = response["question"] if "question" in response else None
+    new_chat_redirection = response["new_chat_redirection"] if "new_chat_redirection" in response else None
+    user_id = "41d9f95cb83b64d6c47988e4" # in future it should be an id from user session
+
+    if new_chat_redirection:
+        response = StreamingHttpResponse(agent.ask_quietly(chat_id), status=200, content_type="text/plain")
+        response["X-Response-Type"] = "text"
+        return response
+
+    if chat_id is not None:
+        response = StreamingHttpResponse(agent.ask(question, chat_id), status=200, content_type="text/plain")
+        response["X-Response-Type"] = "text"
+        return response
+    else:
+        new_chat_id = chat_history.create_new_chat(user_id, question)
+        return JsonResponse({"redirect_url": f"/chat/{new_chat_id}?new_chat_redirection=true"})

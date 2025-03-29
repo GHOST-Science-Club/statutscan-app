@@ -175,3 +175,6 @@ cython_debug/
 
 # Vectorization
 data/vector_db/vectorize.py
+
+# Todo
+TODO.md

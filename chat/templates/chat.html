@@ -1,0 +1,68 @@
+{% extends 'main.html' %}
+{% load static %}
+
+{% block title %}
+{% if title %}
+    {{ title }}
+{% else %}
+    StatutScan
+{% endif %}
+{% endblock title %}
+
+{% block extra_head %}
+    <link rel="stylesheet" type="text/css" href="{% static 'styles/github-markdown-dark.css' %}">
+    <link rel="stylesheet" type="text/css" href="{% static 'styles/chat-dark.css' %}?v=1.0">
+{% endblock extra_head %}
+
+{% block content %}
+<div id="body" class="chat-container markdown-body">
+{% if chat_history %}
+    {% for message in chat_history %}
+        {% if message.role == "user" %}
+            <div class="user-message">
+                <div class="user-question">{{ message.content }}</div>
+            </div>
+        {% elif message.role == "assistant" %}
+            <div class="assistant-message">
+                <div class="text-response">{{ message.content }}</div>
+                {% if message.metadata and message.metadata.sources %}
+                    <div class="sources-response">
+                        {% for source in message.metadata.sources %}
+                            <div class="sources-item">
+                                <a href="{{ source.source }}" target="_blank">
+                                    <div>
+                                        <img src="/static/images/icons/link-light.svg" alt="LinkImg">
+                                        {% if source.title %}
+                                            {{ source.title }}
+                                        {% else %}
+                                            {{ source.source }}
+                                        {% endif %}
+                                    </div>
+                                </a>
+                            </div>
+                        {% endfor %}
+                    </div>
+                {% endif %}
+            </div>
+        {% endif %}
+    {% endfor %}
+{% endif %}
+</div>
+    
+<div style="height: 90vh;"></div>
+
+<div class="post-container">
+    <form action="#">
+        <textarea id="input" rows="1" placeholder="Zapytaj o co chcesz"></textarea>
+        <button id="send-btn" type="button">
+            <img src="{% static 'images/icons/arrow-dark.svg' %}" alt="⬆">
+        </button>
+    </form>
+</div>
+<div class="footer">
+    Agent może popełniać błędy. Weryfikuj informacje.
+</div>
+
+<script src="{% static 'scripts/marked.min.js' %}"></script>
+<script src="{% static 'scripts/chat.js' %}"></script>
+{% endblock content %}

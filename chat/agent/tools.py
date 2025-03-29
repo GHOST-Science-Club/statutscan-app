@@ -37,7 +37,7 @@ class KnowledgeBaseTool(ToolInterface):
         self.__chroma_client = chromadb.PersistentClient(persistent_directory)
         self.__embedding_fn = embedding_functions.OpenAIEmbeddingFunction(
             model_name="text-embedding-3-small", 
-            api_key = os.getenv("OPENAI_API_KEY")
+            api_key = os.environ["OPENAI_API_KEY"]
         )
         self.__collection = self.__chroma_client.get_collection(
             collection_name,
