@@ -14,7 +14,7 @@ services:
     container_name: statutscan_project_container
     depends_on:
       - mongo
-    command: /bin/bash /statutscan-project/build.sh
+    command: /bin/bash /statutscan-project/entrypoint.sh
 
   mongo:
     image: mongo:latest

@@ -13,7 +13,7 @@ wait_for_mongo() {
       return 0
     else
       retries=$((retries - 1))
-      echo "INFO:MongoDB:Server not available yet, retrying in $delay seconds..."
+      echo "INFO:MongoDB:Don't worry. Server not available yet, retrying in $delay seconds..."
       sleep $delay
     fi
   done
