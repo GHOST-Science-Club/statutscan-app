@@ -3,7 +3,8 @@
     --post-width: max(50vw, min(750px, calc(100vw - 40px)));
     --min-post-height: 50px;
     --send-btn-size: 40px;
-    --send-btn-padding: 9px;
+    --send-btn-padding-right: 5px;
+    --send-btn-padding-bottom: 9px;
     --border-radius: calc(var(--min-post-height) / 2);
     --input-padding: calc((var(--min-post-height) - 1.2em) / 2);
     --background-dark: #2d2d2d;
@@ -20,33 +21,39 @@
 
 .chat-container {
     margin-top: 25px;
-    padding-left: 25px;
-    padding-right: 25px;
+    padding-inline: 25px;
     width: var(--chat-width);
     margin-inline: auto;
     line-height: 1.2em;
 }
 
-.post-container {
+#post-container {
     background-color: var(--background-dark);
     position: fixed;
-    width: var(--post-width);
-    left: calc((100% - var(--post-width)) / 2);
-    bottom: calc(10px + 0.75em);
+    width: 100%;
+    left: 0;
+    bottom: 0;
+}
+
+#post-container div {
+    position: relative;
+    text-align: center;
+    width: 100%;
 }
 
 #input {
     width: var(--post-width);
     min-height: var(--min-post-height);
-    line-height: 1.2em;
-    resize: none;
-    overflow: auto;
     padding: var(--input-padding);
-    box-sizing: border-box;
-    outline: none;
-    border-radius: var(--border-radius);
+    padding-right: calc(var(--send-btn-size) + 2 * var(--send-btn-padding-right));
     background-color: var(--post-textarea-dark);
     color: var(--text-color-dark);
+    border-radius: var(--border-radius);
+    outline: none;
+    line-height: 1.2em;
+    resize: none;
+    box-sizing: border-box;
+    overflow: auto;
     border: none;
     -ms-overflow-style: none;
     scrollbar-width: none;
@@ -64,8 +71,8 @@
     position: absolute;
     width: var(--send-btn-size);
     height: var(--send-btn-size);
-    right: var(--send-btn-padding);
-    bottom: var(--send-btn-padding);
+    right: calc((100% - var(--post-width)) / 2 + var(--send-btn-padding-right));
+    bottom: var(--send-btn-padding-bottom);
     font-size: calc(0.6 * var(--send-btn-size));
     border-radius: calc(var(--send-btn-size) / 2);
     border: none;
@@ -85,7 +92,6 @@
 .footer {
     background-color: var(--background-dark);
     color: var(--footer-text-color-dark);
-    position: fixed;
     width: 100%;
     left: 0;
     bottom: 0;
@@ -139,6 +145,8 @@
 }
 
 .user-question {
+    text-align: left;
+    max-width: 70%;
     display: inline-block;
     background-color: var(--user-message-background_color);
     width: max-content;

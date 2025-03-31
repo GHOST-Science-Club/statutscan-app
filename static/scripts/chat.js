@@ -1,8 +1,9 @@
-const body = document.getElementById('body');
+const chatBody = document.getElementById('chat-body');
 const submitBtn = document.getElementById('send-btn');
 const input = document.getElementById('input');
-const postContainer = document.getSelection('.post-container');
+const postContainer = document.getElementById('post-container');
 
+var isCurrentlyGenerating = false;
 
 function addElement(jsonData, output, textResponse, sourcesResponse) {
     if ("chunk" in jsonData) {
@@ -85,6 +86,45 @@ function detectAdjacentDictionaries(str) {
 }
 
 
+async function generateAnswer(response, chatBody) {
+    // add answer to the chat body
+    let output = "";
+    const reader = response.body.getReader();
+    let assistantMessage = document.createElement("div");
+    let textResponse = document.createElement("div");
+    let sourcesResponse = document.createElement("div");
+    assistantMessage.className = "assistant-message";
+    textResponse.className = "text-response";
+    sourcesResponse.className = "sources-response";
+    assistantMessage.appendChild(textResponse);
+    assistantMessage.appendChild(sourcesResponse);
+    chatBody.appendChild(assistantMessage);
+
+    // process response chunks and append the answer
+    try {
+        while (true) {
+            const { done, value } = await reader.read();
+            const chunk = new TextDecoder('utf-8', { fatal: true }).decode(value).replace(/^\uFEFF/, '');
+
+            if (detectAdjacentDictionaries(chunk)) {
+                const chunks = splitJsonStrings(chunk);
+                chunks.forEach((obj) => {
+                    const jsonData = JSON.parse(obj);
+                    output = addElement(jsonData, output, textResponse, sourcesResponse);
+                })
+            } else {
+                const jsonData = JSON.parse(chunk);
+                output = addElement(jsonData, output, textResponse, sourcesResponse);
+            }
+
+            if (done) break;
+        }
+    } finally {
+        isCurrentlyGenerating = false;
+    }
+}
+
+
 document.addEventListener("DOMContentLoaded", async () => {
     // convert markdown to HTML
     document.querySelectorAll(".text-response").forEach(div => {
@@ -96,6 +136,8 @@ document.addEventListener("DOMContentLoaded", async () => {
     const isNewChatRedirection = urlParams.get('new_chat_redirection') === 'true';
 
     if (isNewChatRedirection) {
+        isCurrentlyGenerating = true;
+
         // remove url param from url address
         urlParams.delete('new_chat_redirection');
         const newUrl = window.location.pathname + (urlParams.toString() ? '?' + urlParams.toString() : '');
@@ -116,43 +158,19 @@ document.addEventListener("DOMContentLoaded", async () => {
             })
         });
 
-        // add answer to the body
-        let output = "";
-        const reader = response.body.getReader();
-        let assistantMessage = document.createElement("div");
-        let textResponse = document.createElement("div");
-        let sourcesResponse = document.createElement("div");
-        assistantMessage.className = "assistant-message";
-        textResponse.className = "text-response";
-        sourcesResponse.className = "sources-response";
-        assistantMessage.appendChild(textResponse);
-        assistantMessage.appendChild(sourcesResponse);
-        body.appendChild(assistantMessage);
-
-        // process response chunks and append the answer
-        while (true) {
-            const { done, value } = await reader.read();
-            const chunk = new TextDecoder('utf-8', { fatal: true }).decode(value).replace(/^\uFEFF/, '');
-
-            if (detectAdjacentDictionaries(chunk)) {
-                const chunks = splitJsonStrings(chunk);
-                chunks.forEach((obj) => {
-                    const jsonData = JSON.parse(obj);
-                    output = addElement(jsonData, output, textResponse, sourcesResponse);
-                })
-            } else {
-                const jsonData = JSON.parse(chunk);
-                output = addElement(jsonData, output, textResponse, sourcesResponse);
-            }
-
-            if (done) break;
-        }
+        // generate answer in chat body
+        generateAnswer(response, chatBody);
     }
 });
 
 
 submitBtn.addEventListener("click", async (e) => {
     e.preventDefault();
+
+    if (isCurrentlyGenerating) {
+        return;
+    }
+    isCurrentlyGenerating = true;
 
     // get chat id and question
     const pathname = window.location.pathname;
@@ -161,14 +179,14 @@ submitBtn.addEventListener("click", async (e) => {
     const question = input.value.trim();
     input.value = "";
 
-    // add question to body
+    // add question to chat body
     let userMessage = document.createElement("div");
     let userQuestion = document.createElement("div");
     userMessage.className = "user-message";
     userQuestion.className = "user-question";
     userQuestion.innerHTML = question;
     userMessage.appendChild(userQuestion);
-    body.appendChild(userMessage);
+    chatBody.appendChild(userMessage);
 
     // get answer
     const response = await fetch("/answer/", {
@@ -191,38 +209,8 @@ submitBtn.addEventListener("click", async (e) => {
         }
     }
     
-    // add answer to body
-    let output = "";
-    const reader = response.body.getReader();
-    let assistantMessage = document.createElement("div");
-    let textResponse = document.createElement("div");
-    let sourcesResponse = document.createElement("div");
-    assistantMessage.className = "assistant-message"
-    textResponse.className = "text-response";
-    sourcesResponse.className = "sources-response";
-    assistantMessage.appendChild(textResponse);
-    assistantMessage.appendChild(sourcesResponse);
-    body.appendChild(assistantMessage);
-
-    // process response chunks and append the answer
-    while (true) {
-        const { done, value } = await reader.read();
-        const chunk = new TextDecoder('utf-8', { fatal: true }).decode(value).replace(/^\uFEFF/, '');
-
-        if (detectAdjacentDictionaries(chunk)) {
-            const chunks = splitJsonStrings(chunk);
-            chunks.forEach((obj) => {
-                const jsonData = JSON.parse(obj);
-                output = addElement(jsonData, output, textResponse, sourcesResponse);
-            })
-        }
-        else {
-            const jsonData = JSON.parse(chunk);
-            output = addElement(jsonData, output, textResponse, sourcesResponse);
-        }
-
-        if (done) break;
-    }
+    // generate answer in chat body
+    generateAnswer(response, chatBody);
 });
 
 
@@ -231,5 +219,4 @@ input.addEventListener('input', function () {
     let post_height = this.scrollHeight;
     post_height = Math.min(post_height, 200);
     this.style.height = post_height + 'px';
-    postContainer.style.height = post_height + 'px';
 });
