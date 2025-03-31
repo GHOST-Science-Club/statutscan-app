@@ -15,7 +15,7 @@
 {% endblock extra_head %}
 
 {% block content %}
-<div id="body" class="chat-container markdown-body">
+<div id="chat-body" class="chat-container markdown-body">
 {% if chat_history %}
     {% for message in chat_history %}
         {% if message.role == "user" %}
@@ -51,16 +51,18 @@
     
 <div style="height: 90vh;"></div>
 
-<div class="post-container">
-    <form action="#">
-        <textarea id="input" rows="1" placeholder="Zapytaj o co chcesz"></textarea>
-        <button id="send-btn" type="button">
-            <img src="{% static 'images/icons/arrow-dark.svg' %}" alt="⬆">
-        </button>
-    </form>
-</div>
-<div class="footer">
-    Agent może popełniać błędy. Weryfikuj informacje.
+<div id="post-container">
+    <div>
+        <form action="#">
+            <textarea id="input" rows="1" placeholder="Zapytaj o co chcesz"></textarea>
+            <button id="send-btn" type="button">
+                <img src="{% static 'images/icons/arrow-dark.svg' %}" alt="⬆">
+            </button>
+        </form>
+    </div>
+    <footer class="footer">
+        Agent może popełniać błędy. Weryfikuj informacje.
+    </footer>
 </div>
 
 <script src="{% static 'scripts/marked.min.js' %}"></script>
