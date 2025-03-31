@@ -27,5 +27,5 @@ COPY . .
 RUN python manage.py collectstatic --noinput
 
 # Run server
-RUN chmod +x build.sh
-CMD ["./build.sh"]
+RUN chmod +x entrypoint.sh
+CMD ["./entrypoint.sh"]
