@@ -1,0 +1,9 @@
+{
+    "metadata": {
+        "source": "https://instrukcje.put.poznan.pl/konfiguracja-sieci-eduroam-na-urzadzeniach-z-systemem-windows-10/",
+        "title": "Konfiguracja sieci eduroam na urządzeniach z systemem Windows 10/Windows 11 - Instrukcje",
+        "file-type": "html",
+        "download-date": "03-01-2025 15:50:00"
+    },
+    "content": "Konfiguracja sieci eduroam na urz\u0105dzeniach z systemem Windows 10/Windows 11\n\nOpublikowane przez DOiE w dniu 14 marca 2022\n\nAby poprawnie skonfigurowa\u0107 sie\u0107 eduroam u\u017cytkownik powinien mie\u0107 mo\u017cliwo\u015b\u0107 pobrania oraz zainstalowania certyfikatu og\u00f3lnego przeznaczenia p12.\nCertyfikat p12 \u2013 pobieranie\n\nImportujemy certyfikat klikaj\u0105c go dwukrotnie, zgodnie z krokami poni\u017cej:\nPozostawiamy bez zmian lokalizacj\u0119 przechowywania (Bie\u017c\u0105cy u\u017cytkownik), klikamy Dalej\n\nKlikamy Dalej\n\nPodajemy has\u0142o otrzymane podczas procesu generowania certyfikatu. Opcje importu pozostawiamy bez zmian.\n\nPozostawiamy domy\u015blne ustawienie (Automatycznie wybierz magazyn certyfikat\u00f3w\u2026), klikamy Dalej.\n\nKlikamy Zako\u0144cz.\n\nPotwierdzamy instalacj\u0119 certyfikatu g\u0142\u00f3wnego (o ile wcze\u015bniej nie by\u0142 zainstalowany w systemie) \u2013 klikamy Tak.\n\nPotwierdzamy komunikat o pomy\u015blnym imporcie certyfikatu.\n\nPod\u0142\u0105czenie do sieci eduroam\n\nKlikamy, lub dotykamy ikony sieci bezprzewodowej w zasobniku systemowym \nGdy poka\u017ce si\u0119 panel boczny, wybieramy myszk\u0105, lub palcem sie\u0107 eduroam, zaznaczmy Po\u0142\u0105cz automatycznie i klikamy (lub dotykamy) Po\u0142\u0105cz.\n\nW kolejnym oknie klikamy Po\u0142\u0105cz, u\u017cywaj\u0105c certyfikatu. Po\u0142\u0105czenie powinno zosta\u0107 nawi\u0105zane.\n"
+}
