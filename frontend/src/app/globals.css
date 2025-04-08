@@ -4,8 +4,8 @@
 @custom-variant dark (&:is(.dark *));
 
 @theme inline {
-  /*--font-sans: var(--font-geist-sans);*/
-  /*--font-mono: var(--font-geist-mono);*/
+  --font-heading: var(--font-montserrat);
+  --font-text: var(--font-open-sans);
 
   --color-background: var(--background);
   --color-foreground: var(--foreground);
@@ -118,6 +118,22 @@
     @apply border-border outline-ring/50;
   }
   body {
-    @apply bg-background text-foreground;
+    @apply bg-background text-foreground font-text;
+  }
+
+  h1,
+  h2,
+  h3,
+  h4 {
+    @apply font-heading;
+  }
+  h1 {
+    @apply text-4xl md:text-[80px] font-extrabold;
+  }
+  h2 {
+    @apply text-2xl md:text-5xl font-bold;
+  }
+  h3 {
+    @apply text-xl md:text-4xl font-semibold;
   }
 }
