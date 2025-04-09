@@ -25,6 +25,7 @@ THIRD_PARTY_APPS = [
     "rest_framework",
     "corsheaders",
     "djoser",
+    "social_django",
     "drf_yasg",
 ]
 
@@ -66,20 +67,14 @@ TEMPLATES = [
 
 WSGI_APPLICATION = "statutscan_project.wsgi.application"
 
-# DATABASES = {
-#     "default": {
-#         "ENGINE": f"django.db.backends.{getenv('DATABASE_ENGINE', 'postgresql')}",
-#         "NAME": getenv("POSTGRES_DB"),
-#         "USER": getenv("POSTGRES_USER"),
-#         "PASSWORD": getenv("POSTGRES_PASSWORD"),
-#         "HOST": getenv("POSTGRES_HOST"),
-#         "PORT": getenv("POSTGRES_PORT"),
-#     }
-# }
 DATABASES = {
     "default": {
-        "ENGINE": "django.db.backends.sqlite3",
-        "NAME": BASE_DIR / "db.sqlite3",
+        "ENGINE": f"django.db.backends.{getenv('DATABASE_ENGINE', 'postgresql')}",
+        "NAME": getenv("POSTGRES_DB"),
+        "USER": getenv("POSTGRES_USER"),
+        "PASSWORD": getenv("POSTGRES_PASSWORD"),
+        "HOST": getenv("POSTGRES_HOST"),
+        "PORT": getenv("POSTGRES_PORT"),
     }
 }
 
@@ -125,6 +120,25 @@ MEDIA_ROOT = BASE_DIR / "media"
 #     BASE_DIR / 'static'
 # ]
 
+AUTHENTICATION_BACKENDS = [
+    "social_core.backends.google.GoogleOAuth2",
+    "social_core.backends.github.GithubOAuth2",
+    "django.contrib.auth.backends.ModelBackend",
+]
+
+SOCIAL_AUTH_PIPELINE = (
+    'social_core.pipeline.social_auth.social_details',
+    'social_core.pipeline.social_auth.social_uid',
+    'social_core.pipeline.social_auth.auth_allowed',
+    'social_core.pipeline.social_auth.social_user',
+    'social_core.pipeline.user.create_user',
+    'users.pipeline.activate_social_user',
+    'social_core.pipeline.social_auth.associate_user',
+    'social_core.pipeline.social_auth.load_extra_data',
+    'social_core.pipeline.user.user_details',
+)
+
+
 SITE_ID = 1
 
 DJOSER = {
@@ -137,6 +151,7 @@ DJOSER = {
     "PASSWORD_RESET_CONFIRM_RETYPE": True,
     "PASSWORD_RESET_SHOW_EMAIL_NOT_FOUND": True,
     "TOKEN_MODEL": None,
+    "SOCIAL_AUTH_ALLOWED_REDIRECT_URIS": getenv("REDIRECT_URLS", "").split(","),
 }
 
 REST_FRAMEWORK = {
@@ -157,8 +172,17 @@ AUTH_COOKIE_MAX_AGE = 60 * 5
 AUTH_COOKIE_REFRESH_MAX_AGE = 60 * 60 * 24
 AUTH_COOKIE_SECURE = getenv("AUTH_COOKIE_SECURE", "True") == "True"
 AUTH_COOKIE_HTTP_ONLY = True
-AUTH_COOKIE_PATH = '/'
+AUTH_COOKIE_PATH = "/"
 AUTH_COOKIE_SAMESITE = "None"
+
+SOCIAL_AUTH_GOOGLE_OAUTH2_KEY = getenv("GOOGLE_AUTH_KEY")
+SOCIAL_AUTH_GOOGLE_OAUTH2_SECRET = getenv("GOOGLE_AUTH_SECRET_KEY")
+SOCIAL_AUTH_GOOGLE_OAUTH2_SCOPE = [
+    'https://www.googleapis.com/auth/userinfo.email',
+    'https://www.googleapis.com/auth/userinfo.profile',
+    'openid',
+]
+SOCIAL_AUTH_GOOGLE_OAUTH2_EXTRA_DATA = ['first_name', 'last_name']
 
 EMAIL_BACKEND = getenv(
     "EMAIL_BACKEND", "django.core.mail.backends.console.EmailBackend"

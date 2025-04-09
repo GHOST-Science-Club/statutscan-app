@@ -18,14 +18,16 @@ class UserManager(DjangoUserManager):
     def _create_user(self, email: str, password: str, **extra_fields: Any):
         if not email:
             raise ValueError("Adres e-mail musi zostać podany.")
-        if not password:
-            raise ValueError("Hasło musi zostać podane.")
 
         email = self.normalize_email(email)
         validate_email_address(email)
 
         user = self.model(email=email, **extra_fields)
-        user.set_password(password)
+
+        if password:
+            user.set_password(password)
+        else:
+            user.set_unusable_password()
         user.save(using=self._db)
         return user
 
@@ -54,7 +56,7 @@ class UserManager(DjangoUserManager):
 
 class CustomUser(AbstractBaseUser, PermissionsMixin):
     first_name = models.CharField(max_length=30)
-    last_name = models.CharField(max_length=30)
+    last_name = models.CharField(max_length=30, blank=True, null=True)
     email = models.EmailField(
         verbose_name="Email address",
         max_length=255,
