@@ -24,19 +24,22 @@ DJANGO_APPS = [
 THIRD_PARTY_APPS = [
     "rest_framework",
     "corsheaders",
+    "djoser",
+    "social_django",
     "drf_yasg",
 ]
 
 LOCAL_APPS = [
     "chat",
+    "users",
 ]
 
 INSTALLED_APPS = DJANGO_APPS + THIRD_PARTY_APPS + LOCAL_APPS
 
 MIDDLEWARE = [
-    'corsheaders.middleware.CorsMiddleware',
     "django.middleware.security.SecurityMiddleware",
     "django.contrib.sessions.middleware.SessionMiddleware",
+    "corsheaders.middleware.CorsMiddleware",
     "django.middleware.common.CommonMiddleware",
     "django.middleware.csrf.CsrfViewMiddleware",
     "django.contrib.auth.middleware.AuthenticationMiddleware",
@@ -44,7 +47,7 @@ MIDDLEWARE = [
     "django.middleware.clickjacking.XFrameOptionsMiddleware",
 ]
 
-ROOT_URLCONF = 'statutscan_project.urls'
+ROOT_URLCONF = "statutscan_project.urls"
 
 TEMPLATES = [
     {
@@ -75,6 +78,16 @@ DATABASES = {
     }
 }
 
+PASSWORD_HASHERS = [
+    "django.contrib.auth.hashers.Argon2PasswordHasher",
+    "django.contrib.auth.hashers.PBKDF2PasswordHasher",
+    "django.contrib.auth.hashers.PBKDF2SHA1PasswordHasher",
+    "django.contrib.auth.hashers.BCryptSHA256PasswordHasher",
+    "django.contrib.auth.hashers.ScryptPasswordHasher",
+]
+
+DOMAIN = getenv("DOMAIN")
+SITE_NAME = getenv("SITE_NAME")
 
 AUTH_PASSWORD_VALIDATORS = [
     {
@@ -89,15 +102,12 @@ AUTH_PASSWORD_VALIDATORS = [
     {
         "NAME": "django.contrib.auth.password_validation.NumericPasswordValidator",
     },
+    {
+         "NAME": "users.validators.NewPasswordNotSameAsOldValidator",
+    },
 ]
 
-REST_FRAMEWORK = {
-    'DEFAULT_PERMISSION_CLASSES': [
-        'rest_framework.permissions.AllowAny',
-    ],
-}
-
-LANGUAGE_CODE = 'en-us'
+LANGUAGE_CODE = "en-us"
 
 TIME_ZONE = "Europe/Warsaw"
 
@@ -105,14 +115,89 @@ USE_I18N = True
 
 USE_TZ = True
 
-STATIC_URL = 'static/'
-STATIC_ROOT = BASE_DIR / 'staticfiles'
+STATIC_URL = "static/"
+STATIC_ROOT = BASE_DIR / "staticfiles"
+MEDIA_URL = "/media/"
+MEDIA_ROOT = BASE_DIR / "media"
+# STATICFILES_DIRS = [
+#     BASE_DIR / 'static'
+# ]
 
-MEDIA_URL = '/media/'
-MEDIA_ROOT = BASE_DIR / 'media'
-
-STATICFILES_DIRS = [
-    BASE_DIR / 'static'
+AUTHENTICATION_BACKENDS = [
+    "social_core.backends.google.GoogleOAuth2",
+    "social_core.backends.github.GithubOAuth2",
+    "django.contrib.auth.backends.ModelBackend",
 ]
 
-DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
+SOCIAL_AUTH_PIPELINE = (
+    "social_core.pipeline.social_auth.social_details",
+    "social_core.pipeline.social_auth.social_uid",
+    "social_core.pipeline.social_auth.auth_allowed",
+    "social_core.pipeline.social_auth.social_user",
+    "social_core.pipeline.user.create_user",
+    "users.pipeline.activate_social_user",
+    "social_core.pipeline.social_auth.associate_user",
+    "social_core.pipeline.social_auth.load_extra_data",
+    "social_core.pipeline.user.user_details",
+)
+
+
+SITE_ID = 1
+
+DJOSER = {
+    "PASSWORD_RESET_CONFIRM_URL": "password-reset/{uid}/{token}",
+    "SEND_ACTIVATION_EMAIL": True,
+    "SEND_CONFIRMATION_EMAIL": True,
+    "PASSWORD_CHANGE_EMAIL_CONFIRMATION": True,
+    "ACTIVATION_URL": "activation/{uid}/{token}",
+    "USER_CREATE_PASSWORD_RETYPE": True,
+    "PASSWORD_RESET_CONFIRM_RETYPE": True,
+    "PASSWORD_RESET_SHOW_EMAIL_NOT_FOUND": True,
+    "TOKEN_MODEL": None,
+    "SOCIAL_AUTH_ALLOWED_REDIRECT_URIS": getenv("REDIRECT_URLS", "").split(","),
+    "EMAIL": {
+        "activation": "users.email.CustomActivationEmail",
+        'confirmation': "users.email.CustomConfirmationEmail",
+        "password_reset": "users.email.CustomPasswordResetEmail",
+    },
+}
+
+REST_FRAMEWORK = {
+    "DEFAULT_AUTHENTICATION_CLASSES": [
+        "users.authentication.CustomJWTAuthentication",
+    ],
+    "DEFAULT_PERMISSION_CLASSES": ["rest_framework.permissions.IsAuthenticated"],
+}
+
+
+DEFAULT_AUTO_FIELD = "django.db.models.BigAutoField"
+
+AUTH_USER_MODEL = "users.CustomUser"
+
+
+AUTH_COOKIE = "access"
+AUTH_COOKIE_MAX_AGE = 60 * 5
+AUTH_COOKIE_REFRESH_MAX_AGE = 60 * 60 * 24
+AUTH_COOKIE_SECURE = getenv("AUTH_COOKIE_SECURE", "True") == "True"
+AUTH_COOKIE_HTTP_ONLY = True
+AUTH_COOKIE_PATH = "/"
+AUTH_COOKIE_SAMESITE = "None"
+
+SOCIAL_AUTH_GOOGLE_OAUTH2_KEY = getenv("GOOGLE_AUTH_KEY")
+SOCIAL_AUTH_GOOGLE_OAUTH2_SECRET = getenv("GOOGLE_AUTH_SECRET_KEY")
+SOCIAL_AUTH_GOOGLE_OAUTH2_SCOPE = [
+    "https://www.googleapis.com/auth/userinfo.email",
+    "https://www.googleapis.com/auth/userinfo.profile",
+    "openid",
+]
+SOCIAL_AUTH_GOOGLE_OAUTH2_EXTRA_DATA = ["first_name", "last_name"]
+
+EMAIL_BACKEND = getenv(
+    "EMAIL_BACKEND", "django.core.mail.backends.console.EmailBackend"
+)
+EMAIL_HOST = getenv("EMAIL_HOST", "smtp.gmail.com")
+EMAIL_PORT = getenv("EMAIL_PORT")
+EMAIL_USE_TLS = getenv("EMAIL_USE_TLS")
+EMAIL_HOST_USER = getenv("EMAIL_HOST_USER")
+EMAIL_HOST_PASSWORD = getenv("EMAIL_HOST_PASSWORD")
+DEFAULT_FROM_EMAIL = getenv("DEFAULT_FROM_EMAILł")
