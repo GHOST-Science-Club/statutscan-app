@@ -63,10 +63,10 @@ export default function ChatPage() {
           <Plus />
         </Button>
       </div>
-      <div className="m-auto text-center">
+      <main className="m-auto text-center">
         <h2>Zapytaj o coś</h2>
         <ChatTextarea />
-      </div>
+      </main>
       <Button variant="outline" className="absolute right-0 m-2">
         Lorem ipsum
         <ArrowUpRight />

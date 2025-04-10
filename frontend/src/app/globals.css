@@ -152,7 +152,10 @@
   }
 }
 @layer components {
-  .gradientHome {
+  .home-gradient {
     @apply from-background dark:to-muted bg-linear-to-br to-[#FBD7AF];
+  }
+  .text-gradient {
+    @apply bg-clip-text bg-gradient-to-r from-primary to-secondary text-transparent;
   }
 }
