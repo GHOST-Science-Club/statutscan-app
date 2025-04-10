@@ -4,7 +4,7 @@ import { SectionLayout } from '@/components/ui/section-layout';
 
 function HomeSection() {
   return (
-    <SectionLayout className="home-gradient relative flex size-full flex-col rounded-xl">
+    <SectionLayout className="home-gradient relative flex min-h-[calc(100svh-40px)] flex-col rounded-xl p-5">
       <h1 className="mb-2">
         PUTagent<span className="text-primary"> ⎯⎯⎯⎯</span>
         <br /> wsparcie <span className="text-gradient">studenckie</span>
@@ -13,12 +13,8 @@ function HomeSection() {
         Projekt PUTagent został stworzony z inicjatywy organizacji studenckiej
         GHOST przy Politechnice Poznańskiej
       </p>
-      <Button
-        variant="primary"
-        size="lg"
-        className="mt-40 w-fit scale-110"
-        asChild
-      >
+      <div className="flex-1" />
+      <Button variant="primary" size="lg" className="w-fit" asChild>
         <Link href="/chat">Zadaj pytanie</Link>
       </Button>
     </SectionLayout>

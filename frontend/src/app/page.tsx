@@ -4,7 +4,7 @@ import { AboutChatSection } from '@/components/sections/about-chat-section';
 
 export default function Home() {
   return (
-    <main className="p-5 sm:p-10">
+    <main className="p-5">
       <HomeSection />
       <AboutChatSection />
       <ThemeButton />
