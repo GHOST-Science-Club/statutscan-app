@@ -54,6 +54,7 @@
 <div id="post-container">
     <div>
         <form action="#">
+            {% csrf_token %}
             <textarea id="input" rows="1" placeholder="Zapytaj o co chcesz"></textarea>
             <button id="send-btn" type="button">
                 <img src="{% static 'images/icons/arrow-dark.svg' %}" alt="⬆">

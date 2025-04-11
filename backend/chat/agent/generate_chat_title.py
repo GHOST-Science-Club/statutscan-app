@@ -1,6 +1,6 @@
-from openai import OpenAI
+from openai import AsyncOpenAI
 
-def generate_chat_title(message:str) -> str:
+async def generate_chat_title(message: str) -> str:
     """
     Generates a short (max 32 characters) title for a conversation based on the provided user message 
     using the OpenAI API.
@@ -8,9 +8,9 @@ def generate_chat_title(message:str) -> str:
     Returns:
         str: A 32-character or shorter title.
     """
-    client = OpenAI()
+    client = AsyncOpenAI()
     
-    response = client.chat.completions.create(
+    response = await client.chat.completions.create(
         model="gpt-3.5-turbo",
         messages=[
             {

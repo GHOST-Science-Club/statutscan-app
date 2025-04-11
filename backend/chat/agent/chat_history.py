@@ -14,7 +14,7 @@ class ChatHistory:
         self.mongo_connection = apps.get_app_config('chat').mongo_connection
         self.chat_history = self.mongo_connection.get_chat_history()
 
-    def create_new_chat(self, user_id: str, question: str) -> str:
+    async def create_new_chat(self, user_id: str, question: str) -> str:
         """
         Creates a new chat entry in the database, generating a unique chat ID, 
         a title based on the user's question, and storing the initial message.
@@ -27,7 +27,7 @@ class ChatHistory:
             str: The generated chat ID.
         """
         chat_id = generate_id()
-        chat_title = generate_chat_title(question)
+        chat_title = await generate_chat_title(question)
         creation_date = datetime.now()
         messages = [{
             "role": "user",

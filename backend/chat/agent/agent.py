@@ -1,13 +1,13 @@
 import json
 from openai import OpenAI
 from abc import abstractmethod
-from typing import List
+from typing import List, AsyncGenerator
 from .tools import ToolInterface
 from .chat_history import ChatHistory
 
 class AgentInterface:
     @abstractmethod
-    def add_tool(self, tool:ToolInterface):
+    def add_tool(self, tool: ToolInterface):
         """
         The method for adding one tool to agent tool list.
 
@@ -17,7 +17,7 @@ class AgentInterface:
         pass
 
     @abstractmethod
-    def add_tools(self, tool:List[ToolInterface]):
+    def add_tools(self, tool: List[ToolInterface]):
         """
         The method for adding many tools to agent tool list.
 
@@ -27,7 +27,7 @@ class AgentInterface:
         pass
 
     @abstractmethod
-    def ask(self, question:str):
+    def ask(self, question: str):
         """
         The method to ask agent a question. Agent will add question
         to chat history and invoke question to OpenAI API.
@@ -39,7 +39,7 @@ class AgentInterface:
 
 
 class AgentBase(AgentInterface):
-    def __init__(self, client:OpenAI, chat_history:ChatHistory, model:str="gpt-4o-mini"):
+    def __init__(self, client: OpenAI, chat_history: ChatHistory, model: str="gpt-4o-mini"):
         self._client = client
         self._chat_history = chat_history
         self._model = model
@@ -50,19 +50,19 @@ class AgentBase(AgentInterface):
         self._tools.append(tool)
         self._tools_descriptions.append(tool.description)
 
-    def add_tools(self, tools:list):
+    def add_tools(self, tools: list):
         for tool in tools:
             self._tools.append(tool)
             self._tools_descriptions.append(tool.description)
 
-    def _call_function(self, name, args):
+    async def _call_function(self, name, args):
         for tool in self._tools:
             if tool.name == name:
-                return tool.use(**args)
+                return await tool.use(**args)
 
 
 class Agent(AgentBase):    
-    def ask(self, question:str, chat_id:str):
+    async def ask(self, question: str, chat_id: str) -> AsyncGenerator[str, None]:
         """
         The method to ask agent a question. Agent will add question
         to chat history and invoke question to OpenAI API.
@@ -75,10 +75,10 @@ class Agent(AgentBase):
         message = {"role": "user", "content": question}
         self._chat_history.add_new_message(chat_id, message)
 
-        for chunk in self.__process_question(chat_id):
+        async for chunk in self.__process_question(chat_id):
             yield json.dumps(chunk)
 
-    def ask_quietly(self, chat_id:str):
+    async def ask_quietly(self, chat_id: str) -> AsyncGenerator[str, None]:
         """
         The method to ask agent a question. Agent invoke question to
         OpenAI API without adding question to database.
@@ -86,16 +86,17 @@ class Agent(AgentBase):
         Parameters:
             chat_id (str): chat id to get access to chat history
         """
-        for chunk in self.__process_question(chat_id):
+        async for chunk in self.__process_question(chat_id):
             yield json.dumps(chunk)
 
-    def __process_question(self, chat_id:str):
+    async def __process_question(self, chat_id: str) -> AsyncGenerator[str, None]:
         # 2. Invoke OpenAi API (make decision which tool use)
-        completion = self._client.chat.completions.create(
+        completion = await self._client.chat.completions.create(
             model=self._model,
             messages=self._chat_history.get_chat_history_for_agent(chat_id),
             tools=self._tools_descriptions
-        ).model_dump()
+        )
+        completion = completion.model_dump()
 
         # 3. Collect related sources
         related_sources = []
@@ -107,7 +108,7 @@ class Agent(AgentBase):
         for tool_call in tool_calls:
             name = tool_call["function"]["name"]
             args = json.loads(tool_call["function"]["arguments"])
-            result = self._call_function(name, args)
+            result = await self._call_function(name, args)
             
             for metadata in result["metadatas"]:
                 source = {}
@@ -131,7 +132,7 @@ class Agent(AgentBase):
             self._chat_history.add_new_message(chat_id, message)
 
         # 4. Finall prompt
-        completion_finall_stream = self._client.chat.completions.create(
+        completion_stream = await self._client.chat.completions.create(
             model=self._model,
             temperature=0,
             messages=self._chat_history.get_chat_history_for_agent(chat_id),
@@ -141,7 +142,7 @@ class Agent(AgentBase):
         # 5. Stream output
         collected_messages = []
 
-        for chunk in completion_finall_stream:
+        async for chunk in completion_stream:
             chunk_message = chunk.choices[0].delta.content
             collected_messages.append(chunk_message)
 

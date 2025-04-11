@@ -5,20 +5,10 @@ from rest_framework.response import Response
 from rest_framework import status
 from django.http import StreamingHttpResponse
 
-from openai import OpenAI
 from .agent.chat_history import ChatHistory
-from .agent.tools import KnowledgeBaseTool
-from .agent.agent import Agent
-import os
 
-BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
-PERSISTENT_DIRECTORY = os.path.join(BASE_DIR, 'data', 'vector_db', 'chroma_1000signs')
-
-client = OpenAI()
 chat_history = ChatHistory()
-kb_tool = KnowledgeBaseTool(PERSISTENT_DIRECTORY, "example", n_reuslts=1)
-agent = Agent(client, chat_history, model="gpt-4o-mini")
-agent.add_tool(kb_tool)
+
 
 @api_view(['GET'])
 def chat_history_view(request, chat_id=None):
@@ -34,35 +24,22 @@ def chat_history_view(request, chat_id=None):
     else:
         return Response({"error": "chat_id is required."}, status=status.HTTP_400_BAD_REQUEST)
 
+
 @api_view(['POST'])
 @parser_classes([JSONParser])
-def answer_view(request):
-    data = request.data
-    chat_id = data.get("chat_id")
-    question = data.get("question")
-    new_chat_redirection = data.get("new_chat_redirection")
-    user_id = "41d9f95cb83b64d6c47988e4"
+async def chat_redirection_view(request):
+    try:
+        question = request.data.get('question')
+        user_id = await sync_to_async(lambda: request.user.id)()
 
-    if new_chat_redirection:
-        response = StreamingHttpResponse(
-            agent.ask_quietly(chat_id),
-            status=200,
-            content_type="text/plain"
-        )
-        response["X-Response-Type"] = "text"
-        return response
+        if not question or not user_id:
+            return Response({"error": "Missing 'question' or 'user_id'."}, status=status.HTTP_400_BAD_REQUEST)
 
-    if chat_id is not None:
-        response = StreamingHttpResponse(
-            agent.ask(question, chat_id),
-            status=200,
-            content_type="text/plain"
-        )
-        response["X-Response-Type"] = "text"
-        return response
-    else:
-        new_chat_id = chat_history.create_new_chat(user_id, question)
-        return Response(
-            {"redirect_url": f"/chat/{new_chat_id}?new_chat_redirection=true"},
-            status=status.HTTP_200_OK
-        )
+        chat_id = await chat_history.create_new_chat(user_id, question)
+
+        return Response({
+            "redirect_url": f"/chat/{chat_id}?redirection=true"
+        }, status=status.HTTP_201_CREATED)
+
+    except Exception as e:
+        return Response({"error": str(e)}, status=status.HTTP_400_BAD_REQUEST)
