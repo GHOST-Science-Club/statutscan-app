@@ -42,6 +42,7 @@ function AboutChatSection() {
       <h3>
         PUTagent to zaawansowany chatbot oparty na sztucznej inteligencji, który
         <span className="text-gradient">
+          {' '}
           pomaga studentom i kandydatom na studia
         </span>{' '}
         znaleźć odpowiedzi na pytania związane z edukacją w Polsce
