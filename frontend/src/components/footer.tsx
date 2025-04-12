@@ -5,11 +5,11 @@ import { Logo } from '@/components/ui/logo';
 
 function Footer() {
   return (
-    <footer className="grid grid-cols-1 gap-10 p-5 md:grid-cols-4 md:gap-0">
-      <div className="mx-auto flex items-center gap-1 md:mx-0">
-        <Logo className="h-auto w-5" />
-        <p className="font-heading">PUTagent</p>
-      </div>
+    <footer
+      id="Kontakt"
+      className="grid grid-cols-1 gap-10 p-5 md:grid-cols-4 md:gap-0"
+    >
+      <Logo className="mx-auto h-auto w-5 md:mx-0" withText />
       <div className="flex justify-around md:flex-col md:justify-between">
         <div>
           <span className="text-muted-foreground text-sm">LOREM IPSUM</span>

@@ -1,3 +1,4 @@
+import { Header } from '@/components/header';
 import { HomeSection } from '@/components/sections/home-section';
 import { AboutChatSection } from '@/components/sections/about-chat-section';
 import { GhostSection } from '@/components/sections/ghost-section';
@@ -7,6 +8,7 @@ import { Footer } from '@/components/footer';
 export default function Home() {
   return (
     <>
+      <Header />
       <main className="p-5">
         <HomeSection />
         <AboutChatSection />

@@ -12,7 +12,7 @@ const buttonVariants = cva(
         primary:
           'bg-linear-to-r from-primary to-secondary active:bg-primary hover:from-foreground hover:text-background hover:to-foreground active:from-primary active:to-primary active:text-foreground dark:text-background font-bold',
         secondary:
-          'font-semibold border hover:bg-foreground hover:text-background active:bg-primary',
+          'font-semibold border bg-background hover:bg-foreground hover:text-background active:bg-primary',
         default:
           'bg-primary text-primary-foreground shadow-xs hover:bg-primary/90',
         destructive:

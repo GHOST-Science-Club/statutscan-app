@@ -1,5 +1,11 @@
-function Logo({ className }: { className?: string }) {
-  return (
+type Props = {
+  className?: string;
+  withText?: boolean;
+};
+function Logo(props: Props) {
+  const { className, withText } = props;
+
+  const svg = (
     <svg
       width="154"
       height="207"
@@ -16,5 +22,16 @@ function Logo({ className }: { className?: string }) {
       />
     </svg>
   );
+
+  if (withText) {
+    return (
+      <div className="flex items-center gap-2">
+        {svg}
+        <span className="font-heading text-lg">PUTagent</span>
+      </div>
+    );
+  }
+
+  return svg;
 }
 export { Logo };
