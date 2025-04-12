@@ -38,7 +38,7 @@ const cards = [
 
 function AboutChatSection() {
   return (
-    <SectionLayout title="O CZACIE">
+    <SectionLayout id="czat" title="O CZACIE">
       <h3>
         PUTagent to zaawansowany chatbot oparty na sztucznej inteligencji, który
         <span className="text-gradient">

@@ -1,42 +1,63 @@
-import { Logo } from '@/components/ui/logo';
-import Link from 'next/link';
-import { Button } from '@/components/ui/button';
+'use client';
 
-const links = [
-  {
-    name: 'O CZACIE',
-  },
-  {
-    name: 'GHOST',
-  },
-  {
-    name: 'FAQ',
-  },
-  {
-    name: 'KONTAKT',
-  },
-];
+import Link from 'next/link';
+import { NAV_ITEMS } from '@/lib/data';
+import {
+  MobileNav,
+  MobileNavHeader,
+  MobileNavMenu,
+  MobileNavToggle,
+  Navbar,
+  NavbarButton,
+  NavbarLogo,
+  NavBody,
+  NavItems,
+} from '@/components/ui/resizable-navbar';
+import { useState } from 'react';
 
 function Header() {
-  return (
-    <header className="bg-background fixed top-0 left-0 z-10 w-full px-5 py-2 shadow-sm">
-      <nav className="flex items-center justify-between">
-        <Link href="/">
-          <Logo className="h-10 w-auto" withText />
-        </Link>
-        <ul className="bg-muted flex items-center gap-10 rounded-full px-5 py-2">
-          {links.map((link, i) => (
-            <li key={i}>
-              <Link href={`/#${link.name}`}>{link.name}</Link>
-            </li>
-          ))}
-        </ul>
+  const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
 
-        <Button variant="secondary" asChild>
-          <Link href="/login">Zaloguj się</Link>
-        </Button>
-      </nav>
-    </header>
+  return (
+    <Navbar>
+      {/* Desktop Navigation */}
+      <NavBody>
+        <NavbarLogo />
+        <NavItems items={NAV_ITEMS} />
+        <NavbarButton variant="primary" href="/login">
+          Zaloguj się
+        </NavbarButton>
+      </NavBody>
+
+      {/* Mobile Navigation */}
+      <MobileNav>
+        <MobileNavHeader>
+          <NavbarLogo />
+          <MobileNavToggle
+            isOpen={isMobileMenuOpen}
+            onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
+          />
+        </MobileNavHeader>
+
+        <MobileNavMenu
+          isOpen={isMobileMenuOpen}
+          onClose={() => setIsMobileMenuOpen(false)}
+        >
+          {NAV_ITEMS.map((item, idx) => (
+            <Link
+              key={`mobile-link-${idx}`}
+              href={item.link}
+              onClick={() => setIsMobileMenuOpen(false)}
+            >
+              {item.name}
+            </Link>
+          ))}
+          <NavbarButton variant="secondary" className="w-full" href="/login">
+            Zaloguj się
+          </NavbarButton>
+        </MobileNavMenu>
+      </MobileNav>
+    </Navbar>
   );
 }
 export { Header };

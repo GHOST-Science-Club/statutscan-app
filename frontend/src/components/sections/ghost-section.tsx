@@ -2,7 +2,7 @@ import { SectionLayout } from '@/components/ui/section-layout';
 
 function GhostSection() {
   return (
-    <SectionLayout title="GHOST">
+    <SectionLayout id="ghost" title="GHOST">
       <div className="grid grid-cols-1 md:grid-cols-3">
         <div>images</div>
         <div className="col-span-2">

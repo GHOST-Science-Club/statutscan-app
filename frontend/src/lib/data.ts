@@ -1,3 +1,22 @@
+const NAV_ITEMS = [
+  {
+    name: 'O czacie',
+    link: '#czat',
+  },
+  {
+    name: 'GHOST',
+    link: '#ghost',
+  },
+  {
+    name: 'FAQ',
+    link: '#faq',
+  },
+  {
+    name: 'Kontakt',
+    link: '#kontakt',
+  },
+];
+
 const FAQ = [
   {
     question: 'Jakie są koszty korzystania z tej aplikacji?',
@@ -16,4 +35,4 @@ const FAQ = [
   },
 ];
 
-export { FAQ };
+export { FAQ, NAV_ITEMS };

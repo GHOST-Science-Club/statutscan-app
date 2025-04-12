@@ -27,7 +27,7 @@ function Logo(props: Props) {
     return (
       <div className="flex items-center gap-2">
         {svg}
-        <span className="font-heading text-lg">PUTagent</span>
+        <span className="font-heading text-foreground text-lg">PUTagent</span>
       </div>
     );
   }

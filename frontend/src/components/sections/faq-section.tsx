@@ -9,7 +9,7 @@ import { FAQ } from '@/lib/data';
 
 function FaqSection() {
   return (
-    <SectionLayout title="FAQ">
+    <SectionLayout id="faq" title="FAQ">
       <div className="grid grid-cols-1 md:grid-cols-2">
         <h3>Najczęściej zadawane pytania</h3>
         <Accordion type="multiple" className="space-y-5">
@@ -17,7 +17,7 @@ function FaqSection() {
             <AccordionItem
               value={`item-${i}`}
               key={i}
-              className="rounded-2xl border !border-b px-2"
+              className="cursor-pointer rounded-2xl border !border-b px-2"
             >
               <AccordionTrigger className="[&_svg]:size-6">
                 {faq.question}
