@@ -9,7 +9,7 @@ type Props = {
 function SectionLayout(props: Props) {
   const { children, title, className } = props;
   return (
-    <section className={cn('md:p-10', className)}>
+    <section id={title} className={cn('md:p-10', className)}>
       <p className="text-primary w-full py-5">{title}</p>
       {children}
     </section>
