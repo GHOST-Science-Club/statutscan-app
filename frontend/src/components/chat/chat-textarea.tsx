@@ -3,7 +3,7 @@ import { ArrowUp } from 'lucide-react';
 
 export function ChatTextarea() {
   return (
-    <form className="mt-auto">
+    <form className="mt-auto px-2">
       <div className="border-input mt-8 mb-2 flex h-fit max-h-24 min-h-11 w-full rounded-sm border focus-within:outline">
         <label className="sr-only" htmlFor="chat-main-textarea">
           Chat text area

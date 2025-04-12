@@ -1,7 +1,7 @@
 const NAV_ITEMS = [
   {
     name: 'O czacie',
-    link: '#czat',
+    link: '#chat',
   },
   {
     name: 'GHOST',
@@ -13,7 +13,7 @@ const NAV_ITEMS = [
   },
   {
     name: 'Kontakt',
-    link: '#kontakt',
+    link: '#contact',
   },
 ];
 

@@ -17,9 +17,9 @@ function FaqSection() {
             <AccordionItem
               value={`item-${i}`}
               key={i}
-              className="cursor-pointer rounded-2xl border !border-b px-2"
+              className="rounded-2xl border !border-b px-2"
             >
-              <AccordionTrigger className="[&_svg]:size-6">
+              <AccordionTrigger className="cursor-pointer [&_svg]:size-6">
                 {faq.question}
               </AccordionTrigger>
               <AccordionContent>{faq.answer}</AccordionContent>

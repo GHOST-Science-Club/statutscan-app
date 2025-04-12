@@ -6,7 +6,7 @@ import { Logo } from '@/components/ui/logo';
 function Footer() {
   return (
     <footer
-      id="kontakt"
+      id="contact"
       className="grid grid-cols-1 gap-10 p-5 md:grid-cols-4 md:gap-0"
     >
       <div className="mx-auto md:mx-0">
