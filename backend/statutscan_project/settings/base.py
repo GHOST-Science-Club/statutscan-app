@@ -10,6 +10,10 @@ local_env_file = path.join(BASE_DIR, ".envs", ".env.production")
 if path.isfile(local_env_file):
     load_dotenv(local_env_file)
 
+DAPHNE_APP = [
+    "daphne" # must be listed before django.contrib.staticfiles
+]
+
 DJANGO_APPS = [
     "django.contrib.admin",
     "django.contrib.auth",
@@ -34,7 +38,7 @@ LOCAL_APPS = [
     "users",
 ]
 
-INSTALLED_APPS = DJANGO_APPS + THIRD_PARTY_APPS + LOCAL_APPS
+INSTALLED_APPS = DAPHNE_APP + DJANGO_APPS + THIRD_PARTY_APPS + LOCAL_APPS
 
 MIDDLEWARE = [
     "django.middleware.security.SecurityMiddleware",
@@ -65,7 +69,13 @@ TEMPLATES = [
     },
 ]
 
-WSGI_APPLICATION = "statutscan_project.wsgi.application"
+ASGI_APPLICATION = 'statutscan_project.asgi.application'
+
+CHANNEL_LAYERS = {
+    "default": {
+        "BACKEND": "channels.layers.InMemoryChannelLayer"
+    }
+}
 
 DATABASES = {
     "default": {
