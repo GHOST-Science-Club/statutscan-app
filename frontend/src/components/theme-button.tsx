@@ -11,7 +11,7 @@ function ThemeButton() {
 
   if (!isClient) {
     return (
-      <Button variant="outline" size="icon">
+      <Button variant="outline" size="icon" className="rounded-full">
         <Loader className="animate-spin" />
         <span className="sr-only">Loading</span>
       </Button>
@@ -23,6 +23,7 @@ function ThemeButton() {
       variant="secondary"
       size="icon"
       onClick={() => setTheme(otherTheme)}
+      className="rounded-full"
     >
       {otherTheme == 'light' ? <Moon /> : <Sun />}
       <span className="sr-only">Toggle theme</span>
