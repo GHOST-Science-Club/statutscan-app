@@ -24,7 +24,7 @@ function Header() {
       <NavBody>
         <NavbarLogo />
         <NavItems items={NAV_ITEMS} />
-        <NavbarButton variant="primary" href="/login">
+        <NavbarButton variant="gradient" href="/login">
           Zaloguj się
         </NavbarButton>
       </NavBody>
@@ -52,7 +52,7 @@ function Header() {
               {item.name}
             </Link>
           ))}
-          <NavbarButton variant="secondary" className="w-full" href="/login">
+          <NavbarButton variant="gradient" className="w-full" href="/login">
             Zaloguj się
           </NavbarButton>
         </MobileNavMenu>

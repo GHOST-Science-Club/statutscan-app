@@ -9,7 +9,7 @@ export default function Home() {
   return (
     <>
       <Header />
-      <main className="p-5">
+      <main className="space-y-30 p-5">
         <HomeSection />
         <AboutChatSection />
         <GhostSection />
