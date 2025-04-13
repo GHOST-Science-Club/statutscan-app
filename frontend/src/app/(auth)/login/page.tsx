@@ -1,13 +1,10 @@
 import { UserForm } from '@/components/auth/user-form';
 import Link from 'next/link';
-import { SocialButtons } from '@/components/auth/social-buttons';
+import { AuthLayout } from '@/components/auth/auth-layout';
 
 export default function LoginPage() {
   return (
-    <>
-      <h1 className="mb-10 text-3xl text-nowrap sm:text-5xl">
-        Witamy ponownie
-      </h1>
+    <AuthLayout title="Witamy ponownie" social>
       <UserForm buttonText="Zaloguj się" />
       <p className="text-muted-foreground text-sm">
         Nie masz konta?{' '}
@@ -15,7 +12,6 @@ export default function LoginPage() {
           Zarejestruj się
         </Link>
       </p>
-      <SocialButtons />
-    </>
+    </AuthLayout>
   );
 }

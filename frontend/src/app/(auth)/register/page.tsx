@@ -1,11 +1,10 @@
 import { UserForm } from '@/components/auth/user-form';
 import Link from 'next/link';
-import { SocialButtons } from '@/components/auth/social-buttons';
+import { AuthLayout } from '@/components/auth/auth-layout';
 
 export default function RegisterPage() {
   return (
-    <>
-      <h1 className="mb-10 text-3xl text-nowrap sm:text-5xl">Utwórz konto</h1>
+    <AuthLayout title="Utwórz konto" social>
       <UserForm buttonText="Dalej" />
       <p className="text-muted-foreground text-sm">
         Masz już konto?{' '}
@@ -13,7 +12,6 @@ export default function RegisterPage() {
           Zaloguj się
         </Link>
       </p>
-      <SocialButtons />
-    </>
+    </AuthLayout>
   );
 }
