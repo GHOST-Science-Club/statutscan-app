@@ -19,7 +19,7 @@ const codeSchema = z.object({
   code: z.string().min(5).max(50),
 });
 
-function EmailConfirm() {
+function ConfirmForm() {
   const form = useForm<z.infer<typeof codeSchema>>({
     resolver: zodResolver(codeSchema),
     defaultValues: {
@@ -35,16 +35,13 @@ function EmailConfirm() {
 
   return (
     <Form {...form}>
-      <form
-        onSubmit={form.handleSubmit(onSubmit)}
-        className="w-full space-y-4 *:w-full"
-      >
+      <form onSubmit={form.handleSubmit(onSubmit)}>
         <FormField
           control={form.control}
           name="code"
           render={({ field }) => (
             <FormItem>
-              <FormLabel className="text-center leading-5">
+              <FormLabel>
                 Wysłaliśmy e-mail z kodem weryfikacyjnym na podany adres
               </FormLabel>
               <FormControl>
@@ -60,4 +57,4 @@ function EmailConfirm() {
   );
 }
 
-export { EmailConfirm };
+export { ConfirmForm };

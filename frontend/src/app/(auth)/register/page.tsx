@@ -4,14 +4,19 @@ import { AuthLayout } from '@/components/auth/auth-layout';
 
 export default function RegisterPage() {
   return (
-    <AuthLayout title="Utwórz konto" social>
+    <AuthLayout
+      title="Utwórz konto"
+      social
+      description={
+        <>
+          Masz już konto?{' '}
+          <Link href="/login" className="text-foreground underline">
+            Zaloguj się
+          </Link>
+        </>
+      }
+    >
       <UserForm buttonText="Dalej" />
-      <p className="text-muted-foreground text-sm">
-        Masz już konto?{' '}
-        <Link href="/login" className="text-foreground underline">
-          Zaloguj się
-        </Link>
-      </p>
     </AuthLayout>
   );
 }

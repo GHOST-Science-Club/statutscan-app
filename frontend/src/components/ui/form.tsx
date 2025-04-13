@@ -15,6 +15,7 @@ import {
 
 import { cn } from '@/lib/utils';
 import { Label } from '@/components/ui/label';
+import { Icons } from '@/components/ui/icons';
 
 const Form = FormProvider;
 
@@ -97,7 +98,10 @@ function FormLabel({
     <Label
       data-slot="form-label"
       data-error={!!error}
-      className={cn('data-[error=true]:text-destructive', className)}
+      className={cn(
+        'data-[error=true]:text-destructive text-center leading-5',
+        className,
+      )}
       htmlFor={formItemId}
       {...props}
     />
@@ -151,7 +155,7 @@ function FormMessage({ className, ...props }: React.ComponentProps<'p'>) {
       className={cn('text-destructive text-sm', className)}
       {...props}
     >
-      {body}
+      {error && <Icons icon="form_error" />} {body}
     </p>
   );
 }

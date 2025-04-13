@@ -154,6 +154,9 @@
   h3 {
     @apply text-xl font-semibold md:text-4xl;
   }
+  form {
+    @apply w-full space-y-4 *:w-full;
+  }
 }
 
 @layer components {
