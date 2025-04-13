@@ -49,11 +49,14 @@ function AboutChatSection() {
       </h3>
       <div className="mt-6 grid grid-cols-1 gap-8 sm:grid-cols-2 lg:grid-cols-4">
         {cards.map((card, index) => (
-          <div className="relative h-fit rounded-sm border p-2" key={index}>
-            <span className="text-muted-foreground absolute top-2 right-2 text-sm">
-              (0{index + 1})
-            </span>
-            <h4 className="mb-2 text-xl font-semibold">{card.title}</h4>
+          <div className="h-fit rounded-sm border p-2" key={index}>
+            <div className="flex items-start justify-between">
+              <h4 className="mb-2 text-xl font-semibold">{card.title}</h4>
+              <span className="text-muted-foreground text-sm">
+                (0{index + 1})
+              </span>
+            </div>
+
             <p className="text-muted-foreground">{card.description}</p>
             {card.footer}
           </div>
