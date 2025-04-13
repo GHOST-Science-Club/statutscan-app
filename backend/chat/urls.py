@@ -1,8 +1,8 @@
-from django.urls import path, re_path
-from .views import chat_history_view, answer_view
+from django.urls import path
+from . import views
 
 urlpatterns = [
-    path("chat/", chat_history_view, name="chat"),
-    path("chat/<str:chat_id>/", chat_history_view, name="chat_with_id"),
-    path("answer/", answer_view, name="answer"),
+    path('chat/', views.chat_view, name='chat'),
+    path('chat/redirect/', views.chat_redirection_view, name='chat-redirect'),
+    path('chat/<str:chat_id>/', views.chat_history_view, name='chat-history'),
 ]

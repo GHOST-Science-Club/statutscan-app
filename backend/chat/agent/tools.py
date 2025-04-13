@@ -2,6 +2,8 @@ import os
 import chromadb
 from chromadb.utils import embedding_functions
 from abc import abstractmethod
+from typing import Dict
+import asyncio
 
 
 class ToolInterface:
@@ -14,7 +16,7 @@ class ToolInterface:
 
     @property
     @abstractmethod
-    def name(self):
+    def name(self) -> str:
         """
         The parameter with tool name.
         """
@@ -22,7 +24,7 @@ class ToolInterface:
 
     @property
     @abstractmethod
-    def description(self):
+    def description(self) -> Dict:
         """
         The parameter with tool description in dictionary. Compatible with OpenAI API.
         """
@@ -30,7 +32,7 @@ class ToolInterface:
 
 
 class KnowledgeBaseTool(ToolInterface):
-    def __init__(self, persistent_directory:str, collection_name:str, n_reuslts:int=1):
+    def __init__(self, persistent_directory: str, collection_name: str, n_reuslts: int=1):
         self.persistent_directory = persistent_directory
         self.collection_name = collection_name
         self.n_reuslts = n_reuslts
@@ -44,23 +46,23 @@ class KnowledgeBaseTool(ToolInterface):
             embedding_function=self.__embedding_fn
         )
 
-    def use(self, question:str):
+    async def use(self, question:str):
         result = self.__collection.query(query_texts=[question], n_results=self.n_reuslts)
-        reuslt = {
+        result = {
             "content": result["documents"][0],
             "metadatas": result["metadatas"][0]
         }
-        return reuslt
+        return result
     
-    def __call__(self, question:str):
-        return self.use(question)
+    async def __call__(self, question: str):
+        return await self.use(question)
     
     @property
-    def name(self):
+    def name(self) -> str:
         return type(self).__name__
     
     @property
-    def description(self):
+    def description(self) -> Dict:
         return {
             "type": "function",
             "function": {
