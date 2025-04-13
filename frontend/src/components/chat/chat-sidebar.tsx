@@ -11,6 +11,7 @@ import {
 import { Button } from '@/components/ui/button';
 import { CircleHelp, Plus } from 'lucide-react';
 import { ScrollArea } from '@/components/ui/scroll-area';
+import { Logo } from '@/components/ui/logo';
 
 type Props = {
   items: {
@@ -23,7 +24,10 @@ export function ChatSidebar({ items }: Props) {
   return (
     <Sidebar collapsible="offcanvas">
       <SidebarHeader className="flex flex-row items-end justify-end pl-4">
-        <h1 className="mr-auto text-2xl font-semibold">StatutScan</h1>
+        <div className="w-full">
+          <Logo withText />
+        </div>
+
         <SidebarTrigger className="size-9" />
         <Button variant="ghost" size="icon">
           <Plus />
