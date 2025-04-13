@@ -70,7 +70,10 @@ export const Navbar = ({ children, className }: NavbarProps) => {
     <motion.header
       ref={ref}
       // IMPORTANT: Change this to class of `fixed` if you want the navbar to be fixed
-      className={cn('fixed inset-x-0 top-5 z-40 w-full px-5', className)}
+      className={cn(
+        'fixed inset-x-0 top-5 z-40 mx-auto w-full max-w-7xl px-5',
+        className,
+      )}
     >
       {React.Children.map(children, child =>
         React.isValidElement(child)

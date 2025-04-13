@@ -15,7 +15,9 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="pl" suppressHydrationWarning>
-      <body className={`${montserrat.variable} ${openSans.variable}`}>
+      <body
+        className={`${montserrat.variable} ${openSans.variable} mx-auto max-w-7xl`}
+      >
         <Providers>{children}</Providers>
       </body>
     </html>

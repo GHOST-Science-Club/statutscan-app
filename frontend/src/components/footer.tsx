@@ -1,7 +1,6 @@
-import { Button } from '@/components/ui/button';
-import { ArrowUp } from 'lucide-react';
-import { ThemeButton } from '@/components/theme-button';
+import { ThemeButton } from '@/components/ui/theme-button';
 import { Logo } from '@/components/ui/logo';
+import { TopButton } from '@/components/ui/top-button';
 
 function Footer() {
   return (
@@ -35,9 +34,7 @@ function Footer() {
       <div className="flex flex-row-reverse items-end justify-between gap-20 md:flex-col">
         <div className="space-x-5">
           <ThemeButton />
-          <Button variant="primary" size="icon" className="rounded-full">
-            <ArrowUp />
-          </Button>
+          <TopButton />
         </div>
         <p className="text-muted-foreground text-xs text-nowrap">
           © {new Date().getFullYear()} Copyright
