@@ -1,9 +1,8 @@
 type Props = {
-  className?: string;
   withText?: boolean;
 };
 function Logo(props: Props) {
-  const { className, withText } = props;
+  const { withText } = props;
 
   const svg = (
     <svg
@@ -12,7 +11,7 @@ function Logo(props: Props) {
       viewBox="0 0 154 207"
       fill="none"
       xmlns="http://www.w3.org/2000/svg"
-      className={className}
+      className="h-10 w-auto"
     >
       <path
         className="fill-foreground"
