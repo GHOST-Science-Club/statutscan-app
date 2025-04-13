@@ -1,6 +1,6 @@
-import { UserForm } from '@/components/forms/user-form';
+import { UserForm } from '@/components/auth/user-form';
 import Link from 'next/link';
-import { SocialButtons } from '@/components/forms/social-buttons';
+import { SocialButtons } from '@/components/auth/social-buttons';
 
 export default function RegisterPage() {
   return (
