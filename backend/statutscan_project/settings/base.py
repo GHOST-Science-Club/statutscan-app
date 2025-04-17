@@ -144,11 +144,12 @@ SOCIAL_AUTH_PIPELINE = (
     "social_core.pipeline.social_auth.social_uid",
     "social_core.pipeline.social_auth.auth_allowed",
     "social_core.pipeline.social_auth.social_user",
-    "social_core.pipeline.user.create_user",
+    'social_core.pipeline.social_auth.associate_by_email',
+    'social_core.pipeline.user.create_user',
+    'users.pipeline.save_username_from_google',
     "users.pipeline.activate_social_user",
-    "social_core.pipeline.social_auth.associate_user",
+    'social_core.pipeline.social_auth.associate_user',
     "social_core.pipeline.social_auth.load_extra_data",
-    "social_core.pipeline.user.user_details",
 )
 
 
@@ -169,6 +170,10 @@ DJOSER = {
         "activation": "users.email.CustomActivationEmail",
         'confirmation': "users.email.CustomConfirmationEmail",
         "password_reset": "users.email.CustomPasswordResetEmail",
+    },
+    "SERIALIZERS": {
+        "user_create": "users.serializers.UserCreateSerializer",
+        "user": "users.serializers.UserSerializer",
     },
 }
 
@@ -200,7 +205,7 @@ SOCIAL_AUTH_GOOGLE_OAUTH2_SCOPE = [
     "https://www.googleapis.com/auth/userinfo.profile",
     "openid",
 ]
-SOCIAL_AUTH_GOOGLE_OAUTH2_EXTRA_DATA = ["first_name", "last_name"]
+SOCIAL_AUTH_GOOGLE_OAUTH2_EXTRA_DATA = ["name"]
 
 EMAIL_BACKEND = getenv(
     "EMAIL_BACKEND", "django.core.mail.backends.console.EmailBackend"
