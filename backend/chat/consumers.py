@@ -1,6 +1,7 @@
 import os
 import json
 from channels.generic.websocket import AsyncWebsocketConsumer
+from asgiref.sync import sync_to_async
 from openai import AsyncOpenAI
 from .agent.chat_history import ChatHistory
 from .agent.tools import KnowledgeBaseTool
@@ -23,7 +24,16 @@ class ChatConsumer(AsyncWebsocketConsumer):
         Retrieves the chat ID from the URL, creates a corresponding group name,
         and adds the connection to the appropriate channel group. Then, accepts the connection.
         """
+        user = self.scope["user"]
+        if not user.is_authenticated:
+            return await self.close()
+        
         self.chat_id = self.scope['url_route']['kwargs']['chat_id']
+
+        owner_email = await sync_to_async(chat_history.get_owner_email)(self.chat_id)
+        if not owner_email or owner_email != user.email:
+            return await self.close()
+        
         self.room_group_name = f'chat_{self.chat_id}'
 
         await self.channel_layer.group_add(
