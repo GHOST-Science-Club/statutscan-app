@@ -8,7 +8,7 @@ export default function NotFoundPage() {
   return (
     <main className="relative flex min-h-screen w-full flex-col items-center justify-center">
       <div className="mt-5">
-        <Logo withText />
+        <Logo />
       </div>
       <div className="h-[300px] md:h-[400px]" />
       <div className="mb-5 flex flex-col items-center gap-5 text-center">

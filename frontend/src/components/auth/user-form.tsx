@@ -16,8 +16,20 @@ import {
 import { Input } from '@/components/ui/input';
 
 const loginSchema = z.object({
-  username: z.string().min(2).max(50),
-  password: z.string().min(8).max(50),
+  username: z
+    .string({
+      errorMap: () => ({
+        message: 'Nazwa użytkownika musi zawierać minimum 5 znaków',
+      }),
+    })
+    .min(5)
+    .max(50, {
+      message: 'Nazwa użytkownika może zawierać maksymalnie 50 znaków',
+    }),
+  password: z
+    .string()
+    .min(8, { message: 'Hasło musi zawierać minimum 8 znaków' })
+    .max(50, { message: 'Hasło może zawierać maksymalnie 50 znaków' }),
 });
 
 type Props = {

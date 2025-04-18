@@ -26,7 +26,7 @@ export function ChatSidebar({ items }: Props) {
     <Sidebar collapsible="offcanvas">
       <SidebarHeader className="flex flex-row items-end justify-end pl-4">
         <Link href="/" className="mr-auto">
-          <Logo withText />
+          <Logo />
         </Link>
 
         <SidebarTrigger className="size-9" />

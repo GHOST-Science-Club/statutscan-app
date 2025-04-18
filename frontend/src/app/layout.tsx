@@ -5,7 +5,7 @@ import { Providers } from '@/components/providers';
 import { montserrat, openSans } from '@/lib/fonts';
 
 export const metadata: Metadata = {
-  title: 'Statutscan',
+  title: 'PUTagent',
 };
 
 export default function RootLayout({

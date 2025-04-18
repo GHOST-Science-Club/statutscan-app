@@ -16,7 +16,12 @@ import {
 import { Input } from '@/components/ui/input';
 
 const codeSchema = z.object({
-  code: z.string().min(5).max(50),
+  code: z
+    .string({
+      errorMap: () => ({ message: 'Nieprawidłowy kod' }),
+    })
+    .min(5)
+    .max(50),
 });
 
 function ConfirmForm() {

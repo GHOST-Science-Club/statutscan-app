@@ -4,6 +4,7 @@ import { ChatSidebar } from '@/components/chat/chat-sidebar';
 import { CSSProperties } from 'react';
 import { Button } from '@/components/ui/button';
 import { ArrowUpRight, Plus } from 'lucide-react';
+import { ChatInput } from '@/components/chat/chat-input';
 
 const sidebarItems = [
   {
@@ -65,7 +66,7 @@ export default function ChatPage() {
       </div>
       <main className="m-auto text-center">
         <h2>Zapytaj o coś</h2>
-        <ChatTextarea />
+        <ChatInput />
       </main>
       <Button variant="outline" className="absolute right-0 m-2">
         Lorem ipsum

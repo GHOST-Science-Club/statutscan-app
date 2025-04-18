@@ -9,7 +9,7 @@ function Footer() {
       className="mx-auto grid max-w-7xl grid-cols-1 gap-10 p-5 md:grid-cols-4 md:gap-0"
     >
       <div className="mx-auto md:mx-0">
-        <Logo className="h-auto w-5" withText />
+        <Logo />
       </div>
       <div className="flex justify-around md:flex-col md:justify-between">
         <div>

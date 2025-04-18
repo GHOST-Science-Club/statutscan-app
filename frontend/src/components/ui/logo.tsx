@@ -2,7 +2,7 @@ type Props = {
   withText?: boolean;
 };
 function Logo(props: Props) {
-  const { withText } = props;
+  const { withText = true } = props;
 
   const svg = (
     <svg
@@ -26,7 +26,9 @@ function Logo(props: Props) {
     return (
       <div className="flex items-center gap-2">
         {svg}
-        <span className="font-heading text-foreground text-lg">PUTagent</span>
+        <span className="font-heading text-foreground text-lg select-none">
+          PUTagent
+        </span>
       </div>
     );
   }
