@@ -12,7 +12,7 @@ chat_history = ChatHistory()
 
 
 class ChatRedirectionSerializer(serializers.Serializer):
-    question = serializers.CharField(max_length=1000)
+    question = serializers.CharField(max_length=3000)
     
     def create(self, validated_data):
         return validated_data
