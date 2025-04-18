@@ -1,6 +1,7 @@
 import json
 from bson.objectid import ObjectId
-from typing import List, Tuple
+from bson.errors import InvalidId
+from typing import List, Tuple, Optional
 from datetime import datetime
 from django.apps import apps
 from .generate_id import generate_id
@@ -182,3 +183,16 @@ class ChatHistory:
         self.chat_history.delete_one(
             {"_id": ObjectId(chat_id)}
         )
+
+    def get_owner_email(self, chat_id: str) -> Optional[str]:
+        """
+        Fetches the 'email' of the owner for the given chat_id, or None if not found/invalid.
+        """
+        try:
+            _id = ObjectId(chat_id)
+        except InvalidId:
+            return None
+
+        rec = self.chat_history.find_one({"_id": _id}, {"email": 1})
+        return rec.get("email") if rec else None
+
