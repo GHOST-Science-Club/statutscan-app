@@ -1,9 +1,7 @@
-import os
-import chromadb
-from chromadb.utils import embedding_functions
+import openai
 from abc import abstractmethod
 from typing import Dict
-import asyncio
+from .pgvector import PgVector
 
 
 class ToolInterface:
@@ -32,26 +30,21 @@ class ToolInterface:
 
 
 class KnowledgeBaseTool(ToolInterface):
-    def __init__(self, persistent_directory: str, collection_name: str, n_reuslts: int=1):
-        self.persistent_directory = persistent_directory
-        self.collection_name = collection_name
+    def __init__(self, n_reuslts: int=1):
         self.n_reuslts = n_reuslts
-        self.__chroma_client = chromadb.PersistentClient(persistent_directory)
-        self.__embedding_fn = embedding_functions.OpenAIEmbeddingFunction(
-            model_name="text-embedding-3-small", 
-            api_key = os.environ["OPENAI_API_KEY"]
+        self.pgvector = PgVector()
+
+    async def __get_embedding(text, model: str="text-embedding-3-small"):
+        response = await openai.embeddings.create(
+            input=[text],
+            model=model
         )
-        self.__collection = self.__chroma_client.get_collection(
-            collection_name,
-            embedding_function=self.__embedding_fn
-        )
+        return response.data[0].embedding
 
     async def use(self, question:str):
-        result = self.__collection.query(query_texts=[question], n_results=self.n_reuslts)
-        result = {
-            "content": result["documents"][0],
-            "metadatas": result["metadatas"][0]
-        }
+        embedding = await self.__get_embedding(question)
+        result =  await self.pgvector.query(embedding, n_resilts=self.n_reuslts)
+        self.pgvector.close()
         return result
     
     async def __call__(self, question: str):

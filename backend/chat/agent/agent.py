@@ -110,28 +110,29 @@ class Agent(AgentBase):
             args = json.loads(tool_call["function"]["arguments"])
             result = await self._call_function(name, args)
             
-            for metadata in result["metadatas"]:
-                source = {}
-                
-                if "source" in metadata:
-                    source["source"] = metadata["source"]
-                if "title" in metadata:
-                    source["title"] = metadata["title"]
+            if name == "KnowledgeBaseTool":
+                for metadata in result["metadatas"]:
+                    source = {}
+                    
+                    if "source" in metadata:
+                        source["source"] = metadata["source"]
+                    if "title" in metadata:
+                        source["title"] = metadata["title"]
 
-                if "source" in source:
-                    related_sources.append(source)
+                    if "source" in source:
+                        related_sources.append(source)
 
-            message = {
-                "role": "tool",
-                "name": name,
-                "tool_call_id": tool_call["id"],
-                "content": json.dumps(result["content"]),
-                "metadata": json.dumps(result["metadatas"])
-            }
+                message = {
+                    "role": "tool",
+                    "name": name,
+                    "tool_call_id": tool_call["id"],
+                    "content": json.dumps(result["content"]),
+                    "metadata": json.dumps(result["metadatas"])
+                }
 
-            self._chat_history.add_new_message(chat_id, message)
+                self._chat_history.add_new_message(chat_id, message)
 
-        # 4. Finall prompt
+        # 4. Final prompt
         completion_stream = await self._client.chat.completions.create(
             model=self._model,
             temperature=0,

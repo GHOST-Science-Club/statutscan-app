@@ -4,6 +4,7 @@ anyio==4.9.0
 argon2-cffi==23.1.0
 argon2-cffi-bindings==21.2.0
 asgiref==3.8.1
+asyncpg==0.30.0
 attrs==25.1.0
 autobahn==24.4.2
 Automat==24.8.1
@@ -18,8 +19,6 @@ certifi==2025.1.31
 cffi==1.17.1
 channels==4.2.2
 charset-normalizer==3.4.1
-chroma-hnswlib==0.7.6
-chromadb==1.0.0
 click==8.1.8
 click-didyoumean==0.3.1
 click-plugins==1.1.1
@@ -63,6 +62,7 @@ googleapis-common-protos==1.69.2
 grpcio==1.71.0
 h11==0.14.0
 httpcore==1.0.7
+httplib2==0.22.0
 httptools==0.6.4
 httpx==0.28.1
 huggingface-hub==0.30.1
@@ -101,10 +101,12 @@ opentelemetry-util-http==0.52b1
 orjson==3.10.16
 overrides==7.7.0
 packaging==24.2
+pgvector==0.4.0
 phonenumbers==8.13.54
 pillow==11.1.0
 posthog==3.23.0
 prompt_toolkit==3.0.50
+proto-plus==1.26.1
 protobuf==5.29.4
 psycopg2-binary==2.9.10
 pyasn1==0.6.1
@@ -116,6 +118,7 @@ Pygments==2.19.1
 PyJWT==2.10.1
 pymongo==4.11.3
 pyOpenSSL==25.0.0
+pyparsing==3.2.3
 PyPika==0.48.9
 pyproject_hooks==1.2.0
 python-crontab==3.2.0

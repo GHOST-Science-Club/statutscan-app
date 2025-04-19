@@ -27,7 +27,7 @@ services:
     command: mongod --quiet --logpath /dev/null
 
   db:
-    image: postgres:latest
+    image: pgvector/pgvector:pg17
     container_name: postgres
     env_file:
       - ./.envs/.env.local

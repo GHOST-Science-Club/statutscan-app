@@ -12,7 +12,7 @@ PERSISTENT_DIRECTORY = os.path.join(BASE_DIR, 'data', 'vector_db', 'chroma_1000s
 
 client = AsyncOpenAI()
 chat_history = ChatHistory()
-kb_tool = KnowledgeBaseTool(PERSISTENT_DIRECTORY, "example", n_reuslts=1)
+kb_tool = KnowledgeBaseTool(n_reuslts=1)
 agent = Agent(client, chat_history, model="gpt-4o-mini")
 agent.add_tool(kb_tool)
 
