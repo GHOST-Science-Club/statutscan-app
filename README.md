@@ -9,6 +9,10 @@
 to access, explains rules and procedures, and helps students communicate with administration. It is a web application
 with a Q&A chatbot using RAG and vector databases with the necessary information sources.
 
+**Demonstration video of the previous version of the project:**
+
+[![Youtube](https://i.postimg.cc/XYVqJ23V/statutscan-demo-thumbnail.png)](https://www.youtube.com/watch?v=3IKxKgnEjdY)
+
 ## Setup and Configuration
 
 1. **Clone the Repository**

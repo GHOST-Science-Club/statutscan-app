@@ -8,19 +8,18 @@ class CustomUserAdmin(BaseUserAdmin):
     ordering = ["date_joined"]
     list_display = [
         "email",
-        "first_name",
-        "last_name",
+        "username",
         "tokens_used",
         "is_active",
         "is_staff",
         "last_login",
         "date_joined",
     ]
-    search_fields = ["email", "first_name", "last_name"]
+    search_fields = ["email", "username"]
 
     fieldsets = (
         (None, {"fields": ("email", "password")}),
-        (_("Personal info"), {"fields": ("first_name", "last_name")}),
+        (_("Personal info"), {"fields": ["username"]}),
         (
             _("Permissions"),
             {
@@ -43,8 +42,7 @@ class CustomUserAdmin(BaseUserAdmin):
                 "classes": ("wide",),
                 "fields": (
                     "email",
-                    "first_name",
-                    "last_name",
+                    "username",
                     "password1",
                     "password2",
                 ),
