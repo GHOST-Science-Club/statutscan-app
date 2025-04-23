@@ -4,8 +4,8 @@ from bson.errors import InvalidId
 from typing import List, Tuple, Optional
 from datetime import datetime
 from django.apps import apps
-from .generate_id import generate_id
-from .generate_chat_title import generate_chat_title
+from chat.agent.generate_id import generate_id
+from chat.agent.generate_chat_title import generate_chat_title
 
 
 class ChatHistory:

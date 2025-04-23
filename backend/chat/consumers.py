@@ -7,12 +7,9 @@ from .agent.chat_history import ChatHistory
 from .agent.tools import KnowledgeBaseTool
 from .agent.agent import Agent
 
-BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
-PERSISTENT_DIRECTORY = os.path.join(BASE_DIR, 'data', 'vector_db', 'chroma_1000signs')
-
 client = AsyncOpenAI()
 chat_history = ChatHistory()
-kb_tool = KnowledgeBaseTool(n_reuslts=1)
+kb_tool = KnowledgeBaseTool(n_results=1)
 agent = Agent(client, chat_history, model="gpt-4o-mini")
 agent.add_tool(kb_tool)
 

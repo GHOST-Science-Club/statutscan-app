@@ -32,7 +32,6 @@ try:
         host=POSTGRES_HOST,
         port=POSTGRES_PORT
     )
-    conn.autocommit = True
     cur = conn.cursor()
 except Exception as e:
     raise RuntimeError(f"Failed to connect to database: {e}")
@@ -40,6 +39,7 @@ except Exception as e:
 # Adding pgvector extension
 try:
     cur.execute("CREATE EXTENSION IF NOT EXISTS vector;")
+    conn.commit()
     logger.info("Extension added successfully.")
 except Exception as e:
     raise RuntimeError(f"Failed to adding pgvector extension: {e}")
@@ -48,12 +48,13 @@ except Exception as e:
 try:
     cur.execute(f"""
     CREATE TABLE IF NOT EXISTS embeddings (
-        id SERIAL PRIMARY KEY,
+        id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
         content TEXT,
         metadata JSONB,
         embedding VECTOR(1536) --1536 is length of text-embedding-3-small vector
     );
     """)
+    conn.commit()
     logger.info("Table 'embeddings' created successfully.")
 except Exception as e:
     raise RuntimeError(f"Failed to create table: {e}")
@@ -84,7 +85,6 @@ except Exception as e:
     raise RuntimeError(f"Failed to insert embeddings to table: {e}")
 
 # Close connection with database
-conn.commit()
 cur.close()
 conn.close()
 

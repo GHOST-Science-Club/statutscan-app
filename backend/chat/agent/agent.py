@@ -2,8 +2,8 @@ import json
 from openai import OpenAI
 from abc import abstractmethod
 from typing import List, AsyncGenerator
-from .tools import ToolInterface
-from .chat_history import ChatHistory
+from chat.agent.tools import ToolInterface
+from chat.agent.chat_history import ChatHistory
 
 class AgentInterface:
     @abstractmethod
@@ -111,7 +111,7 @@ class Agent(AgentBase):
             result = await self._call_function(name, args)
             
             if name == "KnowledgeBaseTool":
-                for metadata in result["metadatas"]:
+                for metadata in result["metadata"]:
                     source = {}
                     
                     if "source" in metadata:
@@ -127,7 +127,7 @@ class Agent(AgentBase):
                     "name": name,
                     "tool_call_id": tool_call["id"],
                     "content": json.dumps(result["content"]),
-                    "metadata": json.dumps(result["metadatas"])
+                    "metadata": json.dumps(result["metadata"])
                 }
 
                 self._chat_history.add_new_message(chat_id, message)

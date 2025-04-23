@@ -1,7 +1,9 @@
-import openai
+from openai import AsyncOpenAI
 from abc import abstractmethod
 from typing import Dict
-from .pgvector import PgVector
+from pgvector.django import CosineDistance
+from chat.models import Embeddings
+from asgiref.sync import sync_to_async
 
 
 class ToolInterface:
@@ -30,21 +32,28 @@ class ToolInterface:
 
 
 class KnowledgeBaseTool(ToolInterface):
-    def __init__(self, n_reuslts: int=1):
-        self.n_reuslts = n_reuslts
-        self.pgvector = PgVector()
+    def __init__(self, n_results: int=1):
+        self.n_results = n_results
+        self.openai_client = AsyncOpenAI()
 
-    async def __get_embedding(text, model: str="text-embedding-3-small"):
-        response = await openai.embeddings.create(
+    async def __get_embedding(self, text: str):
+        response = await self.openai_client.embeddings.create(
             input=[text],
-            model=model
+            model="text-embedding-3-small"
         )
         return response.data[0].embedding
 
     async def use(self, question:str):
         embedding = await self.__get_embedding(question)
-        result =  await self.pgvector.query(embedding, n_resilts=self.n_reuslts)
-        self.pgvector.close()
+        documents = await sync_to_async(
+            lambda: list(
+                Embeddings.objects.order_by(CosineDistance("embedding", embedding))[:self.n_results]
+            )
+        )()
+        result = {
+            "content": [document.content for document in documents],
+            "metadata": [document.metadata for document in documents]
+        }
         return result
     
     async def __call__(self, question: str):
