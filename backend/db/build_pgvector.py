@@ -3,6 +3,7 @@ import logging
 import psycopg2
 import json
 from pathlib import Path
+import pgvector.psycopg2
 
 BASE_DIR = Path(__file__).resolve(strict=True).parent.parent
 CURRENT_DIR = f"{BASE_DIR}/db"
@@ -36,13 +37,23 @@ try:
 except Exception as e:
     raise RuntimeError(f"Failed to connect to database: {e}")
 
-# Adding pgvector extension
+# Adding vector extension
 try:
     cur.execute("CREATE EXTENSION IF NOT EXISTS vector;")
     conn.commit()
-    logger.info("Extension added successfully.")
+    logger.info("Extension vector added successfully.")
 except Exception as e:
-    raise RuntimeError(f"Failed to adding pgvector extension: {e}")
+    raise RuntimeError(f"Failed to adding vector extension: {e}")
+
+pgvector.psycopg2.register_vector()
+
+# # Adding uuid-ossp extension
+try:
+    cur.execute("CREATE EXTENSION IF NOT EXISTS \"uuid-ossp\";")
+    conn.commit()
+    logger.info("Extension uuid-ossp added successfully.")
+except Exception as e:
+    raise RuntimeError(f"Failed to adding uuid-ossp extension: {e}")
 
 # Create the "embeddings" table with vector column
 try:
