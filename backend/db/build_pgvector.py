@@ -43,9 +43,9 @@ try:
     conn.commit()
     logger.info("Extension vector added successfully.")
 except Exception as e:
-    raise RuntimeError(f"Failed to adding vector extension: {e}")
+    raise RuntimeError(f"Failed to add vector extension: {e}")
 
-pgvector.psycopg2.register_vector()
+pgvector.psycopg2.register_vector(conn)
 
 # # Adding uuid-ossp extension
 try:
@@ -53,7 +53,7 @@ try:
     conn.commit()
     logger.info("Extension uuid-ossp added successfully.")
 except Exception as e:
-    raise RuntimeError(f"Failed to adding uuid-ossp extension: {e}")
+    raise RuntimeError(f"Failed to add uuid-ossp extension: {e}")
 
 # Create the "embeddings" table with vector column
 try:
