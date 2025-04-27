@@ -8,3 +8,5 @@ venv/
 *.log
 staticfiles/
 .envs/*
+ignore/
+.ignore/
