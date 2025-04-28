@@ -8,7 +8,7 @@ export default function AuthLayout({ children }: { children: ReactNode }) {
       <Link href="/" className="absolute top-5 left-5">
         <Logo />
       </Link>
-      <main className="m-auto flex min-h-screen max-w-xs flex-col items-center justify-center gap-5 p-5">
+      <main className="m-auto flex min-h-screen max-w-sm flex-col items-center justify-center gap-5 px-5 pt-15">
         {children}
       </main>
     </>

@@ -70,7 +70,7 @@ export const Navbar = ({ children, className }: NavbarProps) => {
     <header
       ref={ref}
       className={cn(
-        'fixed inset-x-0 top-5 z-40 mx-auto w-full max-w-7xl px-5',
+        'sticky inset-x-0 top-5 z-40 mx-auto w-full max-w-7xl px-5',
         className,
       )}
     >

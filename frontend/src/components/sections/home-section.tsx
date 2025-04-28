@@ -9,7 +9,7 @@ function HomeSection() {
   return (
     <SectionLayout
       id="home"
-      className="home-gradient relative flex h-[calc(100svh-40px)] max-h-[800px] min-h-[530px] flex-col rounded-xl p-5"
+      className="home-gradient relative flex h-[calc(100svh-90px)] max-h-[800px] min-h-[530px] flex-col rounded-xl p-5"
     >
       <h1 className="mb-2">
         PUTagent<span className="text-primary"> ⎯⎯⎯⎯</span>
@@ -27,7 +27,12 @@ function HomeSection() {
           className="object-contain object-right"
         />
       </div>
-      <Button variant="primary" size="lg" className="w-fit" asChild>
+      <Button
+        variant="primary"
+        size="lg"
+        className="mx-auto w-fit md:mx-0"
+        asChild
+      >
         <Link href="/chat">Zadaj pytanie</Link>
       </Button>
     </SectionLayout>
