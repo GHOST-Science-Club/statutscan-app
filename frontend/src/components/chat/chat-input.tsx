@@ -33,6 +33,7 @@ function ChatInput() {
         ref={textareaRef}
         id="chat-main-input"
         placeholder="Zapytaj mnie o coś"
+        aria-label="Główne pole tesktowe czatu"
         className="min-h-[56px] w-full resize-none rounded-md border-none py-4 pr-12 pl-3 leading-[1.2] text-wrap sm:pl-6"
         value={inputValue}
         onKeyDown={e => {
@@ -50,6 +51,7 @@ function ChatInput() {
       <Button
         variant="ghost"
         size="icon"
+        aria-label="Wyślij wiadomość do czatu"
         className={cn(
           'absolute top-1/2 right-3 -translate-y-1/2 rounded-full transition-opacity',
           inputValue ? 'opacity-100' : 'opacity-30',

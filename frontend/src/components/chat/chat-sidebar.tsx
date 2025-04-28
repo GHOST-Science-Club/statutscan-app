@@ -30,7 +30,7 @@ export function ChatSidebar({ items }: Props) {
         </Link>
 
         <SidebarTrigger className="size-9" />
-        <Button variant="ghost" size="icon">
+        <Button aria-label="Nowy czat" variant="ghost" size="icon">
           <Plus />
         </Button>
       </SidebarHeader>
@@ -49,7 +49,12 @@ export function ChatSidebar({ items }: Props) {
         </ScrollArea>
       </SidebarContent>
       <SidebarFooter>
-        <Button variant="ghost" size="icon" className="ml-auto">
+        <Button
+          aria-label="Pomoc"
+          variant="ghost"
+          size="icon"
+          className="ml-auto"
+        >
           <CircleHelp />
         </Button>
       </SidebarFooter>

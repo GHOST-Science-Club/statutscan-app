@@ -265,6 +265,7 @@ function SidebarTrigger({
       data-sidebar="trigger"
       data-slot="sidebar-trigger"
       variant="ghost"
+      aria-label="Otwórz / zamknij pasek boczny"
       size="icon"
       className={cn('size-7', className)}
       onClick={event => {

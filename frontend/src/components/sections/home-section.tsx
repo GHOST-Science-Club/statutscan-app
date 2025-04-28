@@ -21,7 +21,7 @@ function HomeSection() {
       <div className="relative flex-1">
         <Image
           src={hatPng}
-          alt=""
+          alt="Zdjęcie czapki studenckiej"
           fill
           className="object-contain object-right"
         />

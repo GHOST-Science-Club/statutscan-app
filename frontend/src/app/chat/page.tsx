@@ -59,7 +59,7 @@ export default function ChatPage() {
       <ChatSidebar items={sidebarItems} />
       <div className="absolute m-2">
         <SidebarTrigger className="size-9" />
-        <Button variant="ghost" size="icon">
+        <Button aria-label="Nowy czat" variant="ghost" size="icon">
           <Plus />
         </Button>
       </div>
