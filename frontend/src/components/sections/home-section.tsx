@@ -3,6 +3,7 @@ import { Button } from '@/components/ui/button';
 import { SectionLayout } from '@/components/ui/section-layout';
 import hatPng from '@/../public/hat.png';
 import Image from 'next/image';
+import { TextAnimate } from '@/components/ui/text-animate';
 
 function HomeSection() {
   return (
@@ -14,10 +15,10 @@ function HomeSection() {
         PUTagent<span className="text-primary"> ⎯⎯⎯⎯</span>
         <br /> wsparcie <span className="text-gradient">studenckie</span>
       </h1>
-      <p className="text-muted-foreground">
+      <TextAnimate duration={0.5} className="text-muted-foreground">
         Projekt PUTagent został stworzony z inicjatywy organizacji studenckiej
         GHOST przy Politechnice Poznańskiej
-      </p>
+      </TextAnimate>
       <div className="relative flex-1">
         <Image
           src={hatPng}

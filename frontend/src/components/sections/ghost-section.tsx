@@ -33,6 +33,7 @@ function GhostSection() {
               src={person}
               alt="person"
               key={i}
+              placeholder="blur"
               className={cn(
                 'aspect-square object-cover object-top',
                 i % 3 == 0 && '-mt-5',
@@ -43,12 +44,9 @@ function GhostSection() {
           ))}
         </div>
         <div className="col-span-2">
-          <div>
-            <p className="text-muted font-heading text-center text-7xl font-extrabold xl:text-[220px]">
-              GHOST
-            </p>
-          </div>
-
+          <p className="text-muted font-heading text-center text-7xl font-extrabold xl:text-[220px]">
+            GHOST
+          </p>
           <h3>Organizacja studencka przy Politechnice Poznaskiej</h3>
           <br />
           <p>

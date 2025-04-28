@@ -17,7 +17,6 @@ import { useState } from 'react';
 
 function Header() {
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
-
   return (
     <Navbar>
       {/* Desktop Navigation */}

@@ -6,12 +6,15 @@ import {
   AccordionTrigger,
 } from '@/components/ui/accordion';
 import { FAQ } from '@/lib/data';
+import { TextAnimate } from '@/components/ui/text-animate';
 
 function FaqSection() {
   return (
     <SectionLayout id="faq" title="FAQ">
       <div className="grid grid-cols-1 md:grid-cols-2">
-        <h3>Najczęściej zadawane pytania</h3>
+        <TextAnimate as="h3" animation="slideRight" by="character">
+          Najczęściej zadawane pytania
+        </TextAnimate>
         <Accordion type="multiple" className="space-y-5">
           {FAQ.map((faq, i) => (
             <AccordionItem
