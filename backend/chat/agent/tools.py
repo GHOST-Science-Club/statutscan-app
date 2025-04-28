@@ -1,9 +1,9 @@
-import os
-import chromadb
-from chromadb.utils import embedding_functions
+from openai import AsyncOpenAI
 from abc import abstractmethod
 from typing import Dict
-import asyncio
+from pgvector.django import CosineDistance
+from chat.models import Embeddings
+from asgiref.sync import sync_to_async
 
 
 class ToolInterface:
@@ -32,25 +32,27 @@ class ToolInterface:
 
 
 class KnowledgeBaseTool(ToolInterface):
-    def __init__(self, persistent_directory: str, collection_name: str, n_reuslts: int=1):
-        self.persistent_directory = persistent_directory
-        self.collection_name = collection_name
-        self.n_reuslts = n_reuslts
-        self.__chroma_client = chromadb.PersistentClient(persistent_directory)
-        self.__embedding_fn = embedding_functions.OpenAIEmbeddingFunction(
-            model_name="text-embedding-3-small", 
-            api_key = os.environ["OPENAI_API_KEY"]
+    def __init__(self, n_results: int=1):
+        self.n_results = n_results
+        self.openai_client = AsyncOpenAI()
+
+    async def __get_embedding(self, text: str):
+        response = await self.openai_client.embeddings.create(
+            input=[text],
+            model="text-embedding-3-small"
         )
-        self.__collection = self.__chroma_client.get_collection(
-            collection_name,
-            embedding_function=self.__embedding_fn
-        )
+        return response.data[0].embedding
 
     async def use(self, question:str):
-        result = self.__collection.query(query_texts=[question], n_results=self.n_reuslts)
+        embedding = await self.__get_embedding(question)
+        documents = await sync_to_async(
+            lambda: list(
+                Embeddings.objects.order_by(CosineDistance("embedding", embedding))[:self.n_results]
+            )
+        )()
         result = {
-            "content": result["documents"][0],
-            "metadatas": result["metadatas"][0]
+            "content": [document.content for document in documents],
+            "metadata": [document.metadata for document in documents]
         }
         return result
     
