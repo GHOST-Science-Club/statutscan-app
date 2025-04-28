@@ -8,7 +8,7 @@ function HomeSection() {
   return (
     <SectionLayout
       id="home"
-      className="home-gradient relative flex min-h-[calc(100svh-40px)] flex-col rounded-xl p-5"
+      className="home-gradient relative flex h-[calc(100svh-40px)] max-h-[800px] min-h-[530px] flex-col rounded-xl p-5"
     >
       <h1 className="mb-2">
         PUTagent<span className="text-primary"> ⎯⎯⎯⎯</span>

@@ -1,5 +1,4 @@
 import { SidebarProvider, SidebarTrigger } from '@/components/ui/sidebar';
-import { ChatTextarea } from '@/components/chat/chat-textarea';
 import { ChatSidebar } from '@/components/chat/chat-sidebar';
 import { CSSProperties } from 'react';
 import { Button } from '@/components/ui/button';
@@ -64,11 +63,11 @@ export default function ChatPage() {
           <Plus />
         </Button>
       </div>
-      <main className="m-auto text-center">
-        <h2>Zapytaj o coś</h2>
+      <main className="m-auto w-full max-w-xl text-center">
+        <h2 className="text-gradient pb-5">Zapytaj o coś</h2>
         <ChatInput />
       </main>
-      <Button variant="outline" className="absolute right-0 m-2">
+      <Button variant="primary" className="absolute right-0 m-2">
         Lorem ipsum
         <ArrowUpRight />
       </Button>

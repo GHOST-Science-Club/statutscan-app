@@ -22,19 +22,18 @@ function ChatInput() {
     setInputValue('');
     adjustHeight(true);
 
-    // Simulate a network request
     setTimeout(() => {
       setLoading(false);
     }, 1000);
   };
 
   return (
-    <div className="relative mx-auto w-full max-w-xl">
+    <div className="relative mx-auto w-full max-w-xl px-2">
       <Textarea
         ref={textareaRef}
         id="chat-main-input"
         placeholder="Zapytaj mnie o coś"
-        className="min-h-[56px] w-full resize-none rounded-md border-none py-4 pr-12 pl-6 leading-[1.2] text-wrap"
+        className="min-h-[56px] w-full resize-none rounded-md border-none py-4 pr-12 pl-3 leading-[1.2] text-wrap sm:pl-6"
         value={inputValue}
         onKeyDown={e => {
           if (e.key === 'Enter') {
@@ -51,20 +50,14 @@ function ChatInput() {
       <Button
         variant="ghost"
         size="icon"
-        className="absolute top-1/2 right-3 -translate-y-1/2 rounded-full"
+        className={cn(
+          'absolute top-1/2 right-3 -translate-y-1/2 rounded-full transition-opacity',
+          inputValue ? 'opacity-100' : 'opacity-30',
+        )}
         disabled={loading}
         onClick={handleSubmit}
       >
-        {loading ? (
-          <Loader className="animate-spin" />
-        ) : (
-          <ArrowUp
-            className={cn(
-              'transition-opacity',
-              inputValue ? 'opacity-100' : 'opacity-30',
-            )}
-          />
-        )}
+        {loading ? <Loader className="animate-spin" /> : <ArrowUp />}
       </Button>
     </div>
   );

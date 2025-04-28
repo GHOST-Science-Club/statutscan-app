@@ -18,7 +18,7 @@ import { Input } from '@/components/ui/input';
 import Link from 'next/link';
 
 const loginSchema = z.object({
-  mail: z
+  email: z
     .string({
       errorMap: () => ({
         message: 'Adres e-mail powinien zawierać minimum 5 znaków',
@@ -45,7 +45,7 @@ function UserForm(props: Props) {
   const form = useForm<z.infer<typeof loginSchema>>({
     resolver: zodResolver(loginSchema),
     defaultValues: {
-      mail: '',
+      email: '',
       password: '',
     },
   });
@@ -59,7 +59,7 @@ function UserForm(props: Props) {
       <form onSubmit={form.handleSubmit(onSubmit)}>
         <FormField
           control={form.control}
-          name="mail"
+          name="email"
           render={({ field }) => (
             <FormItem>
               <FormLabel className="sr-only">Nazwa użytkownika</FormLabel>

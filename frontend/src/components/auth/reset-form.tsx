@@ -16,7 +16,7 @@ import {
 import { Input } from '@/components/ui/input';
 
 const resetSchema = z.object({
-  mail: z
+  email: z
     .string({
       errorMap: () => ({
         message: 'Adres e-mail powinien zawierać minimum 5 znaków',
@@ -32,7 +32,7 @@ function ResetForm() {
   const form = useForm<z.infer<typeof resetSchema>>({
     resolver: zodResolver(resetSchema),
     defaultValues: {
-      mail: '',
+      email: '',
     },
   });
 
@@ -45,7 +45,7 @@ function ResetForm() {
       <form onSubmit={form.handleSubmit(onSubmit)}>
         <FormField
           control={form.control}
-          name="mail"
+          name="email"
           render={({ field }) => (
             <FormItem>
               <FormLabel>
