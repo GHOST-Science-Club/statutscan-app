@@ -166,4 +166,7 @@
   .text-gradient {
     @apply from-primary to-secondary bg-gradient-to-r bg-clip-text text-transparent;
   }
+  .link-underline {
+    @apply hover:text-foreground text-muted-foreground underline decoration-1 underline-offset-2 duration-300;
+  }
 }

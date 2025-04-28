@@ -10,7 +10,7 @@ export default function RegisterPage() {
       description={
         <>
           Masz już konto?{' '}
-          <Link href="/login" className="text-foreground underline">
+          <Link href="/login" className="link-underline">
             Zaloguj się
           </Link>
         </>

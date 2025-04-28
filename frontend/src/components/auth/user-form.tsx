@@ -8,23 +8,25 @@ import { Button } from '@/components/ui/button';
 import {
   Form,
   FormControl,
+  FormDescription,
   FormField,
   FormItem,
   FormLabel,
   FormMessage,
 } from '@/components/ui/form';
 import { Input } from '@/components/ui/input';
+import Link from 'next/link';
 
 const loginSchema = z.object({
-  username: z
+  mail: z
     .string({
       errorMap: () => ({
-        message: 'Nazwa użytkownika musi zawierać minimum 5 znaków',
+        message: 'Adres e-mail powinien zawierać minimum 5 znaków',
       }),
     })
     .min(5)
     .max(50, {
-      message: 'Nazwa użytkownika może zawierać maksymalnie 50 znaków',
+      message: 'Adres e-mail powinien zawierać minimum 50 znaków',
     }),
   password: z
     .string()
@@ -34,22 +36,21 @@ const loginSchema = z.object({
 
 type Props = {
   buttonText: string;
+  rememberPassword?: boolean;
 };
 
 function UserForm(props: Props) {
-  const { buttonText } = props;
+  const { buttonText, rememberPassword } = props;
 
   const form = useForm<z.infer<typeof loginSchema>>({
     resolver: zodResolver(loginSchema),
     defaultValues: {
-      username: '',
+      mail: '',
       password: '',
     },
   });
 
   function onSubmit(values: z.infer<typeof loginSchema>) {
-    // Do something with the form values.
-    // ✅ This will be type-safe and validated.
     console.log(values);
   }
 
@@ -58,12 +59,12 @@ function UserForm(props: Props) {
       <form onSubmit={form.handleSubmit(onSubmit)}>
         <FormField
           control={form.control}
-          name="username"
+          name="mail"
           render={({ field }) => (
             <FormItem>
               <FormLabel className="sr-only">Nazwa użytkownika</FormLabel>
               <FormControl>
-                <Input placeholder="Adres-email" {...field} />
+                <Input placeholder="Adres e-mail" {...field} />
               </FormControl>
               <FormMessage />
             </FormItem>
@@ -76,9 +77,19 @@ function UserForm(props: Props) {
             <FormItem>
               <FormLabel className="sr-only">Hasło</FormLabel>
               <FormControl>
-                <Input placeholder="Hasło" {...field} />
+                <Input type="password" placeholder="Hasło" {...field} />
               </FormControl>
               <FormMessage />
+              {rememberPassword && (
+                <FormDescription className="ml-auto">
+                  <Link
+                    href="/reset-password"
+                    className="hover:text-foreground text-xs underline decoration-1 underline-offset-2 duration-300"
+                  >
+                    Nie pamietam hasła.
+                  </Link>
+                </FormDescription>
+              )}
             </FormItem>
           )}
         />

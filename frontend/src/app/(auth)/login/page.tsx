@@ -9,14 +9,14 @@ export default function LoginPage() {
       description={
         <>
           Nie masz konta?{' '}
-          <Link href="/register" className="text-foreground underline">
+          <Link href="/register" className="link-underline">
             Zarejestruj się
           </Link>
         </>
       }
       social
     >
-      <UserForm buttonText="Zaloguj się" />
+      <UserForm rememberPassword buttonText="Zaloguj się" />
     </AuthLayout>
   );
 }

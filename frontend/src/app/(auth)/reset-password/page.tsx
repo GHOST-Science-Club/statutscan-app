@@ -1,18 +1,18 @@
-import Link from 'next/link';
-import { ConfirmForm } from '@/components/auth/confirm-form';
 import { AuthLayout } from '@/components/auth/auth-layout';
+import { ResetForm } from '@/components/auth/reset-form';
+import Link from 'next/link';
 
 export default function ConfirmPage() {
   return (
     <AuthLayout
-      title="Utwórz konto"
+      title="Resetuj hasło"
       description={
         <Link href="/login" className="link-underline">
-          Wyślij kod weryfikacyjny ponownie
+          Wróć do logowania
         </Link>
       }
     >
-      <ConfirmForm />
+      <ResetForm />
     </AuthLayout>
   );
 }
