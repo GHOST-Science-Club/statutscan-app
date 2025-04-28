@@ -24,7 +24,7 @@ with a Q&A chatbot using RAG and vector databases with the necessary information
 ### BACKEND
 
 1. Go to backend directory using `cd backend`
-2. create in `.envs` folder 2 files:
+2. Create in `.envs` folder 2 files:
     - `.env.local` (fill it as .env.example)
     - `.env.production`
 3. Turn on [Docker Desktop](https://www.docker.com/products/docker-desktop/)
@@ -34,5 +34,6 @@ with a Q&A chatbot using RAG and vector databases with the necessary information
 ### FRONTEND
 
 1. Go to frontend directory using `cd frontend`
+2. Create file `.env` and fill it as `.env.example`
 2. Run `npm run dev` in console
 3. Project is ready on http://localhost:3000/

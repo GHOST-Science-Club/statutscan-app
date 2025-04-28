@@ -1,6 +1,7 @@
-import { UserForm } from '@/components/auth/user-form';
 import Link from 'next/link';
+import { UserForm } from '@/components/auth/user-form';
 import { AuthLayout } from '@/components/auth/auth-layout';
+import { registerUser } from '@/lib/api/registerUser';
 
 export default function RegisterPage() {
   return (
@@ -16,7 +17,7 @@ export default function RegisterPage() {
         </>
       }
     >
-      <UserForm buttonText="Dalej" />
+      <UserForm onSubmit={registerUser} buttonText="Dalej" />
     </AuthLayout>
   );
 }

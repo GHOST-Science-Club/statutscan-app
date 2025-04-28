@@ -12,12 +12,6 @@ function SocialButtons() {
       </li>
       <li>
         <Button variant="secondary">
-          <Icons icon="github" />
-          Kontynuuj z Github
-        </Button>
-      </li>
-      <li>
-        <Button variant="secondary">
           <Icons icon="microsoft" />
           Kontynuuj z Microsoft
         </Button>

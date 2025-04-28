@@ -1,6 +1,6 @@
+import Link from 'next/link';
 import { AuthLayout } from '@/components/auth/auth-layout';
 import { ResetForm } from '@/components/auth/reset-form';
-import Link from 'next/link';
 
 export default function ConfirmPage() {
   return (

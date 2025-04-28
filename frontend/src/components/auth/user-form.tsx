@@ -16,43 +16,24 @@ import {
 } from '@/components/ui/form';
 import { Input } from '@/components/ui/input';
 import Link from 'next/link';
-
-const loginSchema = z.object({
-  email: z
-    .string({
-      errorMap: () => ({
-        message: 'Adres e-mail powinien zawierać minimum 5 znaków',
-      }),
-    })
-    .min(5)
-    .max(50, {
-      message: 'Adres e-mail powinien zawierać minimum 50 znaków',
-    }),
-  password: z
-    .string()
-    .min(8, { message: 'Hasło musi zawierać minimum 8 znaków' })
-    .max(50, { message: 'Hasło może zawierać maksymalnie 50 znaków' }),
-});
+import { userSchema } from '@/lib/types';
 
 type Props = {
   buttonText: string;
   rememberPassword?: boolean;
+  onSubmit: (values: z.infer<typeof userSchema>) => void;
 };
 
 function UserForm(props: Props) {
-  const { buttonText, rememberPassword } = props;
+  const { buttonText, rememberPassword, onSubmit } = props;
 
-  const form = useForm<z.infer<typeof loginSchema>>({
-    resolver: zodResolver(loginSchema),
+  const form = useForm<z.infer<typeof userSchema>>({
+    resolver: zodResolver(userSchema),
     defaultValues: {
       email: '',
       password: '',
     },
   });
-
-  function onSubmit(values: z.infer<typeof loginSchema>) {
-    console.log(values);
-  }
 
   return (
     <Form {...form}>
