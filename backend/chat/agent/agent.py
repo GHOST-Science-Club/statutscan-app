@@ -61,7 +61,7 @@ class AgentBase(AgentInterface):
                 return await tool.use(**args)
 
 
-class Agent(AgentBase):    
+class Agent(AgentBase):
     async def ask(self, question: str, chat_id: str) -> AsyncGenerator[str, None]:
         """
         The method to ask agent a question. Agent will add question

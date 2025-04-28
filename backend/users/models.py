@@ -77,8 +77,11 @@ class CustomUser(AbstractBaseUser, PermissionsMixin):
         unique=True,
     )
     tokens_used = models.PositiveIntegerField(default=0)
+    total_tokens_used = models.PositiveIntegerField(default=0)
+    is_chat_blocked = models.BooleanField(default=False)
     is_active = models.BooleanField(default=False)
     is_staff = models.BooleanField(default=False)
+    last_chat_usage = models.DateTimeField(default=timezone.now)
     last_login = models.DateTimeField(auto_now=True)
     date_joined = models.DateTimeField("Date joined", default=timezone.now)
 

@@ -1,12 +1,17 @@
 from openai import AsyncOpenAI
+from typing import Tuple
+from chat.agent.token_usage_manager import TokenUsageManager
 
-async def generate_chat_title(message: str) -> str:
+token_usage_manager = TokenUsageManager()
+
+
+async def generate_chat_title(message: str) -> Tuple[str, int]:
     """
     Generates a short (max 32 characters) title for a conversation based on the provided user message 
     using the OpenAI API.
 
     Returns:
-        str: A 32-character or shorter title.
+        Tuple[str, int]: A tuple with two value - chat title (str) and tokens used (int).
     """
     client = AsyncOpenAI()
     
@@ -27,5 +32,7 @@ async def generate_chat_title(message: str) -> str:
     )
     
     title = response.choices[0].message.content.strip()
+    tokens_used = response.usage.total_tokens
+
     
     return title
