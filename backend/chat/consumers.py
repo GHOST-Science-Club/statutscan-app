@@ -1,11 +1,13 @@
-import os
 import json
 from channels.generic.websocket import AsyncWebsocketConsumer
 from asgiref.sync import sync_to_async
 from openai import AsyncOpenAI
-from .agent.chat_history import ChatHistory
-from .agent.tools import KnowledgeBaseTool
-from .agent.agent import Agent
+from chat.agent.chat_history import ChatHistory
+from chat.agent.tools import KnowledgeBaseTool
+from chat.agent.agent import Agent
+from chat.agent.token_usage_manager import TokenUsageManager
+
+token_usage_manager = TokenUsageManager()
 
 client = AsyncOpenAI()
 chat_history = ChatHistory()
@@ -27,9 +29,11 @@ class ChatConsumer(AsyncWebsocketConsumer):
         
         self.chat_id = self.scope['url_route']['kwargs']['chat_id']
 
-        owner_email = await sync_to_async(chat_history.get_owner_email)(self.chat_id)
-        if not owner_email or owner_email != user.email:
+        user_email = await sync_to_async(chat_history.get_owner_email)(self.chat_id)
+        if not user_email or user_email != user.email:
             return await self.close()
+        else:
+            self.user_email = user.email
         
         self.room_group_name = f'chat_{self.chat_id}'
 
@@ -56,6 +60,12 @@ class ChatConsumer(AsyncWebsocketConsumer):
         Parses the incoming JSON data to determine whether to handle the agent's response
         normally or quietly (e.g., for redirection scenarios).
         """
+        if token_usage_manager.is_user_blocked(self.user_email):
+            self.send(text_data=json.dumps({
+                'type': 'token_limit_reached',
+                'reset_date': token_usage_manager.get_reset_date(self.user_email)
+            }))
+
         data = json.loads(text_data)
         is_redirection = data.get('is_redirection', None)
 

@@ -4,11 +4,12 @@ from rest_framework.parsers import JSONParser
 from rest_framework.response import Response
 from rest_framework import status, serializers
 from rest_framework.permissions import IsAuthenticated
-from asgiref.sync import sync_to_async
 
-from .agent.chat_history import ChatHistory
+from chat.agent.chat_history import ChatHistory
+from chat.agent.token_usage_manager import TokenUsageManager
 
 chat_history = ChatHistory()
+token_usage_manager = TokenUsageManager()
 
 
 class ChatRedirectionSerializer(serializers.Serializer):
@@ -57,8 +58,13 @@ async def chat_redirection_view(request):
         user_email = request.user.email
 
         if not user_email:
-            return Response({"error": "Missing 'user_email'."},
-                            status=status.HTTP_400_BAD_REQUEST)
+            return Response({"error": "Missing 'user_email'."}, status=status.HTTP_400_BAD_REQUEST)
+
+        if token_usage_manager.is_user_blocked(user_email):
+            return Response(
+                {"detail": "You have reached your token limit and are blocked from chatting"},
+                status=status.HTTP_403_FORBIDDEN
+            )
 
         try:
             chat_id = await chat_history.create_new_chat(user_email, question)

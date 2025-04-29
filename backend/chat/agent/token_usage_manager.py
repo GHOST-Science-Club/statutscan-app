@@ -10,8 +10,8 @@ class TokenUsageManager:
     def __init__(self):
         self.__token_limit = 10_000
         self.__cooldown_time = 24 # in hours
-        self.mongo_connection = apps.get_app_config('chat').mongo_connection
-        self.chat_history = self.mongo_connection.get_chat_history()
+        self.__mongo_connection = apps.get_app_config('chat').mongo_connection
+        self.__chat_history = self.__mongo_connection.get_chat_history()
 
     def __unblock_user_if_it_possible(self, user: CustomUser):
         """
@@ -33,7 +33,7 @@ class TokenUsageManager:
         except InvalidId:
             return None
 
-        rec = self.chat_history.find_one({"_id": _id}, {"email": 1})
+        rec = self.__chat_history.find_one({"_id": _id}, {"email": 1})
         return rec.get("email") if rec else None
 
     def is_chat_blocked(self, chat_id: str) -> bool:
@@ -47,14 +47,45 @@ class TokenUsageManager:
             bool: True if the user is blocked, False if the user is not blocked
         """
         user_email = self.__get_owner_email(chat_id)
+        return self.__is_chat_blocked_by_email(user_email)
+    
+    def is_user_blocked(self, user_email: str) -> bool:
+        """
+        Checks whether the user with a given emial is blocked from chatting.
+        
+        Args:
+            user_email (str): The email of a user.
+        
+        Returns:
+            bool: True if the user is blocked, False if the user is not blocked
+        """
+        return self.__is_chat_blocked_by_email(user_email)
+
+    def __is_chat_blocked_by_email(self, user_email: str) -> bool:
         try:
             user = CustomUser.objects.get(email=user_email)
         except CustomUser.DoesNotExist:
             return None
 
         self.__unblock_user_if_it_possible(user)
-        
         return user.is_chat_blocked
+    
+    def get_reset_date(self, user_eamil: str) -> str:
+        """
+        Determines the date and time when the user will be unblocked from chatting.
+
+        Args:
+            user_email (str): The email of the user.
+
+        Returns:
+            str: The date and time (in '%Y-%m-%d %H:%M:%S' format) when the user will be unblocked.
+                If the user is not blocked, it returns the current time.
+        """
+        if not self.__is_chat_blocked_by_email(user_eamil):
+            return timezone.now().strftime('%Y-%m-%d %H:%M:%S')
+        
+        reset_date = timezone.now() + timedelta(hours=self.__cooldown_time)
+        return reset_date.strftime('%Y-%m-%d %H:%M:%S')
 
     def add_used_tokens(self, chat_id: str, tokens: int):
         """
