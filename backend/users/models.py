@@ -16,17 +16,15 @@ def validate_email_address(email: str) -> None:
 
 class UserManager(DjangoUserManager):
     def _create_user(
-        self, email: str, username: str, password: str, **extra_fields: Any
+        self, email: str, password: str, **extra_fields: Any
     ):
         if not email:
             raise ValueError("Adres e-mail musi zostać podany.")
-        if not username:
-            raise ValueError("Nazwa użytkownika (username) musi zostać podana.")
 
         email = self.normalize_email(email)
         validate_email_address(email)
 
-        user = self.model(email=email, username=username, **extra_fields)
+        user = self.model(email=email, **extra_fields)
 
         if password:
             user.set_password(password)
@@ -38,19 +36,17 @@ class UserManager(DjangoUserManager):
     def create_user(
         self,
         email: str,
-        username: str,
         password: Optional[str] = None,
         **extra_fields: Any
     ):
         extra_fields.setdefault("is_staff", False)
         extra_fields.setdefault("is_active", False)
         extra_fields.setdefault("is_superuser", False)
-        return self._create_user(email, username, password, **extra_fields)
+        return self._create_user(email, password, **extra_fields)
 
     def create_superuser(
         self,
         email: str,
-        username: str,
         password: Optional[str] = None,
         **extra_fields: Any
     ):
@@ -63,14 +59,10 @@ class UserManager(DjangoUserManager):
         if extra_fields.get("is_superuser") is not True:
             raise ValueError("Superuser musi mieć ustawione is_superuser=True")
 
-        return self._create_user(email, username, password, **extra_fields)
+        return self._create_user(email, password, **extra_fields)
 
 
 class CustomUser(AbstractBaseUser, PermissionsMixin):
-    username = models.CharField(
-        max_length=150,
-        unique=True,
-    )
     email = models.EmailField(
         verbose_name="Email address",
         max_length=255,
@@ -85,7 +77,7 @@ class CustomUser(AbstractBaseUser, PermissionsMixin):
     objects = UserManager()
 
     USERNAME_FIELD = "email"
-    REQUIRED_FIELDS = ["username"]
+    REQUIRED_FIELDS = []
 
     def __str__(self):
         return str(self.email)
