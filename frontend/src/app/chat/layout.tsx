@@ -1,9 +1,8 @@
+import { CSSProperties, ReactNode } from 'react';
+import { ArrowUpRight, Plus } from 'lucide-react';
 import { SidebarProvider, SidebarTrigger } from '@/components/ui/sidebar';
 import { ChatSidebar } from '@/components/chat/chat-sidebar';
-import { CSSProperties } from 'react';
 import { Button } from '@/components/ui/button';
-import { ArrowUpRight, Plus } from 'lucide-react';
-import { ChatInput } from '@/components/chat/chat-input';
 
 const sidebarItems = [
   {
@@ -45,7 +44,7 @@ const sidebarItems = [
   },
 ];
 
-export default function ChatPage() {
+export default function ChatLayout({ children }: { children: ReactNode }) {
   return (
     <SidebarProvider
       defaultOpen
@@ -63,10 +62,7 @@ export default function ChatPage() {
           <Plus />
         </Button>
       </div>
-      <main className="m-auto w-full max-w-xl text-center">
-        <h2 className="text-gradient pb-5">Zapytaj o coś</h2>
-        <ChatInput />
-      </main>
+      <main className="m-auto w-full max-w-xl text-center">{children}</main>
       <Button variant="primary" className="absolute right-0 m-2">
         Lorem ipsum
         <ArrowUpRight />

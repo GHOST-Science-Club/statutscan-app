@@ -1,15 +1,23 @@
 import { AuthLayout } from '@/components/auth/auth-layout';
 import { notFound } from 'next/navigation';
 
-type SearchParams = Promise<{ [key: string]: string | string[] | undefined }>;
+const validType = ['email', 'pass'];
 
-export default async function ConfirmPage(props: {
-  searchParams: SearchParams;
+export function generateStaticParams() {
+  return validType.map(t => ({
+    type: t,
+  }));
+}
+
+export const dynamicParams = false;
+
+export default async function ConfirmPage({
+  params,
+}: {
+  params: Promise<{ type: string }>;
 }) {
-  const { type } = await props.searchParams;
-
-  const validTypes = ['email', 'pass'];
-  if (!validTypes.includes(type as string)) notFound();
+  const { type } = await params;
+  if (!validType.includes(type as string)) notFound();
 
   const heading = type === 'email' ? 'Potwierdź e-mail' : 'Resetowanie hasła';
   const subheading = type === 'email' ? 'aktywacyjny' : 'resetujący hasło';

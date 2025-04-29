@@ -66,8 +66,7 @@ function createAssistantAnswerBody(chatBody) {
 function getChatId() {
   const pathname = window.location.pathname;
   const match = pathname.match(/^\/chat\/([^\/]+)\/?$/);
-  let chatId = match ? match[1] : null;
-  return chatId;
+  return match ? match[1] : null;
 }
 
 function getCookie(name) {
