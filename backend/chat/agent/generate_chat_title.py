@@ -11,7 +11,7 @@ async def generate_chat_title(message: str, chat_id: str) -> str:
     using the OpenAI API.
 
     Returns:
-        str: A +- 32-character or chat title.
+        str: A +- 32-character chat title.
     """
     client = AsyncOpenAI()
     

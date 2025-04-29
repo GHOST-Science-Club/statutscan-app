@@ -70,7 +70,7 @@ class TokenUsageManager:
         self.__unblock_user_if_it_possible(user)
         return user.is_chat_blocked
     
-    def get_reset_date(self, user_eamil: str) -> str:
+    def get_reset_date(self, user_email: str) -> str:
         """
         Determines the date and time when the user will be unblocked from chatting.
 
@@ -81,7 +81,7 @@ class TokenUsageManager:
             str: The date and time (in '%Y-%m-%d %H:%M:%S' format) when the user will be unblocked.
                 If the user is not blocked, it returns the current time.
         """
-        if not self.__is_chat_blocked_by_email(user_eamil):
+        if not self.__is_chat_blocked_by_email(user_email):
             return timezone.now().strftime('%Y-%m-%d %H:%M:%S')
         
         reset_date = timezone.now() + timedelta(hours=self.__cooldown_time)
