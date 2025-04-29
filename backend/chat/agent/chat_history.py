@@ -28,7 +28,7 @@ class ChatHistory:
             str: The generated chat ID.
         """
         chat_id = uuid.uuid4().hex[:24]
-        chat_title = await generate_chat_title(question)
+        chat_title = await generate_chat_title(question, chat_id)
         creation_date = datetime.now()
         messages = [{
             "role": "user",

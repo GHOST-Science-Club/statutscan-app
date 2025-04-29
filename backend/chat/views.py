@@ -20,6 +20,7 @@ class ChatRedirectionSerializer(serializers.Serializer):
     def update(self, instance, validated_data):
         return instance
 
+
 @api_view(['GET'])
 @permission_classes([IsAuthenticated])
 def chat_view(request):

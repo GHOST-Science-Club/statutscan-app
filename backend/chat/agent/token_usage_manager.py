@@ -1,15 +1,17 @@
 from django.utils import timezone
+from django.apps import apps
+from bson.objectid import ObjectId
+from bson.errors import InvalidId
 from datetime import timedelta
 from users.models import CustomUser
-from chat.agent.chat_history import ChatHistory
-
-chat_history = ChatHistory()
 
 
 class TokenUsageManager:
     def __init__(self):
         self.__token_limit = 10_000
         self.__cooldown_time = 24 # in hours
+        self.mongo_connection = apps.get_app_config('chat').mongo_connection
+        self.chat_history = self.mongo_connection.get_chat_history()
 
     def __unblock_user_if_it_possible(self, user: CustomUser):
         """
@@ -25,6 +27,15 @@ class TokenUsageManager:
                 user.is_chat_blocked = False
                 user.save(update_fields=["tokens_used", "is_chat_blocked"])
 
+    def __get_owner_email(self, chat_id: str) -> str:
+        try:
+            _id = ObjectId(chat_id)
+        except InvalidId:
+            return None
+
+        rec = self.chat_history.find_one({"_id": _id}, {"email": 1})
+        return rec.get("email") if rec else None
+
     def is_chat_blocked(self, chat_id: str) -> bool:
         """
         Checks whether the user associated with a given chat ID is blocked from chatting.
@@ -35,7 +46,7 @@ class TokenUsageManager:
         Returns:
             bool: True if the user is blocked, False if the user is not blocked
         """
-        user_email = chat_history.get_owner_email(chat_id)
+        user_email = self.__get_owner_email(chat_id)
         try:
             user = CustomUser.objects.get(email=user_email)
         except CustomUser.DoesNotExist:
@@ -58,7 +69,7 @@ class TokenUsageManager:
             This method updates the `tokens_used`, `total_tokens_used`, and `last_chat_usage` fields.
             If the user exceeds the token limit, the user will be blocked.
         """
-        user_email = chat_history.get_owner_email(chat_id)
+        user_email = self.__get_owner_email(chat_id)
         try:
             user = CustomUser.objects.get(email=user_email)
         except CustomUser.DoesNotExist:

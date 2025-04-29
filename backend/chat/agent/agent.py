@@ -1,9 +1,15 @@
 import json
+import tiktoken
 from openai import OpenAI
 from abc import abstractmethod
 from typing import List, AsyncGenerator
 from chat.agent.tools import ToolInterface
 from chat.agent.chat_history import ChatHistory
+from chat.agent.token_usage_manager import TokenUsageManager
+
+token_usage_manager = TokenUsageManager()
+gpt_4o_mini_token_encoding = tiktoken.encoding_for_model("gpt-4o-mini")
+
 
 class AgentInterface:
     @abstractmethod
@@ -55,10 +61,10 @@ class AgentBase(AgentInterface):
             self._tools.append(tool)
             self._tools_descriptions.append(tool.description)
 
-    async def _call_function(self, name, args):
+    async def _call_function(self, name, chat_id, args):
         for tool in self._tools:
             if tool.name == name:
-                return await tool.use(**args)
+                return await tool.use(**args, chat_id=chat_id)
 
 
 class Agent(AgentBase):
@@ -96,6 +102,7 @@ class Agent(AgentBase):
             messages=self._chat_history.get_chat_history_for_agent(chat_id),
             tools=self._tools_descriptions
         )
+        token_usage_manager.add_used_tokens(chat_id, completion.usage.total_tokens)
         completion = completion.model_dump()
 
         # 3. Collect related sources
@@ -108,7 +115,7 @@ class Agent(AgentBase):
         for tool_call in tool_calls:
             name = tool_call["function"]["name"]
             args = json.loads(tool_call["function"]["arguments"])
-            result = await self._call_function(name, args)
+            result = await self._call_function(name, chat_id, args)
             
             if name == "KnowledgeBaseTool":
                 for metadata in result["metadata"]:
@@ -159,3 +166,8 @@ class Agent(AgentBase):
         final_response = ''.join(collected_messages)
         message = {"role": "assistant", "content": final_response}
         self._chat_history.add_new_message(chat_id, message)
+
+        token_usage_manager.add_used_tokens(
+            chat_id,
+            len(gpt_4o_mini_token_encoding.encode(final_response))
+        )

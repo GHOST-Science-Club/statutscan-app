@@ -128,6 +128,7 @@ python3-openid==3.2.0
 pytz==2025.2
 PyYAML==6.0.2
 referencing==0.36.2
+regex==2024.11.6
 requests==2.32.3
 requests-oauthlib==2.0.0
 rich==14.0.0
@@ -144,6 +145,7 @@ sqlparse==0.5.3
 starlette==0.45.3
 sympy==1.13.3
 tenacity==9.1.2
+tiktoken==0.9.0
 tokenizers==0.21.1
 tqdm==4.67.1
 Twisted==24.11.0
