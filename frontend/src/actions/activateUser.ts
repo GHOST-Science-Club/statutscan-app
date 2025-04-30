@@ -4,6 +4,7 @@ type Values = {
   uid: string;
   token: string;
 };
+
 async function activateUser(values: Values) {
   const { uid, token } = values;
 
@@ -11,7 +12,6 @@ async function activateUser(values: Values) {
     method: 'POST',
     headers: {
       'Content-Type': 'application/json',
-      Accept: 'application/json',
     },
     body: JSON.stringify({ uid, token }),
   });

@@ -1,7 +1,7 @@
 import Link from 'next/link';
 import { UserForm } from '@/components/auth/user-form';
 import { AuthLayout } from '@/components/auth/auth-layout';
-import { loginUser } from '@/lib/api/loginUser';
+import { loginUser } from '@/actions/loginUser';
 
 export default function LoginPage() {
   return (

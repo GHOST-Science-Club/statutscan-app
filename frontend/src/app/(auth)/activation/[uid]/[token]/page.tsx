@@ -2,7 +2,7 @@ import Link from 'next/link';
 import { notFound } from 'next/navigation';
 import { AuthLayout } from '@/components/auth/auth-layout';
 import { Button } from '@/components/ui/button';
-import { activateUser } from '@/lib/api/activateUser';
+import { activateUser } from '@/actions/activateUser';
 
 type Params = {
   uid: string;
