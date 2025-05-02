@@ -1,12 +1,12 @@
 'use server';
 
 import { z } from 'zod';
-import { userSchema } from '@/lib/types';
+import { loginSchema } from '@/lib/types';
 import { cookies } from 'next/headers';
 import { fetchBackend } from '@/lib/fetchBackend';
 import { redirect } from 'next/navigation';
 
-async function loginUser(values: z.infer<typeof userSchema>) {
+async function loginUser(values: z.infer<typeof loginSchema>) {
   const { email, password } = values;
   const res = await fetchBackend({
     url: '/api/jwt/create/',

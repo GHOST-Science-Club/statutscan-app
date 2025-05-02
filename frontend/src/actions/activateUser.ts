@@ -14,10 +14,7 @@ async function activateUser(values: Values) {
     method: 'POST',
     body: { uid, token },
   });
-
-  console.log(res);
-  const json = await res.json();
-  console.log(json);
+  return res.ok;
 }
 
 export { activateUser };

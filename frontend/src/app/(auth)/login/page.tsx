@@ -1,7 +1,6 @@
 import Link from 'next/link';
-import { UserForm } from '@/components/auth/user-form';
 import { AuthLayout } from '@/components/auth/auth-layout';
-import { loginUser } from '@/actions/loginUser';
+import { LoginForm } from '@/components/auth/login-form';
 
 export default function LoginPage() {
   return (
@@ -17,11 +16,7 @@ export default function LoginPage() {
       }
       social
     >
-      <UserForm
-        onSubmit={loginUser}
-        rememberPassword
-        buttonText="Zaloguj się"
-      />
+      <LoginForm />
     </AuthLayout>
   );
 }

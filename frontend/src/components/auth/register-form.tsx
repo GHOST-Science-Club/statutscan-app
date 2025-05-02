@@ -8,32 +8,28 @@ import { Button } from '@/components/ui/button';
 import {
   Form,
   FormControl,
-  FormDescription,
   FormField,
   FormItem,
   FormLabel,
   FormMessage,
 } from '@/components/ui/form';
 import { Input } from '@/components/ui/input';
-import Link from 'next/link';
-import { userSchema } from '@/lib/types';
+import { registerSchema } from '@/lib/types';
+import { registerUser } from '@/actions/registerUser';
 
-type Props = {
-  buttonText: string;
-  rememberPassword?: boolean;
-  onSubmit: (values: z.infer<typeof userSchema>) => void;
-};
-
-function UserForm(props: Props) {
-  const { buttonText, rememberPassword, onSubmit } = props;
-
-  const form = useForm<z.infer<typeof userSchema>>({
-    resolver: zodResolver(userSchema),
+function RegisterForm() {
+  const form = useForm<z.infer<typeof registerSchema>>({
+    resolver: zodResolver(registerSchema),
     defaultValues: {
       email: '',
       password: '',
+      re_password: '',
     },
   });
+
+  const onSubmit = async (values: z.infer<typeof registerSchema>) => {
+    await registerUser(values);
+  };
 
   return (
     <Form {...form}>
@@ -61,23 +57,30 @@ function UserForm(props: Props) {
                 <Input type="password" placeholder="Hasło" {...field} />
               </FormControl>
               <FormMessage />
-              {rememberPassword && (
-                <FormDescription className="ml-auto">
-                  <Link
-                    href="/reset-password"
-                    className="hover:text-foreground text-xs underline decoration-1 underline-offset-2 duration-300"
-                  >
-                    Nie pamietam hasła.
-                  </Link>
-                </FormDescription>
-              )}
             </FormItem>
           )}
         />
-        <Button type="submit">{buttonText}</Button>
+        <FormField
+          control={form.control}
+          name="re_password"
+          render={({ field }) => (
+            <FormItem>
+              <FormLabel className="sr-only">Potwierdź hasło</FormLabel>
+              <FormControl>
+                <Input
+                  type="password"
+                  placeholder="Potwierdź hasło"
+                  {...field}
+                />
+              </FormControl>
+              <FormMessage />
+            </FormItem>
+          )}
+        />
+        <Button type="submit">Utwórz konto</Button>
       </form>
     </Form>
   );
 }
 
-export { UserForm };
+export { RegisterForm };

@@ -14,19 +14,7 @@ import {
   FormMessage,
 } from '@/components/ui/form';
 import { Input } from '@/components/ui/input';
-
-const resetSchema = z.object({
-  email: z
-    .string({
-      errorMap: () => ({
-        message: 'Adres e-mail powinien zawierać minimum 5 znaków',
-      }),
-    })
-    .min(5)
-    .max(50, {
-      message: 'Adres e-mail powinien zawierać minimum 50 znaków',
-    }),
-});
+import { resetSchema } from '@/lib/types';
 
 function ResetForm() {
   const form = useForm<z.infer<typeof resetSchema>>({

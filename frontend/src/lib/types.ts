@@ -1,6 +1,6 @@
 import { z } from 'zod';
 
-const userSchema = z.object({
+const loginSchema = z.object({
   email: z
     .string({
       errorMap: () => ({
@@ -17,4 +17,26 @@ const userSchema = z.object({
     .max(50, { message: 'Hasło może zawierać maksymalnie 50 znaków' }),
 });
 
-export { userSchema };
+const registerSchema = loginSchema
+  .extend({
+    re_password: z.string(),
+  })
+  .refine(data => data.password === data.re_password, {
+    message: 'Hasła muszą być takie same',
+    path: ['re_password'],
+  });
+
+const resetSchema = z.object({
+  email: z
+    .string({
+      errorMap: () => ({
+        message: 'Adres e-mail powinien zawierać minimum 5 znaków',
+      }),
+    })
+    .min(5)
+    .max(50, {
+      message: 'Adres e-mail powinien zawierać minimum 50 znaków',
+    }),
+});
+
+export { loginSchema, registerSchema, resetSchema };

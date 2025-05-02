@@ -1,14 +1,13 @@
 'use server';
 
 import { z } from 'zod';
-import { userSchema } from '@/lib/types';
+import { registerSchema } from '@/lib/types';
 import { fetchBackend } from '@/lib/fetchBackend';
 import { redirect } from 'next/navigation';
 
-async function registerUser(values: z.infer<typeof userSchema>) {
-  const { email, password } = values;
+async function registerUser(values: z.infer<typeof registerSchema>) {
+  const { email, password, re_password } = values;
   const username = 'asdasd123asd';
-  const re_password = password;
   const res = await fetchBackend({
     url: '/api/users/',
     method: 'POST',
