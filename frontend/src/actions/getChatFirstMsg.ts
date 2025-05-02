@@ -1,13 +1,14 @@
 'use server';
 
+import { fetchBackend } from '@/lib/fetchBackend';
+
 async function getChatFirstMsg({ question }: { question: string }) {
-  const res = await fetch(process.env.API_URL + '/chat/redirect/', {
+  const res = await fetchBackend({
+    url: '/chat/redirect/',
     method: 'POST',
-    headers: {
-      'Content-Type': 'application/json',
-    },
-    body: JSON.stringify({ question }),
+    body: { question },
   });
+
   console.log(res);
   const json = await res.json();
   console.log(json);

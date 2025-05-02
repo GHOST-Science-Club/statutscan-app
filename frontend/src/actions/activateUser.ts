@@ -1,5 +1,7 @@
 'use server';
 
+import { fetchBackend } from '@/lib/fetchBackend';
+
 type Values = {
   uid: string;
   token: string;
@@ -7,14 +9,12 @@ type Values = {
 
 async function activateUser(values: Values) {
   const { uid, token } = values;
-
-  const res = await fetch(process.env.API_URL + '/api/users/activation/', {
+  const res = await fetchBackend({
+    url: '/api/users/activation/',
     method: 'POST',
-    headers: {
-      'Content-Type': 'application/json',
-    },
-    body: JSON.stringify({ uid, token }),
+    body: { uid, token },
   });
+
   console.log(res);
   const json = await res.json();
   console.log(json);
