@@ -13,13 +13,16 @@ import {
   FormItem,
   FormLabel,
   FormMessage,
+  FormRootError,
 } from '@/components/ui/form';
 import { Input } from '@/components/ui/input';
 import Link from 'next/link';
 import { loginSchema } from '@/lib/types';
 import { loginUser } from '@/actions/loginUser';
+import { useState } from 'react';
 
 function LoginForm() {
+  const [loading, setLoading] = useState(false);
   const form = useForm<z.infer<typeof loginSchema>>({
     resolver: zodResolver(loginSchema),
     defaultValues: {
@@ -29,7 +32,15 @@ function LoginForm() {
   });
 
   const onSubmit = async (values: z.infer<typeof loginSchema>) => {
-    await loginUser(values);
+    setLoading(true);
+    const ok = await loginUser(values);
+    if (!ok) {
+      setLoading(false);
+      form.setError('root', {
+        type: 'custom',
+        message: 'Niepoprawny adres e-mail lub hasło',
+      });
+    }
   };
 
   return (
@@ -69,7 +80,10 @@ function LoginForm() {
             </FormItem>
           )}
         />
-        <Button type="submit">Zaloguj się</Button>
+        <FormRootError />
+        <Button type="submit" disabled={loading}>
+          {loading ? 'Logowanie' : 'Zaloguj się'}
+        </Button>
       </form>
     </Form>
   );

@@ -5,12 +5,12 @@ import * as LabelPrimitive from '@radix-ui/react-label';
 import { Slot } from '@radix-ui/react-slot';
 import {
   Controller,
-  FormProvider,
-  useFormContext,
-  useFormState,
   type ControllerProps,
   type FieldPath,
   type FieldValues,
+  FormProvider,
+  useFormContext,
+  useFormState,
 } from 'react-hook-form';
 
 import { cn } from '@/lib/utils';
@@ -160,6 +160,24 @@ function FormMessage({ className, ...props }: React.ComponentProps<'p'>) {
   );
 }
 
+function FormRootError({ className, ...props }: React.ComponentProps<'p'>) {
+  const { errors } = useFormState();
+  const rootError = errors.root;
+
+  if (!rootError) {
+    return null;
+  }
+
+  return (
+    <p
+      className={cn('text-destructive text-center text-sm', className)}
+      {...props}
+    >
+      {rootError.message}
+    </p>
+  );
+}
+
 export {
   useFormField,
   Form,
@@ -169,4 +187,5 @@ export {
   FormDescription,
   FormMessage,
   FormField,
+  FormRootError,
 };

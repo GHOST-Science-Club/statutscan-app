@@ -13,6 +13,10 @@ async function loginUser(values: z.infer<typeof loginSchema>) {
     method: 'POST',
     body: { email, password },
   });
+
+  if (!res.ok) return false;
+  if (res.status != 200) return false;
+
   const json = await res.json();
   const cookieStore = await cookies();
   cookieStore.set('access', json.access, {
@@ -30,9 +34,7 @@ async function loginUser(values: z.infer<typeof loginSchema>) {
     maxAge: 86400,
   });
 
-  if (res.status == 200) {
-    redirect('/chat');
-  }
+  redirect('/chat');
 }
 
 export { loginUser };
