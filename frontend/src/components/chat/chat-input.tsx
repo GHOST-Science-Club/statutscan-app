@@ -7,7 +7,10 @@ import { cn } from '@/lib/utils';
 import { useAutoResizeTextarea } from '@/hooks/use-auto-resize-textarea';
 import { Button } from '@/components/ui/button';
 
-function ChatInput() {
+type Props = {
+  onSubmit: (value: string) => void;
+};
+function ChatInput({ onSubmit }: Props) {
   const [inputValue, setInputValue] = useState('');
   const [loading, setLoading] = useState(false);
   const { textareaRef, adjustHeight } = useAutoResizeTextarea({
@@ -21,6 +24,8 @@ function ChatInput() {
 
     setInputValue('');
     adjustHeight(true);
+
+    onSubmit(inputValue);
 
     setTimeout(() => {
       setLoading(false);
