@@ -16,13 +16,14 @@ async function refreshToken() {
   });
 
   const json = await res.json();
-  cookieStore.set('access', json.access, {
-    secure: true,
-    httpOnly: true,
-    sameSite: process.env.NODE_ENV == 'production' && 'strict',
-    path: '/',
-    maxAge: 86400,
-  });
+  if (json.access)
+    cookieStore.set('access', json.access, {
+      secure: true,
+      httpOnly: true,
+      sameSite: process.env.NODE_ENV == 'production' && 'strict',
+      path: '/',
+      maxAge: 86400,
+    });
 }
 
 export { refreshToken };

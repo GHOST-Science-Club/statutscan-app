@@ -4,6 +4,7 @@ import { z } from 'zod';
 import { userSchema } from '@/lib/types';
 import { cookies } from 'next/headers';
 import { fetchBackend } from '@/lib/fetchBackend';
+import { redirect } from 'next/navigation';
 
 async function loginUser(values: z.infer<typeof userSchema>) {
   const { email, password } = values;
@@ -13,7 +14,6 @@ async function loginUser(values: z.infer<typeof userSchema>) {
     body: { email, password },
   });
   const json = await res.json();
-  console.log(json, res.status);
   const cookieStore = await cookies();
   cookieStore.set('access', json.access, {
     secure: true,
@@ -29,6 +29,10 @@ async function loginUser(values: z.infer<typeof userSchema>) {
     path: '/',
     maxAge: 86400,
   });
+
+  if (res.status == 200) {
+    redirect('/chat');
+  }
 }
 
 export { loginUser };
