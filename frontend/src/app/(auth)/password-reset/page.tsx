@@ -1,8 +1,8 @@
 import Link from 'next/link';
 import { AuthLayout } from '@/components/auth/auth-layout';
-import { ResetForm } from '@/components/auth/reset-form';
+import { ResetPassForm } from '@/components/auth/reset-pass-form';
 
-export default function ConfirmPage() {
+export default function ResetPasswordPage() {
   return (
     <AuthLayout
       title="Resetuj hasło"
@@ -12,7 +12,7 @@ export default function ConfirmPage() {
         </Link>
       }
     >
-      <ResetForm />
+      <ResetPassForm />
     </AuthLayout>
   );
 }

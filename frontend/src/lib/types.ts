@@ -41,4 +41,17 @@ const resetSchema = z.object({
     .email('Niepoprawny adres e-mail'),
 });
 
-export { loginSchema, registerSchema, resetSchema };
+const resetConfirmSchema = z
+  .object({
+    new_password: z
+      .string()
+      .min(8, { message: 'Hasło musi zawierać minimum 8 znaków' })
+      .max(50, { message: 'Hasło może zawierać maksymalnie 50 znaków' }),
+    re_new_password: z.string(),
+  })
+  .refine(data => data.new_password === data.re_new_password, {
+    message: 'Hasła muszą być takie same',
+    path: ['re_password'],
+  });
+
+export { loginSchema, registerSchema, resetSchema, resetConfirmSchema };

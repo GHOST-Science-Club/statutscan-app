@@ -14,10 +14,14 @@ import {
   FormMessage,
 } from '@/components/ui/form';
 import { Input } from '@/components/ui/input';
-import { resetSchema } from '@/lib/types';
+import { resetConfirmSchema, resetSchema } from '@/lib/types';
 import { redirect } from 'next/navigation';
+import { resetConfirmPassword } from '@/actions/resetConfirmPassword';
+import { useState } from 'react';
+import { resetPassword } from '@/actions/resetPassword';
 
-function ResetForm() {
+function ResetPassForm() {
+  const [loading, setLoading] = useState(false);
   const form = useForm<z.infer<typeof resetSchema>>({
     resolver: zodResolver(resetSchema),
     defaultValues: {
@@ -25,10 +29,17 @@ function ResetForm() {
     },
   });
 
-  function onSubmit(values: z.infer<typeof resetSchema>) {
-    console.log(values);
-    redirect('/confirm/pass');
-  }
+  const onSubmit = async (values: z.infer<typeof resetSchema>) => {
+    setLoading(true);
+    const ok = await resetPassword(values);
+    if (!ok) {
+      setLoading(false);
+      form.setError('email', {
+        type: 'custom',
+        message: 'Nie istnieje konto z podanym adresem e-mail',
+      });
+    } else redirect('/confirm/pass');
+  };
 
   return (
     <Form {...form}>
@@ -48,10 +59,12 @@ function ResetForm() {
             </FormItem>
           )}
         />
-        <Button type="submit">Wyślij</Button>
+        <Button type="submit" disabled={loading}>
+          {loading ? 'Wsyłanie' : 'Wyślij'}
+        </Button>
       </form>
     </Form>
   );
 }
 
-export { ResetForm };
+export { ResetPassForm };

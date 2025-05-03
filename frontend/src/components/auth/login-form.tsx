@@ -71,7 +71,7 @@ function LoginForm() {
               <FormMessage />
               <FormDescription className="ml-auto">
                 <Link
-                  href="/reset-password"
+                  href="/password-reset"
                   className="hover:text-foreground text-xs underline decoration-1 underline-offset-2 duration-300"
                 >
                   Nie pamietam hasła.
