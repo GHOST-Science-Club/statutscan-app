@@ -12,6 +12,7 @@ import {
   FormItem,
   FormLabel,
   FormMessage,
+  FormRootError,
 } from '@/components/ui/form';
 import { Input } from '@/components/ui/input';
 import { registerSchema } from '@/lib/types';
@@ -28,7 +29,15 @@ function RegisterForm() {
   });
 
   const onSubmit = async (values: z.infer<typeof registerSchema>) => {
-    await registerUser(values);
+    const errors = await registerUser(values);
+    if (errors) {
+      errors.forEach(error => {
+        form.setError(error.type, {
+          type: 'manual',
+          message: error.message,
+        });
+      });
+    }
   };
 
   return (
@@ -77,6 +86,7 @@ function RegisterForm() {
             </FormItem>
           )}
         />
+        <FormRootError />
         <Button type="submit">Utwórz konto</Button>
       </form>
     </Form>

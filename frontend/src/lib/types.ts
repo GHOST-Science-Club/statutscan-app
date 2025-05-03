@@ -9,8 +9,9 @@ const loginSchema = z.object({
     })
     .min(5)
     .max(50, {
-      message: 'Adres e-mail powinien zawierać minimum 50 znaków',
-    }),
+      message: 'Adres e-mail powinien zawierać maksymalnie 50 znaków',
+    })
+    .email('Niepoprawny adres e-mail'),
   password: z
     .string()
     .min(8, { message: 'Hasło musi zawierać minimum 8 znaków' })
@@ -36,7 +37,8 @@ const resetSchema = z.object({
     .min(5)
     .max(50, {
       message: 'Adres e-mail powinien zawierać minimum 50 znaków',
-    }),
+    })
+    .email('Niepoprawny adres e-mail'),
 });
 
 export { loginSchema, registerSchema, resetSchema };
