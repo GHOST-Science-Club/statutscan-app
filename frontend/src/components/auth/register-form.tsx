@@ -17,8 +17,10 @@ import {
 import { Input } from '@/components/ui/input';
 import { registerSchema } from '@/lib/types';
 import { registerUser } from '@/actions/registerUser';
+import { useState } from 'react';
 
 function RegisterForm() {
+  const [loading, setLoading] = useState(false);
   const form = useForm<z.infer<typeof registerSchema>>({
     resolver: zodResolver(registerSchema),
     defaultValues: {
@@ -29,6 +31,7 @@ function RegisterForm() {
   });
 
   const onSubmit = async (values: z.infer<typeof registerSchema>) => {
+    setLoading(true);
     const errors = await registerUser(values);
     if (errors) {
       errors.forEach(error => {
@@ -37,6 +40,7 @@ function RegisterForm() {
           message: error.message,
         });
       });
+      setLoading(false);
     }
   };
 
@@ -87,7 +91,9 @@ function RegisterForm() {
           )}
         />
         <FormRootError />
-        <Button type="submit">Utwórz konto</Button>
+        <Button type="submit" disabled={loading}>
+          {loading ? 'Logowanie' : 'Utwórz konto'}
+        </Button>
       </form>
     </Form>
   );

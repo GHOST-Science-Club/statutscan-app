@@ -15,6 +15,7 @@ import {
 } from '@/components/ui/form';
 import { Input } from '@/components/ui/input';
 import { resetSchema } from '@/lib/types';
+import { redirect } from 'next/navigation';
 
 function ResetForm() {
   const form = useForm<z.infer<typeof resetSchema>>({
@@ -26,6 +27,7 @@ function ResetForm() {
 
   function onSubmit(values: z.infer<typeof resetSchema>) {
     console.log(values);
+    redirect('/confirm/pass');
   }
 
   return (
