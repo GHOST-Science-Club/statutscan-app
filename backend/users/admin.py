@@ -9,8 +9,11 @@ class CustomUserAdmin(BaseUserAdmin):
     list_display = [
         "email",
         "tokens_used",
+        "total_tokens_used",
+        "is_chat_blocked",
         "is_active",
         "is_staff",
+        "last_chat_usage",
         "last_login",
         "date_joined",
     ]
@@ -31,6 +34,7 @@ class CustomUserAdmin(BaseUserAdmin):
             },
         ),
         (_("Important dates"), {"fields": ("last_login", "date_joined")}),
+        (_("Chat info"), {"fields": ("tokens_used", "total_tokens_used", "is_chat_blocked", "last_chat_usage")}),
     )
 
     add_fieldsets = (
@@ -47,7 +51,12 @@ class CustomUserAdmin(BaseUserAdmin):
         ),
     )
 
-    readonly_fields = ("date_joined", "last_login", "tokens_used")
-
+    readonly_fields = (
+        "date_joined",
+        "last_login",
+        "tokens_used",
+        "total_tokens_used",
+        "last_chat_usage",
+    )
 
 admin.site.register(CustomUser, CustomUserAdmin)
