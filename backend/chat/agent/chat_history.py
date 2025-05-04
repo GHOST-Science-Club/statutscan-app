@@ -4,8 +4,8 @@ from bson.errors import InvalidId
 from typing import List, Tuple, Optional
 from datetime import datetime
 from django.apps import apps
-from chat.agent.generate_id import generate_id
 from chat.agent.generate_chat_title import generate_chat_title
+import uuid
 
 
 class ChatHistory:
@@ -27,8 +27,8 @@ class ChatHistory:
         Returns:
             str: The generated chat ID.
         """
-        chat_id = generate_id()
-        chat_title = await generate_chat_title(question)
+        chat_id = uuid.uuid4().hex[:24]
+        chat_title = await generate_chat_title(question, chat_id)
         creation_date = datetime.now()
         messages = [{
             "role": "user",
@@ -195,4 +195,3 @@ class ChatHistory:
 
         rec = self.chat_history.find_one({"_id": _id}, {"email": 1})
         return rec.get("email") if rec else None
-
