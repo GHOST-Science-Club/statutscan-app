@@ -13,19 +13,32 @@ import {
   NavBody,
   NavItems,
 } from '@/components/ui/resizable-navbar';
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
+import { isLogged } from '@/actions/isLogged';
 
 function Header() {
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
+  const [logged, setIsLogged] = useState(false);
+
+  useEffect(() => {
+    isLogged().then(res => setIsLogged(res));
+  }, []);
+
   return (
     <Navbar>
       {/* Desktop Navigation */}
       <NavBody>
         <NavbarLogo />
         <NavItems items={NAV_ITEMS} />
-        <NavbarButton variant="gradient" href="/login">
-          Zaloguj się
-        </NavbarButton>
+        {logged ? (
+          <NavbarButton variant="gradient" href="/chat">
+            Czat
+          </NavbarButton>
+        ) : (
+          <NavbarButton variant="gradient" href="/login">
+            Zaloguj się
+          </NavbarButton>
+        )}
       </NavBody>
 
       {/* Mobile Navigation */}
@@ -51,9 +64,15 @@ function Header() {
               {item.name}
             </Link>
           ))}
-          <NavbarButton variant="gradient" className="w-full" href="/login">
-            Zaloguj się
-          </NavbarButton>
+          {logged ? (
+            <NavbarButton variant="gradient" className="w-full" href="/chat">
+              Czat
+            </NavbarButton>
+          ) : (
+            <NavbarButton variant="gradient" className="w-full" href="/login">
+              Zaloguj się
+            </NavbarButton>
+          )}
         </MobileNavMenu>
       </MobileNav>
     </Navbar>

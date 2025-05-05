@@ -1,7 +1,6 @@
 import type { NextRequest } from 'next/server';
 import { NextResponse } from 'next/server';
-import { verifyToken } from '@/actions/verifyToken';
-import { refreshToken } from '@/actions/refreshToken';
+import { isLogged } from '@/actions/isLogged';
 
 export async function middleware(request: NextRequest) {
   const response = NextResponse.next();
@@ -10,14 +9,9 @@ export async function middleware(request: NextRequest) {
   response.headers.set('Referrer-Policy', 'origin-when-cross-origin');
 
   if (request.nextUrl.pathname.startsWith('/chat')) {
-    const firstAttempt = await verifyToken();
-    if (!firstAttempt) {
-      await refreshToken();
-      const secondAttempt = await verifyToken();
-      if (!secondAttempt)
-        return NextResponse.redirect(new URL('/unauthorized', request.url));
-    }
-    return NextResponse.next();
+    const logged = await isLogged();
+    if (!logged)
+      return NextResponse.redirect(new URL('/unauthorized', request.url));
   }
 
   return NextResponse.next();

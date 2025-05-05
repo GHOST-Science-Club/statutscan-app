@@ -70,7 +70,7 @@ export const Navbar = ({ children, className }: NavbarProps) => {
     <header
       ref={ref}
       className={cn(
-        'sticky inset-x-0 top-5 z-40 mx-auto w-full max-w-7xl px-5',
+        'pointer-events-none sticky inset-x-0 top-5 z-40 mx-auto w-full max-w-7xl px-5',
         className,
       )}
     >
@@ -106,7 +106,7 @@ export const NavBody = ({ children, className, visible }: NavBodyProps) => {
         minWidth: '800px',
       }}
       className={cn(
-        'relative z-[60] mx-auto hidden w-full max-w-7xl flex-row items-center justify-between self-start rounded-full bg-transparent px-4 py-2 lg:flex dark:bg-transparent',
+        'pointer-events-auto relative z-[60] mx-auto hidden w-full max-w-7xl flex-row items-center justify-between self-start rounded-full bg-transparent px-4 py-2 lg:flex dark:bg-transparent',
         visible && 'bg-card/80',
         className,
       )}
@@ -168,7 +168,7 @@ export const MobileNav = ({ children, className, visible }: MobileNavProps) => {
         damping: 50,
       }}
       className={cn(
-        'relative z-50 mx-auto flex w-full max-w-[calc(100vw-2rem)] flex-col items-center justify-between bg-transparent px-0 py-2 lg:hidden',
+        'pointer-events-auto relative z-50 mx-auto flex w-full max-w-[calc(100vw-2rem)] flex-col items-center justify-between bg-transparent px-0 py-2 lg:hidden',
         visible && 'bg-card/80',
         className,
       )}
