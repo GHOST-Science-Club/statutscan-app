@@ -51,7 +51,7 @@ const resetConfirmSchema = z
   })
   .refine(data => data.new_password === data.re_new_password, {
     message: 'Hasła muszą być takie same',
-    path: ['re_password'],
+    path: ['re_new_password'],
   });
 
 export { loginSchema, registerSchema, resetSchema, resetConfirmSchema };

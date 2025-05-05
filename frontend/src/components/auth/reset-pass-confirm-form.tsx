@@ -18,11 +18,13 @@ import { Input } from '@/components/ui/input';
 import { resetConfirmSchema } from '@/lib/types';
 import { useState } from 'react';
 import { resetConfirmPassword } from '@/actions/resetConfirmPassword';
+import { redirect } from 'next/navigation';
 
 type Props = {
   uid: string;
   token: string;
 };
+
 function ResetPassConfirmForm(props: Props) {
   const { uid, token } = props;
   const [loading, setLoading] = useState(false);
@@ -36,11 +38,18 @@ function ResetPassConfirmForm(props: Props) {
 
   const onSubmit = async (values: z.infer<typeof resetConfirmSchema>) => {
     setLoading(true);
-    await resetConfirmPassword({
+    const ok = await resetConfirmPassword({
       uid,
       token,
       ...values,
     });
+    if (ok) {
+      redirect('/login');
+    } else {
+      form.setError('root', {
+        message: 'Nie udało się zresetować hasła',
+      });
+    }
   };
 
   return (

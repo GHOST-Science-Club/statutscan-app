@@ -22,6 +22,7 @@ async function resetConfirmPassword(props: Props) {
     },
   });
   console.log(res);
+  return res.ok;
 }
 
 export { resetConfirmPassword };
