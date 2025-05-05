@@ -4,6 +4,9 @@ from typing import Dict
 from pgvector.django import CosineDistance
 from chat.models import Embeddings
 from asgiref.sync import sync_to_async
+from chat.agent.token_usage_manager import TokenUsageManager
+
+token_usage_manager = TokenUsageManager()
 
 
 class ToolInterface:
@@ -36,15 +39,16 @@ class KnowledgeBaseTool(ToolInterface):
         self.n_results = n_results
         self.openai_client = AsyncOpenAI()
 
-    async def __get_embedding(self, text: str):
+    async def __get_embedding(self, text: str, chat_id: str):
         response = await self.openai_client.embeddings.create(
             input=[text],
             model="text-embedding-3-small"
         )
+        token_usage_manager.add_used_tokens(chat_id, response.usage.total_tokens)
         return response.data[0].embedding
 
-    async def use(self, question:str):
-        embedding = await self.__get_embedding(question)
+    async def use(self, question:str, chat_id: str):
+        embedding = await self.__get_embedding(question, chat_id)
         documents = await sync_to_async(
             lambda: list(
                 Embeddings.objects.order_by(CosineDistance("embedding", embedding))[:self.n_results]

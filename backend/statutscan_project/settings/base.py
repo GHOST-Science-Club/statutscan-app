@@ -10,9 +10,7 @@ local_env_file = path.join(BASE_DIR, ".envs", ".env.production")
 if path.isfile(local_env_file):
     load_dotenv(local_env_file)
 
-DAPHNE_APP = [
-    "daphne" # must be listed before django.contrib.staticfiles
-]
+DAPHNE_APP = ["daphne"]  # must be listed before django.contrib.staticfiles
 
 DJANGO_APPS = [
     "django.contrib.admin",
@@ -69,13 +67,9 @@ TEMPLATES = [
     },
 ]
 
-ASGI_APPLICATION = 'statutscan_project.asgi.application'
+ASGI_APPLICATION = "statutscan_project.asgi.application"
 
-CHANNEL_LAYERS = {
-    "default": {
-        "BACKEND": "channels.layers.InMemoryChannelLayer"
-    }
-}
+CHANNEL_LAYERS = {"default": {"BACKEND": "channels.layers.InMemoryChannelLayer"}}
 
 DATABASES = {
     "default": {
@@ -113,7 +107,7 @@ AUTH_PASSWORD_VALIDATORS = [
         "NAME": "django.contrib.auth.password_validation.NumericPasswordValidator",
     },
     {
-         "NAME": "users.validators.NewPasswordNotSameAsOldValidator",
+        "NAME": "users.validators.NewPasswordNotSameAsOldValidator",
     },
 ]
 
@@ -144,10 +138,10 @@ SOCIAL_AUTH_PIPELINE = (
     "social_core.pipeline.social_auth.social_uid",
     "social_core.pipeline.social_auth.auth_allowed",
     "social_core.pipeline.social_auth.social_user",
-    'social_core.pipeline.social_auth.associate_by_email',
-    'social_core.pipeline.user.create_user',
+    "social_core.pipeline.social_auth.associate_by_email",
+    "social_core.pipeline.user.create_user",
     "users.pipeline.activate_social_user",
-    'social_core.pipeline.social_auth.associate_user',
+    "social_core.pipeline.social_auth.associate_user",
     "social_core.pipeline.social_auth.load_extra_data",
 )
 
@@ -167,8 +161,13 @@ DJOSER = {
     "SOCIAL_AUTH_ALLOWED_REDIRECT_URIS": getenv("REDIRECT_URLS", "").split(","),
     "EMAIL": {
         "activation": "users.email.CustomActivationEmail",
-        'confirmation': "users.email.CustomConfirmationEmail",
+        "confirmation": "users.email.CustomConfirmationEmail",
         "password_reset": "users.email.CustomPasswordResetEmail",
+    },
+    "SERIALIZERS": {
+        "user_create": "users.serializers.UserCreateSerializer",
+        "user": "users.serializers.UserSerializer",
+        "current_user": "users.serializers.CurrentUserSerializer",
     },
 }
 
