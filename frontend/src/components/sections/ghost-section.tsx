@@ -1,5 +1,6 @@
 import Image from 'next/image';
 import { SectionLayout } from '@/components/ui/section-layout';
+import { TextAnimate } from '@/components/ui/text-animate';
 import person1 from '@/../public/person1.png';
 import person2 from '@/../public/person2.png';
 import person3 from '@/../public/person3.png';
@@ -44,9 +45,14 @@ function GhostSection() {
           ))}
         </div>
         <div className="col-span-2">
-          <p className="text-muted font-heading text-center text-7xl font-extrabold xl:text-[220px]">
+          <TextAnimate
+            as="p"
+            animation="slideLeft"
+            by="character"
+            className="text-muted font-heading text-center text-7xl font-extrabold xl:text-[200px]"
+          >
             GHOST
-          </p>
+          </TextAnimate>
           <h3>Organizacja studencka przy Politechnice Poznaskiej</h3>
           <br />
           <p>

@@ -12,7 +12,7 @@ function FaqSection() {
   return (
     <SectionLayout id="faq" title="FAQ">
       <div className="grid grid-cols-1 md:grid-cols-2">
-        <TextAnimate as="h3" animation="slideRight" by="character">
+        <TextAnimate as="h3" animation="slideRight" by="word" className="mb-5">
           Najczęściej zadawane pytania
         </TextAnimate>
         <Accordion type="multiple" className="space-y-5">

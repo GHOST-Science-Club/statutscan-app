@@ -1,6 +1,7 @@
 import { SectionLayout } from '@/components/ui/section-layout';
 import { Button } from '@/components/ui/button';
 import Link from 'next/link';
+import { AboutChatItem } from '@/components/AboutChatItem';
 
 const cards = [
   {
@@ -47,19 +48,9 @@ function AboutChatSection() {
         </span>{' '}
         znaleźć odpowiedzi na pytania związane z edukacją w Polsce
       </h3>
-      <div className="mt-6 grid grid-cols-1 gap-8 sm:grid-cols-2 lg:grid-cols-4">
+      <div className="mt-6 grid grid-cols-1 gap-8 overflow-hidden sm:grid-cols-2 lg:grid-cols-4">
         {cards.map((card, index) => (
-          <div className="h-fit rounded-sm border p-2" key={index}>
-            <div className="flex items-start justify-between">
-              <h4 className="mb-2 text-xl font-semibold">{card.title}</h4>
-              <span className="text-muted-foreground text-sm">
-                (0{index + 1})
-              </span>
-            </div>
-
-            <p className="text-muted-foreground">{card.description}</p>
-            {card.footer}
-          </div>
+          <AboutChatItem key={index} index={index} {...card} />
         ))}
       </div>
     </SectionLayout>
