@@ -1,20 +1,10 @@
 'use client';
 import { ChatInput } from '@/components/chat/chat-input';
+import { getChatFirstMsg } from '@/actions/getChatFirstMsg';
 
 export default function ChatInitialPage() {
   const onSubmit = async (question: string) => {
-    console.log('Question submitted:', question);
-
-    const response = await fetch('http://localhost:8000/chat/redirect/', {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-      },
-      credentials: 'include',
-      body: JSON.stringify({ question }),
-    });
-
-    console.log(response);
+    await getChatFirstMsg({ question });
   };
 
   return (
@@ -22,7 +12,6 @@ export default function ChatInitialPage() {
       <section>
         <h2 className="text-gradient pb-5">Zapytaj o coś</h2>
       </section>
-
       <ChatInput onSubmit={onSubmit} />
     </>
   );
