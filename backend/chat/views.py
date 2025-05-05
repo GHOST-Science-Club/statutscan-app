@@ -4,13 +4,10 @@ from rest_framework.parsers import JSONParser
 from rest_framework.response import Response
 from rest_framework import status, serializers
 from rest_framework.permissions import IsAuthenticated
-<<<<<<< HEAD
 from rest_framework import mixins, viewsets
 from drf_yasg import openapi
 from drf_yasg.utils import swagger_auto_schema
 from asgiref.sync import async_to_sync
-=======
->>>>>>> main
 
 from chat.agent.chat_history import ChatHistory
 from chat.agent.token_usage_manager import TokenUsageManager
@@ -29,7 +26,7 @@ class ChatRedirectionSerializer(serializers.Serializer):
         return instance
 
 
-<<<<<<< HEAD
+
 class ChatRedirectionView(
     mixins.CreateModelMixin,
     viewsets.GenericViewSet
@@ -42,8 +39,6 @@ class ChatRedirectionView(
         return super().create(request, *args, **kwargs)
 
 
-=======
->>>>>>> main
 @api_view(['GET'])
 @permission_classes([IsAuthenticated])
 def chat_view(request):
