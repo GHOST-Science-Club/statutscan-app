@@ -21,6 +21,7 @@ urlpatterns = [
     path('', include('chat.urls')),
     path('api/', include('djoser.urls')),
     path('api/', include('users.urls')),
+    path('dashboard/', include('dashboard.urls')),
 
     re_path(
         r"^swagger(?P<format>\.json|\.yaml)$",

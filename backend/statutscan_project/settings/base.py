@@ -29,6 +29,7 @@ THIRD_PARTY_APPS = [
     "djoser",
     "social_django",
     "drf_yasg",
+    "django_plotly_dash.apps.DjangoPlotlyDashConfig"
 ]
 
 LOCAL_APPS = [
