@@ -7,7 +7,6 @@ from rest_framework.permissions import IsAuthenticated
 from rest_framework import mixins, viewsets
 from drf_yasg import openapi
 from drf_yasg.utils import swagger_auto_schema
-from asgiref.sync import async_to_sync
 
 from chat.agent.chat_history import ChatHistory
 from chat.agent.token_usage_manager import TokenUsageManager
@@ -24,7 +23,6 @@ class ChatRedirectionSerializer(serializers.Serializer):
 
     def update(self, instance, validated_data):
         return instance
-
 
 
 class ChatRedirectionView(
@@ -98,7 +96,7 @@ def chat_redirection_view(request):
             return Response({"error": "Could not create chat."}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
 
         return Response({
-            "redirect_url": f"/chat/{chat_id}?redirection=true"
+            "redirect_url": f"/chat/{chat_id}/?redirection=true"
         }, status=status.HTTP_201_CREATED)
 
     except Exception as e:
