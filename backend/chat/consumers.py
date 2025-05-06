@@ -54,6 +54,20 @@ class ChatConsumer(AsyncWebsocketConsumer):
             self.channel_name
         )
 
+    async def safe_send(self, content):
+        try:
+            await self.send(text_data=json.dumps(content))
+        except Exception as e:
+            print(f"Send error: {e}")
+            try:
+                await self.send(text_data=json.dumps({
+                    'type': 'error',
+                    'message': 'An error occurred while sending a message. Please try again later.'
+                }))
+            except Exception as nested_e:
+                print(f"Connection is broken: {nested_e}")
+                await self.close()
+
     async def receive(self, text_data):
         """
         Called when a message is received over the WebSocket.
@@ -61,7 +75,7 @@ class ChatConsumer(AsyncWebsocketConsumer):
         normally or quietly (e.g., for redirection scenarios).
         """
         if token_usage_manager.is_user_blocked(self.user_email):
-            self.send(text_data=json.dumps({
+            self.safe_send(text_data=json.dumps({
                 'type': 'token_limit_reached',
                 'reset_date': token_usage_manager.get_reset_date(self.user_email)
             }))
@@ -81,13 +95,13 @@ class ChatConsumer(AsyncWebsocketConsumer):
         Sends streamed chunks of the response back to the client, followed by a 'DONE' signal.
         """
         async for chunk in agent.ask(question, self.chat_id):
-            await self.send(text_data=json.dumps({
+            await self.safe_send(text_data=json.dumps({
                 'type': 'assistant_answer',
                 'message': chunk,
                 'streaming': True
             }))
 
-        await self.send(text_data=json.dumps({
+        await self.safe_send(text_data=json.dumps({
             'type': 'assistant_answer',
             'message': 'DONE',
             'streaming': False
@@ -99,13 +113,13 @@ class ChatConsumer(AsyncWebsocketConsumer):
         Sends streamed chunks silently (without an explicit question), followed by a 'DONE' signal.
         """
         async for chunk in agent.ask_quietly(self.chat_id):
-            await self.send(text_data=json.dumps({
+            await self.safe_send(text_data=json.dumps({
                 'type': 'assistant_answer',
                 'message': chunk,
                 'streaming': True
             }))
 
-        await self.send(text_data=json.dumps({
+        await self.safe_send(text_data=json.dumps({
             'type': 'assistant_answer',
             'message': 'DONE',
             'streaming': False

@@ -91,12 +91,13 @@ def chat_redirection_view(request):
             )
 
         try:
-            chat_id = async_to_sync(chat_history.create_new_chat)(user_email, question)
-        except Exception:
+            chat_id = chat_history.create_new_chat(user_email, question)
+        except Exception as e:
+            print(f"Error: {e}")
             return Response({"error": "Could not create chat."}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
 
         return Response({
-            "redirect_url": f"/chat/{chat_id}?redirection=true"
+            "redirect_url": f"/chat/{chat_id}/?redirection=true"
         }, status=status.HTTP_201_CREATED)
 
     except Exception as e:
