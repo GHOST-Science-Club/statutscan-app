@@ -1,30 +1,38 @@
-version: '3.12'
 services:
   app:
-    build: .
+    build:
+      context: .
+      dockerfile: Dockerfile.dev
+    image: statutscan-project:dev
+    container_name: statutscan_dev
+    env_file:
+      - ./.envs/.env.local
+    # маунтим локальный код — любые изменения сразу видны внутри контейнера
     volumes:
-      - .:/statutscan-project
+      - .:/app
       - static_volume:/app/staticfiles
       - media_volume:/app/media
     ports:
-      - 8000:8000
-    env_file:
-      - ./.envs/.env.local
-    image: statutscan-project:django
-    container_name: statutscan_project_container
+      - '8000:8000'
     depends_on:
-      - mongo
       - db
-    command: /bin/bash /statutscan-project/entrypoint.sh
+      - mongo
+    command: ["./entrypoint.sh"]
 
   mongo:
     image: mongo:latest
     container_name: mongodb
+    env_file:
+      - ./.envs/.env.local
     ports:
-      - "27017:27017"
+      - '27017:27017'
     volumes:
-      - mongo-data:/data/mongo_db
-    command: mongod --quiet --logpath /dev/null
+      - mongo-data:/data/db
+    healthcheck:
+      test:  ["CMD", "mongo", "--eval", "db.adminCommand('ping')"]
+      interval: 5s
+      timeout: 2s
+      retries: 5
 
   db:
     image: pgvector/pgvector:pg17
@@ -32,9 +40,14 @@ services:
     env_file:
       - ./.envs/.env.local
     ports:
-      - "5432:5432"
+      - '5432:5432'
     volumes:
       - postgres_data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U $POSTGRES_USER -d $POSTGRES_DB"]
+      interval: 5s
+      timeout: 2s
+      retries: 5
 
 volumes:
   static_volume:

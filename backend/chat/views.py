@@ -4,6 +4,9 @@ from rest_framework.parsers import JSONParser
 from rest_framework.response import Response
 from rest_framework import status, serializers
 from rest_framework.permissions import IsAuthenticated
+from rest_framework import mixins, viewsets
+from drf_yasg import openapi
+from drf_yasg.utils import swagger_auto_schema
 
 from chat.agent.chat_history import ChatHistory
 from chat.agent.token_usage_manager import TokenUsageManager
@@ -20,6 +23,18 @@ class ChatRedirectionSerializer(serializers.Serializer):
 
     def update(self, instance, validated_data):
         return instance
+
+
+class ChatRedirectionView(
+    mixins.CreateModelMixin,
+    viewsets.GenericViewSet
+):
+    permission_classes = [IsAuthenticated]
+    serializer_class = ChatRedirectionSerializer
+    queryset = []
+
+    def create(self, request, *args, **kwargs):
+        return super().create(request, *args, **kwargs)
 
 
 @api_view(['GET'])
@@ -45,10 +60,18 @@ def chat_history_view(request, chat_id):
     return Response(data, status=status.HTTP_200_OK)
 
 
+@swagger_auto_schema(
+    method='post',
+    request_body=ChatRedirectionSerializer,
+    responses={201: openapi.Response('Redirect', schema=openapi.Schema(
+        type=openapi.TYPE_OBJECT,
+        properties={'redirect_url': openapi.Schema(type=openapi.TYPE_STRING)}
+    ))}
+)
 @api_view(['POST'])
 @parser_classes([JSONParser])
 @permission_classes([IsAuthenticated])
-async def chat_redirection_view(request):
+def chat_redirection_view(request):
     try:
         serializer = ChatRedirectionSerializer(data=request.data)
         if not serializer.is_valid():
@@ -67,12 +90,13 @@ async def chat_redirection_view(request):
             )
 
         try:
-            chat_id = await chat_history.create_new_chat(user_email, question)
-        except Exception:
+            chat_id = chat_history.create_new_chat(user_email, question)
+        except Exception as e:
+            print(f"Error: {e}")
             return Response({"error": "Could not create chat."}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
 
         return Response({
-            "redirect_url": f"/chat/{chat_id}?redirection=true"
+            "redirect_url": f"/chat/{chat_id}/?redirection=true"
         }, status=status.HTTP_201_CREATED)
 
     except Exception as e:
