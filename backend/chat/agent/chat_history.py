@@ -1,19 +1,18 @@
-import json
+import uuid
 from bson.objectid import ObjectId
 from bson.errors import InvalidId
 from typing import List, Tuple, Optional
 from datetime import datetime
 from django.apps import apps
 from chat.agent.generate_chat_title import generate_chat_title
-import uuid
+from chat.agent.prompt_injection import PromptInjection
 
 
 class ChatHistory:
-    __system_prompt = "Jesteś asystentem, który ma za zadanie pomagać studentom w problemach administracyjnych."
-
     def __init__(self):
-        self.mongo_connection = apps.get_app_config('chat').mongo_connection
-        self.chat_history = self.mongo_connection.get_chat_history()
+        self._mongo_connection = apps.get_app_config('chat').mongo_connection
+        self._chat_history = self._mongo_connection.get_chat_history()
+        self._prompt_injection = PromptInjection()
 
     async def create_new_chat(self, user_id: str, question: str) -> str:
         """
@@ -34,7 +33,7 @@ class ChatHistory:
             "role": "user",
             "content": question
         }]
-        self.chat_history.insert_one({
+        self._chat_history.insert_one({
             "_id": ObjectId(chat_id),
             "user_id": user_id,
             "creation_date": creation_date,
@@ -51,7 +50,7 @@ class ChatHistory:
             chat_id (str): The chat ID to which the message should be added.
             message (dict): The message to be added to the chat.
         """
-        self.chat_history.update_one(
+        self._chat_history.update_one(
             {"_id": ObjectId(chat_id)},
             {"$push": {"messages": message}}
         )
@@ -75,8 +74,38 @@ class ChatHistory:
                 return False
 
         # check chat existance
-        chat_data = self.chat_history.find_one({"_id": ObjectId(chat_id)})
+        chat_data = self._chat_history.find_one({"_id": ObjectId(chat_id)})
         return bool(chat_data)
+    
+    def get_chat_last_message(self, chat_id: str) -> dict:
+        """
+        Retrieve the last message from the chat history for a given chat ID.
+
+        Args:
+            chat_id (str): The unique identifier of the chat.
+
+        Returns:
+            dict: Last message.
+        """
+        chat_data = self.get_chat_history_for_agent(chat_id)
+        return chat_data[-1]
+    
+    def get_chat_n_last_messages(self, chat_id: str, n_last: int) -> List[dict]:
+        """
+        Retrieve the last `n_last` messages from the chat history for a given chat ID.
+
+        Args:
+            chat_id (str): The unique identifier of the chat.
+            n_last (int): The number of most recent messages to retrieve.
+
+        Returns:
+            List[dict]: A list of the last `n_last` messages.
+        """
+        if n_last <= 0:
+            return []
+
+        chat_data = self.get_chat_history_for_agent(chat_id)
+        return chat_data[-n_last:]
 
     def get_chat_history_for_agent(self, chat_id: str) -> List[dict]:
         """
@@ -88,21 +117,28 @@ class ChatHistory:
         Returns:
             List[dict]: A list of messages formatted for the agent.
         """
-        chat_data = self.chat_history.find_one(
+        chat_data = self._chat_history.find_one(
             {"_id": ObjectId(chat_id)},
             {"messages": 1}
         )
-        if chat_data:
-            messages = chat_data.get("messages", [])
-            messages = [{"role": "system", "content": self.__system_prompt}] + \
-                       [
-                           {message for key in message.keys() if key != "metadatas"}
-                           if (message["role"] == "assistant") and ("metadatas" in messages) else
-                           message
-                           for message in messages
-                       ]
-            return messages
-        return []
+        
+        if not chat_data:
+            return []
+
+        messages = []
+        for message in chat_data.get("messages", []):
+            if message.get("role") not in ["user", "assistant"]:
+                continue
+
+            if message.get("role") == "user" and message.get("metadatas").get("prompt_injection") == True:
+                continue
+
+            messages.append({
+                "role": message["role"],
+                "content": message["content"]
+            })
+
+        return messages
 
     def get_chat_history_for_html(self, chat_id: str) -> Tuple[List[dict], str]:
         """
@@ -114,7 +150,7 @@ class ChatHistory:
         Returns:
             Tuple[List[dict], str]: A tuple containing the list of transformed messages and the chat title.
         """
-        chat_data = self.chat_history.find_one(
+        chat_data = self._chat_history.find_one(
             {"_id": ObjectId(chat_id)},
             {"messages": 1, "title": 1}
         )
@@ -123,39 +159,26 @@ class ChatHistory:
             return [], None
         
         title = chat_data.get("title", None)
-        messages = chat_data.get("messages", [])
-
-        transformed_messages = []
-        metadata = {"sources": []}
-        for message in messages:
-            if message["role"] == "user":
-                transformed_messages.append(message)
+        messages = []
+        for message in chat_data.get("messages", []):
+            if message.get("role") not in ["user", "assistant"]:
                 continue
 
-            if (message["role"] == "tool") and (message["name"] == "KnowledgeBaseTool"):
-                for source in json.loads(message["metadata"]):
-                    new_source = {}
-
-                    if "source" in source:
-                        new_source["source"] = source["source"]
-
-                    if "title" in source:
-                        new_source["title"] = source["title"]
-
-                    metadata["sources"].append(new_source)
-                continue
-
-            if message["role"] == "assistant":
-                if "tool_calls" in message:
-                    continue
-
-                if metadata:
-                    message["metadata"] = metadata
-                    metadata = {"sources": []}
-
-                transformed_messages.append(message)
-                
-        return transformed_messages, title
+            if "metadata" in message and "sources" in message.get("metadata"):
+                messages.append({
+                    "role": message["role"],
+                    "content": message["content"],
+                    "metadata": {
+                        "sources": message["metadata"]["sources"]
+                    }
+                })
+            else:
+                messages.append({
+                    "role": message["role"],
+                    "content": message["content"]
+                })
+        
+        return messages, title
 
     def get_user_chats(self, user_id: str) -> List[dict]:
         """
@@ -167,7 +190,7 @@ class ChatHistory:
         Returns:
             List[dict]: A list of chat summaries for the user.
         """
-        chats = self.chat_history.find(
+        chats = self._chat_history.find(
             {"user_id": user_id},
             {"_id": 1, "title": 1, "creation_date": 1}
         )
@@ -180,18 +203,51 @@ class ChatHistory:
         Args:
             chat_id (str): The chat ID to delete.
         """
-        self.chat_history.delete_one(
+        self._chat_history.delete_one(
             {"_id": ObjectId(chat_id)}
+        )
+
+    def flag_last_message_as_prompt_injection(self, chat_id: str):
+        """
+        Flags the last user message in a chat as a prompt injection.
+
+        Args:
+            chat_id (str): The unique identifier of the chat document in the database.
+        """
+        chat_data = self._chat_history.find_one(
+            {"_id": ObjectId(chat_id)},
+            {"messages": 1}
+        )
+
+        if not chat_data:
+            return None
+
+        messages = chat_data.get("messages", [])
+
+        if len(messages) == 0:
+            return None
+        
+        for i, message in reversed(tuple(enumerate(messages))):
+            if message.get("role") != "user":
+                continue
+
+            messages[i].setdefault("metadatas", {})
+            messages[i].get("metadatas").setdefault("prompt_injection", True)
+            break
+
+        self._chat_history.update_one(
+            {"_id": ObjectId(chat_id)},
+            {"$set": {"messages": messages}}
         )
 
     def get_owner_email(self, chat_id: str) -> Optional[str]:
         """
-        Fetches the 'email' of the owner for the given chat_id, or None if not found/invalid.
+        Fetches the 'email' of the owner for the given chat_id.
         """
         try:
             _id = ObjectId(chat_id)
         except InvalidId:
             return None
 
-        rec = self.chat_history.find_one({"_id": _id}, {"email": 1})
+        rec = self._chat_history.find_one({"_id": _id}, {"email": 1})
         return rec.get("email") if rec else None
