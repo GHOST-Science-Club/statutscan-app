@@ -20,5 +20,5 @@ class UserSerializer(BaseUserSerializer):
 class CurrentUserSerializer(BaseUserSerializer):
     class Meta(BaseUserSerializer.Meta):
         model = CustomUser
-        fields = ("id", "email", "tokens_used")
+        fields = ("id", "email", "tokens_used", "total_tokens_used", "last_chat_usage")
         ref_name = "CustomUserDetail"
