@@ -7,7 +7,6 @@ services:
     container_name: statutscan_dev
     env_file:
       - ./.envs/.env.local
-    # маунтим локальный код — любые изменения сразу видны внутри контейнера
     volumes:
       - .:/app
       - static_volume:/app/staticfiles
@@ -17,6 +16,7 @@ services:
     depends_on:
       - db
       - mongo
+      - redis
     command: ["./entrypoint.sh"]
 
   mongo:
@@ -30,6 +30,24 @@ services:
       - mongo-data:/data/db
     healthcheck:
       test:  ["CMD", "mongo", "--eval", "db.adminCommand('ping')"]
+      interval: 5s
+      timeout: 2s
+      retries: 5
+
+  redis:
+    image: redis:latest
+    container_name: redis
+    env_file:
+      - ./.envs/.env.local
+    environment:
+      - REDIS_HOST=redis
+      - REDIS_PORT=6379
+    ports:
+      - '6379:6379'
+    volumes:
+      - redis_data:/data
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
       interval: 5s
       timeout: 2s
       retries: 5
@@ -54,3 +72,4 @@ volumes:
   media_volume:
   mongo-data:
   postgres_data:
+  redis_data:
