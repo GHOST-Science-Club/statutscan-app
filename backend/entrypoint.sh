@@ -27,4 +27,5 @@ wait_for_mongo $MONGO_HOST
 python3 db/build_mongodb.py
 python3 db/build_pgvector.py
 python3 manage.py migrate --noinput
-python3 manage.py runserver 0.0.0.0:8000
+uvicorn statutscan_project.asgi:application --host 0.0.0.0 --port 8000 --reload
+
