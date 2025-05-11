@@ -102,7 +102,7 @@ class Agent(AgentBase):
             messages=self._chat_history.get_chat_history_for_agent(chat_id),
             tools=self._tools_descriptions
         )
-        token_usage_manager.add_used_tokens(chat_id, completion.usage.total_tokens)
+        await token_usage_manager.add_used_tokens(chat_id, completion.usage.total_tokens)
         completion = completion.model_dump()
 
         # 3. Collect related sources
@@ -167,7 +167,7 @@ class Agent(AgentBase):
         message = {"role": "assistant", "content": final_response}
         self._chat_history.add_new_message(chat_id, message)
 
-        token_usage_manager.add_used_tokens(
+        await token_usage_manager.add_used_tokens(
             chat_id,
             len(gpt_4o_mini_token_encoding.encode(final_response))
         )
