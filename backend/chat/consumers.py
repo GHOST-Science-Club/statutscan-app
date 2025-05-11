@@ -17,6 +17,10 @@ agent.add_tool(kb_tool)
 
 
 class ChatConsumer(AsyncWebsocketConsumer):
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        self.room_group_name = None
+
     async def connect(self):
         """
         Called when a WebSocket connection is initiated.
@@ -49,10 +53,11 @@ class ChatConsumer(AsyncWebsocketConsumer):
         Called when the WebSocket connection is closed.
         Removes the connection from the corresponding channel group.
         """
-        await self.channel_layer.group_discard(
-            self.room_group_name,
-            self.channel_name
-        )
+        if isinstance(self.room_group_name, str) and self.room_group_name:
+            await self.channel_layer.group_discard(
+                self.room_group_name,
+                self.channel_name
+            )
 
     async def safe_send(self, content):
         try:
@@ -74,11 +79,11 @@ class ChatConsumer(AsyncWebsocketConsumer):
         Parses the incoming JSON data to determine whether to handle the agent's response
         normally or quietly (e.g., for redirection scenarios).
         """
-        if token_usage_manager.is_user_blocked(self.user_email):
-            self.safe_send(text_data=json.dumps({
+        if await token_usage_manager.is_user_blocked(self.user_email):
+            await self.safe_send({
                 'type': 'token_limit_reached',
-                'reset_date': token_usage_manager.get_reset_date(self.user_email)
-            }))
+                'reset_date': sync_to_async(token_usage_manager.get_reset_date)(self.user_email)
+            })
 
         data = json.loads(text_data)
         is_redirection = data.get('is_redirection', None)
@@ -95,17 +100,17 @@ class ChatConsumer(AsyncWebsocketConsumer):
         Sends streamed chunks of the response back to the client, followed by a 'DONE' signal.
         """
         async for chunk in agent.ask(question, self.chat_id):
-            await self.safe_send(text_data=json.dumps({
+            await self.safe_send({
                 'type': 'assistant_answer',
                 'message': chunk,
                 'streaming': True
-            }))
+            })
 
-        await self.safe_send(text_data=json.dumps({
+        await self.safe_send({
             'type': 'assistant_answer',
             'message': 'DONE',
             'streaming': False
-        }))
+        })
 
     async def _handle_agent_response_quietly(self):
         """
