@@ -14,13 +14,13 @@ class ChatHistory:
         self._chat_history = self._mongo_connection.get_chat_history()
         self._prompt_injection = PromptInjection()
 
-    async def create_new_chat(self, user_id: str, question: str) -> str:
+    async def create_new_chat(self, user_email: str, question: str) -> str:
         """
         Creates a new chat entry in the database, generating a unique chat ID, 
         a title based on the user's question, and storing the initial message.
 
         Args:
-            user_id (str): The user ID initiating the chat.
+            user_email (str): The user ID initiating the chat.
             question (str): The initial question/message from the user.
 
         Returns:
@@ -35,7 +35,7 @@ class ChatHistory:
         }]
         self._chat_history.insert_one({
             "_id": ObjectId(chat_id),
-            "user_id": user_id,
+            "email": user_email,
             "creation_date": creation_date,
             "title": chat_title,
             "messages": messages
@@ -180,21 +180,25 @@ class ChatHistory:
         
         return messages, title
 
-    def get_user_chats(self, user_id: str) -> List[dict]:
+    def get_user_chats(self, user_email: str) -> List[dict]:
         """
         Retrieves a list of chat summaries for a specific user, including chat ID, title, and creation date.
 
         Args:
-            user_id (str): The user ID for which to retrieve chat summaries.
+            user_email (str): The user ID for which to retrieve chat summaries.
 
         Returns:
             List[dict]: A list of chat summaries for the user.
         """
         chats = self._chat_history.find(
-            {"user_id": user_id},
+            {"email": user_email},
             {"_id": 1, "title": 1, "creation_date": 1}
         )
-        return list(chats)
+        chats = list(chats)
+        for i in range(len(chats)):
+            chats[i].setdefault("id", chats[i].get("_id"))
+            del chats[i]["_id"]
+        return chats
 
     def delete_chat(self, chat_id: str):
         """
@@ -203,9 +207,13 @@ class ChatHistory:
         Args:
             chat_id (str): The chat ID to delete.
         """
-        self._chat_history.delete_one(
-            {"_id": ObjectId(chat_id)}
-        )
+        try:
+            self._chat_history.delete_one(
+                {"_id": ObjectId(chat_id)}
+            )
+        except:
+            return False
+        return True
 
     def flag_last_message_as_prompt_injection(self, chat_id: str):
         """

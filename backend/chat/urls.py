@@ -5,4 +5,6 @@ urlpatterns = [
     path('chat/', views.chat_view, name='chat'),
     path('chat/redirect/', views.chat_redirection_view, name='chat-redirect'),
     path('chat/<str:chat_id>/', views.chat_history_view, name='chat-history'),
+    path('chat/<str:chat_id>/delete/', views.delete_chat_view, name='delete-chat'),
+    path('chats/', views.chat_list_view, name='chat-list')
 ]
