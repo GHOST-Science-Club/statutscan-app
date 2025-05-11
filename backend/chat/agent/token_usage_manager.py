@@ -4,6 +4,8 @@ from bson.objectid import ObjectId
 from bson.errors import InvalidId
 from datetime import timedelta
 from users.models import CustomUser
+from channels.db import database_sync_to_async
+from asgiref.sync import sync_to_async
 
 
 class TokenUsageManager:
@@ -13,6 +15,7 @@ class TokenUsageManager:
         self.__mongo_connection = apps.get_app_config('chat').mongo_connection
         self.__chat_history = self.__mongo_connection.get_chat_history()
 
+    @sync_to_async
     def __unblock_user_if_it_possible(self, user: CustomUser):
         """
         Unblocks the user if the cooldown time has passed since their last chat usage.
@@ -49,7 +52,12 @@ class TokenUsageManager:
         user_email = self.__get_owner_email(chat_id)
         return self.__is_chat_blocked_by_email(user_email)
     
-    def is_user_blocked(self, user_email: str) -> bool:
+    @database_sync_to_async
+    def _get_user(self, user_email):
+        return CustomUser.objects.filter(email=user_email).first()
+    
+    async def is_user_blocked(self, user_email: str) -> bool:
+        
         """
         Checks whether the user with a given emial is blocked from chatting.
         
@@ -59,17 +67,16 @@ class TokenUsageManager:
         Returns:
             bool: True if the user is blocked, False if the user is not blocked
         """
-        return self.__is_chat_blocked_by_email(user_email)
+        user = await self._get_user(user_email)
+        await self.__unblock_user_if_it_possible(user)
+        return user.is_chat_blocked
 
-    def __is_chat_blocked_by_email(self, user_email: str) -> bool:
-        try:
-            user = CustomUser.objects.get(email=user_email)
-        except CustomUser.DoesNotExist:
-            return None
-
-        self.__unblock_user_if_it_possible(user)
+    async def __is_chat_blocked_by_email(self, user_email: str) -> bool:
+        user = await self._get_user(user_email)
+        await self.__unblock_user_if_it_possible(user)
         return user.is_chat_blocked
     
+
     def get_reset_date(self, user_email: str) -> str:
         """
         Determines the date and time when the user will be unblocked from chatting.
@@ -87,7 +94,7 @@ class TokenUsageManager:
         reset_date = timezone.now() + timedelta(hours=self.__cooldown_time)
         return reset_date.strftime('%Y-%m-%d %H:%M:%S')
 
-    def add_used_tokens(self, chat_id: str, tokens: int):
+    async def add_used_tokens(self, chat_id: str, tokens: int):
         """
         Adds tokens to the user's account and checks if the user has exceeded the token limit.
         
@@ -101,12 +108,9 @@ class TokenUsageManager:
             If the user exceeds the token limit, the user will be blocked.
         """
         user_email = self.__get_owner_email(chat_id)
-        try:
-            user = CustomUser.objects.get(email=user_email)
-        except CustomUser.DoesNotExist:
-            return None
+        user = await self._get_user(user_email)
         
-        self.__unblock_user_if_it_possible(user)
+        await self.__unblock_user_if_it_possible(user)
 
         if user.is_chat_blocked:
             return None
@@ -118,4 +122,6 @@ class TokenUsageManager:
         if user.tokens_used >= self.__token_limit:
             user.is_chat_blocked = True
 
-        user.save(update_fields=["tokens_used", "total_tokens_used", "last_chat_usage", "is_chat_blocked"])
+        await sync_to_async(user.save, thread_sensitive=True)(
+            update_fields=["tokens_used", "total_tokens_used", "last_chat_usage", "is_chat_blocked"]
+        )
