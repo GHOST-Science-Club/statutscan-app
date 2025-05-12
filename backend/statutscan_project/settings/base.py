@@ -40,6 +40,7 @@ INSTALLED_APPS = DAPHNE_APP + DJANGO_APPS + THIRD_PARTY_APPS + LOCAL_APPS
 
 MIDDLEWARE = [
     "django.middleware.security.SecurityMiddleware",
+    "whitenoise.middleware.WhiteNoiseMiddleware",
     "django.contrib.sessions.middleware.SessionMiddleware",
     "corsheaders.middleware.CorsMiddleware",
     "django.middleware.common.CommonMiddleware",
@@ -69,7 +70,14 @@ TEMPLATES = [
 
 ASGI_APPLICATION = "statutscan_project.asgi.application"
 
-CHANNEL_LAYERS = {"default": {"BACKEND": "channels.layers.InMemoryChannelLayer"}}
+CHANNEL_LAYERS = {
+    "default": {
+        "BACKEND": "channels_redis.core.RedisChannelLayer",
+        "CONFIG": {
+            "hosts": [(getenv("REDIS_HOST", "redis"), int(getenv("REDIS_PORT", 6379)))],
+        },
+    },
+}
 
 DATABASES = {
     "default": {

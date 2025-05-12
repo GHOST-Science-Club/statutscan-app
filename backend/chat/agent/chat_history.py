@@ -1,3 +1,4 @@
+import json
 import uuid
 from bson.objectid import ObjectId
 from bson.errors import InvalidId
@@ -14,20 +15,20 @@ class ChatHistory:
         self._chat_history = self._mongo_connection.get_chat_history()
         self._prompt_injection = PromptInjection()
 
-    async def create_new_chat(self, user_email: str, question: str) -> str:
+    def create_new_chat(self, email: str, question: str) -> str:
         """
         Creates a new chat entry in the database, generating a unique chat ID, 
         a title based on the user's question, and storing the initial message.
 
         Args:
-            user_email (str): The user ID initiating the chat.
+            email (str): The user email initiating the chat.
             question (str): The initial question/message from the user.
 
         Returns:
             str: The generated chat ID.
         """
         chat_id = uuid.uuid4().hex[:24]
-        chat_title = await generate_chat_title(question, chat_id)
+        chat_title = generate_chat_title(question, chat_id)
         creation_date = datetime.now()
         messages = [{
             "role": "user",
@@ -35,7 +36,7 @@ class ChatHistory:
         }]
         self._chat_history.insert_one({
             "_id": ObjectId(chat_id),
-            "email": user_email,
+            "email": email,
             "creation_date": creation_date,
             "title": chat_title,
             "messages": messages
@@ -180,18 +181,18 @@ class ChatHistory:
         
         return messages, title
 
-    def get_user_chats(self, user_email: str) -> List[dict]:
+    def get_user_chats(self, email: str) -> List[dict]:
         """
         Retrieves a list of chat summaries for a specific user, including chat ID, title, and creation date.
 
         Args:
-            user_email (str): The user ID for which to retrieve chat summaries.
+            email (str): The user email for which to retrieve chat summaries.
 
         Returns:
             List[dict]: A list of chat summaries for the user.
         """
-        chats = self._chat_history.find(
-            {"email": user_email},
+        chats = self.chat_history.find(
+            {"email": email},
             {"_id": 1, "title": 1, "creation_date": 1}
         )
         chats = list(chats)

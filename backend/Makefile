@@ -1,14 +1,14 @@
 build:
-	docker compose -f docker-compose.yml up --build -d --remove-orphans
+	docker compose --env-file ./.envs/.env.local -f docker-compose.yml up --build -d --remove-orphans
 
 up:
-	docker compose -f docker-compose.yml up -d
+	docker compose --env-file ./.envs/.env.local -f docker-compose.yml up -d
 
 down:
-	docker compose -f docker-compose.yml down
+	docker compose --env-file ./.envs/.env.local -f docker-compose.yml down
 
 down-v:
-	docker compose -f docker-compose.yml down -v
+	docker compose --env-file ./.envs/.env.local -f docker-compose.yml down -v
 
 makemigrations:
 	docker compose -f docker-compose.yml run --rm app python manage.py makemigrations
