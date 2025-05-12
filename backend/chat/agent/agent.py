@@ -6,6 +6,7 @@ from typing import List, AsyncGenerator
 from chat.agent.tools import ToolInterface
 from chat.agent.chat_history import ChatHistory
 from chat.agent.token_usage_manager import TokenUsageManager
+from asgiref.sync import sync_to_async
 
 token_usage_manager = TokenUsageManager()
 gpt_4o_mini_token_encoding = tiktoken.encoding_for_model("gpt-4o-mini")
@@ -77,9 +78,11 @@ class Agent(AgentBase):
             question (str): a question in text
             chat_id (str): chat id to get access to chat history
         """
-        # 1. Add new message to database
         message = {"role": "user", "content": question}
-        self._chat_history.add_new_message(chat_id, message)
+        await sync_to_async(self._chat_history.add_new_message, thread_sensitive=True)(
+            chat_id,
+            message
+        )
 
         async for chunk in self.__process_question(chat_id):
             yield json.dumps(chunk)
@@ -96,78 +99,91 @@ class Agent(AgentBase):
             yield json.dumps(chunk)
 
     async def __process_question(self, chat_id: str) -> AsyncGenerator[str, None]:
-        # 2. Invoke OpenAi API (make decision which tool use)
-        completion = await self._client.chat.completions.create(
+        history = await sync_to_async(
+            self._chat_history.get_chat_history_for_agent,
+            thread_sensitive=True
+        )(chat_id)
+
+        completion: ChatCompletion = await self._client.chat.completions.create(
             model=self._model,
-            messages=self._chat_history.get_chat_history_for_agent(chat_id),
-            tools=self._tools_descriptions
+            messages=history,
+            tools=self._tools_descriptions,
         )
-        await token_usage_manager.add_used_tokens(chat_id, completion.usage.total_tokens)
-        completion = completion.model_dump()
 
-        # 3. Collect related sources
+        await sync_to_async(
+            token_usage_manager.add_used_tokens,
+            thread_sensitive=True
+        )(chat_id, completion.usage.total_tokens)
+
+        first_choice = completion.choices[0]
+        first_msg = first_choice.message
+        first_msg_dict = (
+            first_msg.model_dump()
+            if hasattr(first_msg, "model_dump")
+            else first_msg.dict()
+        )
+        await sync_to_async(
+            self._chat_history.add_new_message,
+            thread_sensitive=True
+        )(chat_id, first_msg_dict)
+
         related_sources = []
-
-        self._chat_history.add_new_message(chat_id, completion["choices"][0]["message"])
-        tool_calls = completion["choices"][0]["message"]["tool_calls"]
-        tool_calls = [] if tool_calls is None else tool_calls
-
-        for tool_call in tool_calls:
-            name = tool_call["function"]["name"]
-            args = json.loads(tool_call["function"]["arguments"])
+        tool_calls = first_msg.tool_calls or []
+        for call in tool_calls:
+            name = call.function.name
+            args = json.loads(call.function.arguments)
             result = await self._call_function(name, chat_id, args)
-            
+
+
             if name == "KnowledgeBaseTool":
-                for metadata in result["metadata"]:
-                    source = {}
-                    
-                    if "source" in metadata:
-                        source["source"] = metadata["source"]
-                    if "title" in metadata:
-                        source["title"] = metadata["title"]
+                for meta in result["metadata"]:
+                    src = {}
+                    if "source" in meta:
+                        src["source"] = meta["source"]
+                    if "title" in meta:
+                        src["title"] = meta["title"]
+                    if src:
+                        related_sources.append(src)
 
-                    if "source" in source:
-                        related_sources.append(source)
-
-                message = {
+                tool_msg = {
                     "role": "tool",
                     "name": name,
-                    "tool_call_id": tool_call["id"],
+                    "tool_call_id": call.id,
                     "content": json.dumps(result["content"]),
-                    "metadata": json.dumps(result["metadata"])
+                    "metadata": json.dumps(result["metadata"]),
                 }
+                await sync_to_async(
+                    self._chat_history.add_new_message,
+                    thread_sensitive=True
+                )(chat_id, tool_msg)
 
-                self._chat_history.add_new_message(chat_id, message)
-
-        # 4. Final prompt
-        completion_stream = await self._client.chat.completions.create(
+        stream = await self._client.chat.completions.create(
             model=self._model,
             temperature=0,
-            messages=self._chat_history.get_chat_history_for_agent(chat_id),
-            stream=True
+            messages=await sync_to_async(
+                self._chat_history.get_chat_history_for_agent,
+                thread_sensitive=True
+            )(chat_id),
+            stream=True,
         )
 
-        # 5. Stream output
-        collected_messages = []
-
-        async for chunk in completion_stream:
-            chunk_message = chunk.choices[0].delta.content
-            collected_messages.append(chunk_message)
-
-            if chunk_message is None:
-                continue
-
-            yield {"chunk": chunk_message}
+        collected = []
+        async for chunk in stream:
+            delta = chunk.choices[0].delta.content
+            if delta:
+                collected.append(delta)
+                yield {"chunk": delta}
 
         yield {"sources": related_sources}
 
-        # 6. Add output to chat history
-        collected_messages = [m for m in collected_messages if m is not None]
-        final_response = ''.join(collected_messages)
-        message = {"role": "assistant", "content": final_response}
-        self._chat_history.add_new_message(chat_id, message)
+        full = "".join(collected)
+        final_msg = {"role": "assistant", "content": full}
+        await sync_to_async(
+            self._chat_history.add_new_message,
+            thread_sensitive=True
+        )(chat_id, final_msg)
 
-        await token_usage_manager.add_used_tokens(
-            chat_id,
-            len(gpt_4o_mini_token_encoding.encode(final_response))
-        )
+        await sync_to_async(
+            token_usage_manager.add_used_tokens,
+            thread_sensitive=True
+        )(chat_id, len(gpt_4o_mini_token_encoding.encode(full)))

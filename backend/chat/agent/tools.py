@@ -44,7 +44,9 @@ class KnowledgeBaseTool(ToolInterface):
             input=[text],
             model="text-embedding-3-small"
         )
-        token_usage_manager.add_used_tokens(chat_id, response.usage.total_tokens)
+        await sync_to_async(
+            token_usage_manager.add_used_tokens
+            )(chat_id, response.usage.total_tokens)
         return response.data[0].embedding
 
     async def use(self, question:str, chat_id: str):
