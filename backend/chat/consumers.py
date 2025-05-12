@@ -93,13 +93,13 @@ class ChatConsumer(AsyncWebsocketConsumer):
             return
 
         question = data.get("question")
-        async for chunk in agent.ask(question, self.chat_id):
-            await self.safe_send(
-                {"type": "assistant_answer", "message": chunk, "streaming": True}
-            )
-        await self.safe_send(
-            {"type": "assistant_answer", "message": "DONE", "streaming": False}
-        )
+        is_redirection = data.get('is_redirection', None)
+
+        if not is_redirection:
+            question = data.get('question', None)
+            await self._handle_agent_response(question)
+        else:
+            await self._handle_agent_response_quietly()
 
     async def _handle_agent_response(self, question):
         """
