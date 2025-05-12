@@ -78,7 +78,6 @@ class Agent(AgentBase):
             question (str): a question in text
             chat_id (str): chat id to get access to chat history
         """
-        # 1. Add new message to database
         message = {"role": "user", "content": question}
         await sync_to_async(self._chat_history.add_new_message, thread_sensitive=True)(
             chat_id,
@@ -105,23 +104,19 @@ class Agent(AgentBase):
             thread_sensitive=True
         )(chat_id)
 
-        # 2) Делаем первый запрос без стрима
         completion: ChatCompletion = await self._client.chat.completions.create(
             model=self._model,
             messages=history,
             tools=self._tools_descriptions,
         )
 
-        # 3) Учитываем токены
         await sync_to_async(
             token_usage_manager.add_used_tokens,
             thread_sensitive=True
         )(chat_id, completion.usage.total_tokens)
 
-        # 4) Сохраняем результат первого запроса в Mongo
         first_choice = completion.choices[0]
         first_msg = first_choice.message
-        # Для pydantic-style:
         first_msg_dict = (
             first_msg.model_dump()
             if hasattr(first_msg, "model_dump")
@@ -132,7 +127,6 @@ class Agent(AgentBase):
             thread_sensitive=True
         )(chat_id, first_msg_dict)
 
-        # 5) Обрабатываем вызовы инструментов (если есть)
         related_sources = []
         tool_calls = first_msg.tool_calls or []
         for call in tool_calls:
@@ -140,7 +134,7 @@ class Agent(AgentBase):
             args = json.loads(call.function.arguments)
             result = await self._call_function(name, chat_id, args)
 
-            # Пример: KnowledgeBaseTool
+
             if name == "KnowledgeBaseTool":
                 for meta in result["metadata"]:
                     src = {}
@@ -163,8 +157,6 @@ class Agent(AgentBase):
                     thread_sensitive=True
                 )(chat_id, tool_msg)
 
-        # ——————————————————————————————
-        # 6) Второй запрос — стриминг
         stream = await self._client.chat.completions.create(
             model=self._model,
             temperature=0,
@@ -175,7 +167,6 @@ class Agent(AgentBase):
             stream=True,
         )
 
-        # 7) Отдаём чанки клиенту по одному
         collected = []
         async for chunk in stream:
             delta = chunk.choices[0].delta.content
@@ -183,10 +174,8 @@ class Agent(AgentBase):
                 collected.append(delta)
                 yield {"chunk": delta}
 
-        # 8) По завершении стрима отдадим источники
         yield {"sources": related_sources}
 
-        # 9) Сохраняем финальный ассистентский ответ в Mongo
         full = "".join(collected)
         final_msg = {"role": "assistant", "content": full}
         await sync_to_async(
@@ -194,7 +183,6 @@ class Agent(AgentBase):
             thread_sensitive=True
         )(chat_id, final_msg)
 
-        # 10) Учтём токены за финальный текст
         await sync_to_async(
             token_usage_manager.add_used_tokens,
             thread_sensitive=True
