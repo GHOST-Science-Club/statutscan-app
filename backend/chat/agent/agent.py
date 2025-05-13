@@ -3,6 +3,7 @@ import tiktoken
 from openai import AsyncOpenAI
 from abc import abstractmethod
 from typing import List, AsyncGenerator
+import asyncio
 from chat.agent.tools.interface import ToolInterface
 from chat.agent.chat_history import ChatHistory
 from chat.agent.token_usage_manager import TokenUsageManager
@@ -65,11 +66,6 @@ class AgentBase(AgentInterface):
             self._tools.append(tool)
             self._tools_descriptions.append(tool.description)
 
-    async def _call_function(self, name, chat_id, args):
-        for tool in self._tools:
-            if tool.name == name:
-                return await tool.use(**args, chat_id=chat_id)
-
 
 class Agent(AgentBase):
     def __init__(self, model: str = "gpt-4o-mini", system_prompt: str = None):
@@ -79,6 +75,21 @@ class Agent(AgentBase):
         self._client = AsyncOpenAI()
         self._token_usage_manager = TokenUsageManager()
         self._gpt_4o_mini_token_encoding = tiktoken.encoding_for_model(self._model)
+
+    async def _call_tool(self, name, chat_id, args):
+        for tool in self._tools:
+            if tool.name == name:
+                return await tool.use(**args, chat_id=chat_id)
+            
+    async def _call_tools(self, tool_calls: List, chat_id: str):
+        tool_function_calls = []
+        for tool_call in tool_calls:
+            name = tool_call["function"]["name"]
+            args = json.loads(tool_call["function"]["arguments"])
+            tool_function_calls.append(self._call_tool(name, chat_id, args))
+
+        results = await asyncio.gather(*tool_function_calls)
+        return results
 
     async def ask(self, question: str, chat_id: str) -> AsyncGenerator[str, None]:
         """
@@ -126,9 +137,6 @@ class Agent(AgentBase):
                 }
             } 
             return
-        
-        print("#"*25+f"\nQUESTION: {question}")
-        print("#"*25+f"\n{self._tools_descriptions}\n"+"#"*25)
 
         # Select tools to use
         tool_selection_completion = await self._client.chat.completions.create(
@@ -149,14 +157,12 @@ class Agent(AgentBase):
         tool_calls = [] if tool_calls is None else tool_calls
 
         # Use tools
-        for tool_call in tool_calls:
-            name = tool_call["function"]["name"]
-            args = json.loads(tool_call["function"]["arguments"])
-            result = await self._call_function(name, chat_id, args)
-
-            message = {}
-            message.setdefault("role", "tool")
-            message.setdefault("content", result["content"])
+        results = await self._call_tools(tool_calls, chat_id)
+        for result in results:
+            message = {
+                "role": "tool",
+                "content": result["content"]
+            }
 
             for key, value in result.get("metadatas", {}).items():
                 if key == "source":
@@ -181,7 +187,8 @@ class Agent(AgentBase):
                 collected_messages.append(delta)
                 yield {"chunk": delta}
 
-        yield {"sources": related_sources}
+        if related_sources:
+            yield {"sources": related_sources}
 
         # Save answer
         full = ''.join(collected_messages)
