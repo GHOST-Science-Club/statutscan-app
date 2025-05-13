@@ -1,5 +1,5 @@
 class PromptInjection:
-    async def detect(user_question: str) -> bool:
+    async def detect(self, user_question: str) -> bool:
         """
         Feature not implemented yet.
         """

@@ -131,7 +131,9 @@ class ChatHistory:
             if message.get("role") not in ["user", "assistant"]:
                 continue
 
-            if message.get("role") == "user" and message.get("metadatas").get("prompt_injection") == True:
+            if message.get("role") == "user" and \
+               message.get("metadatas") is not None and \
+               message.get("metadatas").get("prompt_injection") == True:
                 continue
 
             messages.append({

@@ -3,7 +3,8 @@ from channels.generic.websocket import AsyncWebsocketConsumer
 from asgiref.sync import sync_to_async
 from openai import AsyncOpenAI
 from chat.agent.chat_history import ChatHistory
-from chat.agent.tools import KnowledgeBaseTool, ChatHistoryTool
+from chat.agent.tools.chat_history import ChatHistoryTool
+from chat.agent.tools.knowledge_base import KnowledgeBaseTool
 from chat.agent.agent import Agent
 from chat.agent.token_usage_manager import TokenUsageManager
 
@@ -11,7 +12,7 @@ token_usage_manager = TokenUsageManager()
 
 client = AsyncOpenAI()
 chat_history = ChatHistory()
-agent = Agent(client, model="gpt-4o-mini")
+agent = Agent(model="gpt-4o-mini")
 agent.add_tools([
     ChatHistoryTool(n_last_messages=5),
     KnowledgeBaseTool(n_results=3)

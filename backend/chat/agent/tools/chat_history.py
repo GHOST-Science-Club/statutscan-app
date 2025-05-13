@@ -1,6 +1,6 @@
 from typing import Dict
 from openai import AsyncOpenAI
-from chat.agent.tools import ToolInterface
+from chat.agent.tools.interface import ToolInterface
 from chat.agent.chat_history import ChatHistory
 from chat.agent.token_usage_manager import TokenUsageManager
 
@@ -53,9 +53,7 @@ class ChatHistoryTool(ToolInterface):
                     "properties": {
                         "question": {"type": "string"},
                     },
-                    "required": ["question"],
-                    "additionalProperties": False,
-                },
-                "strict": True,
-            },
+                    "required": ["question"]
+                }
+            }
         }

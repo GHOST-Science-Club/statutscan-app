@@ -3,7 +3,7 @@ import tiktoken
 from openai import AsyncOpenAI
 from abc import abstractmethod
 from typing import List, AsyncGenerator
-from chat.agent.tools import ToolInterface
+from chat.agent.tools.interface import ToolInterface
 from chat.agent.chat_history import ChatHistory
 from chat.agent.token_usage_manager import TokenUsageManager
 from chat.agent.prompt_injection import PromptInjection
@@ -72,13 +72,13 @@ class AgentBase(AgentInterface):
 
 
 class Agent(AgentBase):
-    def __init__(self, model = "gpt-4o-mini", system_prompt = None):
+    def __init__(self, model: str = "gpt-4o-mini", system_prompt: str = None):
         super().__init__(model, system_prompt)
         if system_prompt is None:
             self._system_prompt = "You are helpfull assistant, who help students with administrative problems."
         self._client = AsyncOpenAI()
         self._token_usage_manager = TokenUsageManager()
-        self._gpt_4o_mini_token_encoding = tiktoken.encoding_for_model(self.model)
+        self._gpt_4o_mini_token_encoding = tiktoken.encoding_for_model(self._model)
 
     async def ask(self, question: str, chat_id: str) -> AsyncGenerator[str, None]:
         """
@@ -104,6 +104,7 @@ class Agent(AgentBase):
             self._chat_history.get_chat_last_message,
             thread_sensitive=True
         )(chat_id)
+        question = question["content"]
         messages_for_final = [
             {"role": "system", "content": self._system_prompt},
             {"role": "user", "content": question}
@@ -126,6 +127,9 @@ class Agent(AgentBase):
             } 
             return
         
+        print("#"*25+f"\nQUESTION: {question}")
+        print("#"*25+f"\n{self._tools_descriptions}\n"+"#"*25)
+
         # Select tools to use
         tool_selection_completion = await self._client.chat.completions.create(
             model=self._model,
