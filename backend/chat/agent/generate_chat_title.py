@@ -20,6 +20,7 @@ def generate_chat_title(message: str, chat_id: str) -> str:
     client = OpenAI()
     
     response = client.chat.completions.create(
+
         model="gpt-4o-mini",
         messages=[
             {

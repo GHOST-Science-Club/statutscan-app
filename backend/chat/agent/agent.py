@@ -130,9 +130,9 @@ class Agent(AgentBase):
             yield {
                 "error": {
                     "type": "prompt_injection",
-                    "content": self._prompt_injection.get_message()
+                    "content": self._prompt_injection.get_rejection_message()
                 }
-            } 
+            }
             return
 
         # Select tools to use
