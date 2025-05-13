@@ -19,7 +19,10 @@ class KnowledgeBaseTool(ToolInterface):
             input=[text],
             model=self.embedding_model
         )
-        self._token_usage_manager.add_used_tokens(chat_id, response.usage.total_tokens)
+        await sync_to_async(
+            self._token_usage_manager.add_used_tokens,
+            thread_sensitive=True
+        )(chat_id, response.usage.total_tokens)
         return response.data[0].embedding
 
     async def use(self, question:str, chat_id: str):

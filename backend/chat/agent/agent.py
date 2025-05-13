@@ -10,9 +10,6 @@ from chat.agent.token_usage_manager import TokenUsageManager
 from chat.agent.prompt_injection import PromptInjection
 from asgiref.sync import sync_to_async
 
-token_usage_manager = TokenUsageManager()
-gpt_4o_mini_token_encoding = tiktoken.encoding_for_model("gpt-4o-mini")
-
 
 class AgentInterface:
     @abstractmethod
@@ -149,7 +146,7 @@ class Agent(AgentBase):
             tool_choice="auto"
         )
         await sync_to_async(
-            token_usage_manager.add_used_tokens,
+            self._token_usage_manager.add_used_tokens,
             thread_sensitive=True
         )(chat_id, tool_selection_completion.usage.total_tokens)
         tool_selection_completion = tool_selection_completion.model_dump()
@@ -199,6 +196,6 @@ class Agent(AgentBase):
         )(chat_id, final_msg)
 
         await sync_to_async(
-            token_usage_manager.add_used_tokens,
+            self._token_usage_manager.add_used_tokens,
             thread_sensitive=True
-        )(chat_id, len(gpt_4o_mini_token_encoding.encode(full)))
+        )(chat_id, len(self._gpt_4o_mini_token_encoding.encode(full)))

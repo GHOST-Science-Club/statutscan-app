@@ -1,5 +1,6 @@
 from typing import Dict
 from openai import AsyncOpenAI
+from asgiref.sync import sync_to_async
 from chat.agent.tools.interface import ToolInterface
 from chat.agent.chat_history import ChatHistory
 from chat.agent.token_usage_manager import TokenUsageManager
@@ -31,7 +32,10 @@ class ChatHistoryTool(ToolInterface):
             temperature=0.5,
             max_tokens=self.max_output_tokens
         )
-        self._token_usage_manager.add_used_tokens(chat_id, response.usage.total_tokens)
+        await sync_to_async(
+            self._token_usage_manager.add_used_tokens,
+            thread_sensitive=True
+        )(chat_id, response.usage.total_tokens)
         result = {
             "content": response.choices[0].message["content"]
         }

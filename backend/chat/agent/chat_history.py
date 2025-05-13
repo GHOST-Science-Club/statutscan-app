@@ -193,13 +193,13 @@ class ChatHistory:
         Returns:
             List[dict]: A list of chat summaries for the user.
         """
-        chats = self.chat_history.find(
+        chats = self._chat_history.find(
             {"email": email},
             {"_id": 1, "title": 1, "creation_date": 1}
         )
         chats = list(chats)
         for i in range(len(chats)):
-            chats[i].setdefault("id", chats[i].get("_id"))
+            chats[i].setdefault("id", str(chats[i].get("_id")))
             del chats[i]["_id"]
         return chats
 
