@@ -186,15 +186,10 @@ class Agent(AgentBase):
             tool_messages.append(message)
             tool_calls_message["tool_calls"].append(tool_calls[i])
             
-        messages_for_final.append(tool_calls_message)
-        messages_for_final.extend(tool_messages)
-
-        ###################
-        print("[")
-        for message in messages_for_final:
-            print(f"{message},")
-        print("]")
-        ###################
+        if len(tool_calls_message["tool_calls"]) > 0:
+            messages_for_final.append(tool_calls_message)
+        if len(tool_messages) > 0:
+            messages_for_final.extend(tool_messages)
 
         # Final prompt
         stream_completion = await self._client.chat.completions.create(
