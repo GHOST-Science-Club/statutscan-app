@@ -11,22 +11,34 @@ class ChatHistoryTool(ToolInterface):
         self.n_last_messages = n_last_messages
         self.model = model
         self.max_output_tokens = max_output_tokens
-        self._openai_client = AsyncOpenAI()
+        self._client = AsyncOpenAI()
         self._chat_history = ChatHistory()
         self._token_usage_manager = TokenUsageManager()
         self._tool_system_prompt = (
-            "You are a helpful assistant whose job is to summarize the history of time "
-            "extracting the information needed to answer the user's question"
+            "You are a helpful assistant whose job is to summarize the chat history."
+            "Extract the information needed to answer the user's question. "
+            "If chat doesn't contain information needed to answer the question answer "
+            "using word None."
         )
 
     async def use(self, question: str, chat_id: str):
         history = self._chat_history.get_chat_n_last_messages(chat_id, self.n_last_messages)
+        
+        if len(history) <= 1:
+            result = {
+                "content": "None",
+                "metadatas": {
+                    "no_answer": True
+                }
+            }
+            return result
+
         messages = [
             {"role": "system", "content": self._tool_system_prompt},
             {"role": "user", "content": f"User question: {question}"},
             *history
         ]
-        response = await self._openai_client.ChatCompletion.acreate(
+        response = await self._client.chat.completions.create(
             model=self.model,
             messages=messages,
             temperature=0.5,
@@ -37,8 +49,18 @@ class ChatHistoryTool(ToolInterface):
             thread_sensitive=True
         )(chat_id, response.usage.total_tokens)
         result = {
-            "content": response.choices[0].message["content"]
+            "content": response.choices[0].message.content
         }
+
+        if len(result["content"]) <= 10 and "none" in result["content"].lower():
+            result = {
+                "content": "None",
+                "metadatas": {
+                    "no_answer": True
+                }
+            }
+            return result
+
         return result
 
     @property

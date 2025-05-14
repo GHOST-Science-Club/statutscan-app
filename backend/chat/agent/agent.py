@@ -80,13 +80,19 @@ class Agent(AgentBase):
             
     async def _call_tools(self, tool_calls: List, chat_id: str):
         tool_function_calls = []
+        ids = []
         for tool_call in tool_calls:
             name = tool_call["function"]["name"]
             args = json.loads(tool_call["function"]["arguments"])
+            id = tool_call["id"]
             tool_function_calls.append(self._call_tool(name, chat_id, args))
+            ids.append(id)
 
         results = await asyncio.gather(*tool_function_calls)
-        return results
+        return [
+            {"result": result, "id": id}
+            for result, id in zip(results, ids)
+        ]
 
     async def ask(self, question: str, chat_id: str) -> AsyncGenerator[str, None]:
         """
@@ -154,19 +160,41 @@ class Agent(AgentBase):
         tool_calls = [] if tool_calls is None else tool_calls
 
         # Use tools
+        tool_messages = []
+        tool_calls_message = {
+            "role": "assistant",
+            "tool_calls": []
+        }
         results = await self._call_tools(tool_calls, chat_id)
-        for result in results:
+        for i, result in enumerate(results):
+            if "metadatas" in result["result"] and\
+               "no_answer" in result["result"]["metadatas"] and\
+                result["result"]["metadatas"]["no_answer"]:
+                continue
+
             message = {
                 "role": "tool",
-                "content": result["content"]
+                "tool_call_id": result["id"],
+                "content": result["result"]["content"]
             }
 
-            if "metadatas" in result and "sources" in result.get("metadatas", {}):
+            if "metadatas" in result and "sources" in result["metadatas"]:
                 for source_metadata in result["metadatas"]["sources"]:
                     if "source" in source_metadata:
                         related_sources.append(source_metadata["source"])
 
-            messages_for_final.append(message)
+            tool_messages.append(message)
+            tool_calls_message["tool_calls"].append(tool_calls[i])
+            
+        messages_for_final.append(tool_calls_message)
+        messages_for_final.extend(tool_messages)
+
+        ###################
+        print("[")
+        for message in messages_for_final:
+            print(f"{message},")
+        print("]")
+        ###################
 
         # Final prompt
         stream_completion = await self._client.chat.completions.create(
