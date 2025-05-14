@@ -34,7 +34,9 @@ class KnowledgeBaseTool(ToolInterface):
         )()
         result = {
             "content": "\n\n".join([f"{i+1}.\n{document.content}" for i, document in enumerate(documents)]),
-            "metadatas": [document.metadata for document in documents]
+            "metadatas": {
+                "sources": [document.metadata for document in documents]
+            }
         }
         return result
     
