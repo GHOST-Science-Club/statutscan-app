@@ -10,6 +10,10 @@ def generate_chat_title(message: str, chat_id: str) -> str:
     Generates a short title for a conversation based on the provided user message 
     using the OpenAI API.
 
+    Args:
+        message (str): 
+        chat_id (str): 
+
     Returns:
         str: A +- 32-character chat title.
     """

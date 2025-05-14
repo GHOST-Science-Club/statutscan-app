@@ -43,29 +43,42 @@ def chat_view(request):
     return Response({}, status=status.HTTP_200_OK)
 
 
-@api_view(['GET'])
+@api_view(['GET', 'DELETE'])
 @permission_classes([IsAuthenticated])
-def chat_history_view(request, chat_id):
+def chat_detail_view(request, chat_id):
+    """
+    GET /chat/<chat_id>/ -> returns chat history
+    DELETE /chat/<chat_id>/ -> deletes the entire chat
+    """
     if not chat_history.chat_exist(chat_id):
-        return Response({"error": "Chat doesn't exist."}, status=status.HTTP_404_NOT_FOUND)
+        return Response({"error": "Chat not found"}, status=status.HTTP_404_NOT_FOUND)
+
+    # GET
+    if request.method == "GET":
+        owner_email = chat_history.get_owner_email(chat_id)
+        if not owner_email or owner_email != request.user.email:
+            return Response(status=status.HTTP_404_NOT_FOUND)
+        
+        messages, title = chat_history.get_chat_history_for_html(chat_id)
+        data = {"chat_history": messages}
+        if title:
+            data["title"] = title
+        return Response(data, status=status.HTTP_200_OK)
     
-    owner_email = chat_history.get_owner_email(chat_id)
-    if not owner_email or owner_email != request.user.email:
-        return Response(status=status.HTTP_404_NOT_FOUND)
-    
-    messages, title = chat_history.get_chat_history_for_html(chat_id)
-    data = {"chat_history": messages}
-    if title:
-        data["title"] = title
-    return Response(data, status=status.HTTP_200_OK)
+    # DELETE
+    elif request.method == "DELETE":
+        if chat_history.delete_chat(chat_id):
+            return Response({"detail": "Chat deleted successfully"}, status=status.HTTP_204_NO_CONTENT)
+        else:
+            return Response({"error": "Unable to delete chat"}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
 
 
 @swagger_auto_schema(
-    method='post',
+    method="post",
     request_body=ChatRedirectionSerializer,
-    responses={201: openapi.Response('Redirect', schema=openapi.Schema(
+    responses={201: openapi.Response("Redirect", schema=openapi.Schema(
         type=openapi.TYPE_OBJECT,
-        properties={'redirect_url': openapi.Schema(type=openapi.TYPE_STRING)}
+        properties={"redirect_url": openapi.Schema(type=openapi.TYPE_STRING)}
     ))}
 )
 @api_view(['POST'])
@@ -77,11 +90,11 @@ def chat_redirection_view(request):
         if not serializer.is_valid():
             return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
         
-        question = serializer.validated_data['question']
+        question = serializer.validated_data["question"]
         user_email = request.user.email
 
         if not user_email:
-            return Response({"error": "Missing 'user_email'."}, status=status.HTTP_400_BAD_REQUEST)
+            return Response({"error": "Missing 'user_email'"}, status=status.HTTP_400_BAD_REQUEST)
 
         if token_usage_manager.is_user_blocked(user_email):
             return Response(
@@ -100,3 +113,18 @@ def chat_redirection_view(request):
 
     except Exception as e:
         return Response({"error": str(e)}, status=status.HTTP_400_BAD_REQUEST)
+
+
+@api_view(["GET"])
+@permission_classes([IsAuthenticated])
+def chat_list_view(request):
+    user_email = request.user.email
+    if not user_email:
+        return Response({"error": "Missing 'user_email'"}, status=status.HTTP_400_BAD_REQUEST)
+    
+    try:
+        user_chats = chat_history.get_user_chats(user_email)
+    except:
+        return Response({"error": "Unable to get user chats"}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+    
+    return Response({"chats": user_chats})
