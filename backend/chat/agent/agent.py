@@ -161,9 +161,10 @@ class Agent(AgentBase):
                 "content": result["content"]
             }
 
-            for key, value in result.get("metadatas", {}).items():
-                if key == "source":
-                    related_sources.append(value)
+            if "metadatas" in result and "sources" in result.get("metadatas", {}):
+                for source_metadata in result["metadatas"]["sources"]:
+                    if "source" in source_metadata:
+                        related_sources.append(source_metadata["source"])
 
             messages_for_final.append(message)
 
