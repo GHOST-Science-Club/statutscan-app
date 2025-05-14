@@ -1,15 +1,14 @@
 import json
 import tiktoken
-from openai import OpenAI
+from openai import AsyncOpenAI
 from abc import abstractmethod
 from typing import List, AsyncGenerator
-from chat.agent.tools import ToolInterface
+import asyncio
+from chat.agent.tools.interface import ToolInterface
 from chat.agent.chat_history import ChatHistory
 from chat.agent.token_usage_manager import TokenUsageManager
+from chat.agent.prompt_injection import PromptInjection
 from asgiref.sync import sync_to_async
-
-token_usage_manager = TokenUsageManager()
-gpt_4o_mini_token_encoding = tiktoken.encoding_for_model("gpt-4o-mini")
 
 
 class AgentInterface:
@@ -18,7 +17,7 @@ class AgentInterface:
         """
         The method for adding one tool to agent tool list.
 
-        Parameters:
+        Args:
             tool (ToolInterface): tool with additional functionality
         """
         pass
@@ -28,7 +27,7 @@ class AgentInterface:
         """
         The method for adding many tools to agent tool list.
 
-        Parameters:
+        Args:
             tools (List[ToolInterface]): list of tools with additional functionalities
         """
         pass
@@ -39,17 +38,19 @@ class AgentInterface:
         The method to ask agent a question. Agent will add question
         to chat history and invoke question to OpenAI API.
 
-        Parameters:
+        Args:
             question (str): a question in text
         """
         pass
 
 
 class AgentBase(AgentInterface):
-    def __init__(self, client: OpenAI, chat_history: ChatHistory, model: str="gpt-4o-mini"):
-        self._client = client
-        self._chat_history = chat_history
+    def __init__(self, model: str="gpt-4o-mini", system_prompt: str=None):
+        self._client = None
         self._model = model
+        self._system_prompt = system_prompt
+        self._chat_history = ChatHistory()
+        self._prompt_injection = PromptInjection()
         self._tools = []
         self._tools_descriptions = []
 
@@ -62,18 +63,39 @@ class AgentBase(AgentInterface):
             self._tools.append(tool)
             self._tools_descriptions.append(tool.description)
 
-    async def _call_function(self, name, chat_id, args):
+
+class Agent(AgentBase):
+    def __init__(self, model: str = "gpt-4o-mini", system_prompt: str = None):
+        super().__init__(model, system_prompt)
+        if system_prompt is None:
+            self._system_prompt = "You are helpfull assistant, who help students with administrative problems."
+        self._client = AsyncOpenAI()
+        self._token_usage_manager = TokenUsageManager()
+        self._gpt_4o_mini_token_encoding = tiktoken.encoding_for_model(self._model)
+
+    async def _call_tool(self, name, chat_id, args):
         for tool in self._tools:
             if tool.name == name:
                 return await tool.use(**args, chat_id=chat_id)
+            
+    async def _call_tools(self, tool_calls: List, chat_id: str):
+        tool_function_calls = []
+        ids = []
+        for tool_call in tool_calls:
+            name = tool_call["function"]["name"]
+            args = json.loads(tool_call["function"]["arguments"])
+            id = tool_call["id"]
+            tool_function_calls.append(self._call_tool(name, chat_id, args))
+            ids.append(id)
 
+        results = await asyncio.gather(*tool_function_calls)
+        return [
+            {"result": result, "id": id}
+            for result, id in zip(results, ids)
+        ]
 
-class Agent(AgentBase):
     async def ask(self, question: str, chat_id: str) -> AsyncGenerator[str, None]:
         """
-        The method to ask agent a question. Agent will add question
-        to chat history and invoke question to OpenAI API.
-
         Parameters:
             question (str): a question in text
             chat_id (str): chat id to get access to chat history
@@ -88,95 +110,109 @@ class Agent(AgentBase):
             yield json.dumps(chunk)
 
     async def ask_quietly(self, chat_id: str) -> AsyncGenerator[str, None]:
-        """
-        The method to ask agent a question. Agent invoke question to
-        OpenAI API without adding question to database.
-
-        Parameters:
-            chat_id (str): chat id to get access to chat history
-        """
         async for chunk in self.__process_question(chat_id):
             yield json.dumps(chunk)
 
     async def __process_question(self, chat_id: str) -> AsyncGenerator[str, None]:
-        history = await sync_to_async(
-            self._chat_history.get_chat_history_for_agent,
+        question = await sync_to_async(
+            self._chat_history.get_chat_last_message,
             thread_sensitive=True
         )(chat_id)
-
-        completion: ChatCompletion = await self._client.chat.completions.create(
-            model=self._model,
-            messages=history,
-            tools=self._tools_descriptions,
-        )
-
-        await sync_to_async(
-            token_usage_manager.add_used_tokens,
-            thread_sensitive=True
-        )(chat_id, completion.usage.total_tokens)
-
-        first_choice = completion.choices[0]
-        first_msg = first_choice.message
-        first_msg_dict = (
-            first_msg.model_dump()
-            if hasattr(first_msg, "model_dump")
-            else first_msg.dict()
-        )
-        await sync_to_async(
-            self._chat_history.add_new_message,
-            thread_sensitive=True
-        )(chat_id, first_msg_dict)
-
+        question = question["content"]
+        messages_for_final = [
+            {"role": "system", "content": self._system_prompt},
+            {"role": "user", "content": question}
+        ]
         related_sources = []
-        tool_calls = first_msg.tool_calls or []
-        for call in tool_calls:
-            name = call.function.name
-            args = json.loads(call.function.arguments)
-            result = await self._call_function(name, chat_id, args)
 
+        # Detect prompt injection
+        is_prompt_injection = await self._prompt_injection.detect(question)
 
-            if name == "KnowledgeBaseTool":
-                for meta in result["metadata"]:
-                    src = {}
-                    if "source" in meta:
-                        src["source"] = meta["source"]
-                    if "title" in meta:
-                        src["title"] = meta["title"]
-                    if src:
-                        related_sources.append(src)
-
-                tool_msg = {
-                    "role": "tool",
-                    "name": name,
-                    "tool_call_id": call.id,
-                    "content": json.dumps(result["content"]),
-                    "metadata": json.dumps(result["metadata"]),
-                }
-                await sync_to_async(
-                    self._chat_history.add_new_message,
-                    thread_sensitive=True
-                )(chat_id, tool_msg)
-
-        stream = await self._client.chat.completions.create(
-            model=self._model,
-            temperature=0,
-            messages=await sync_to_async(
-                self._chat_history.get_chat_history_for_agent,
+        if is_prompt_injection:
+            await sync_to_async(
+                self._chat_history.flag_last_message_as_prompt_injection,
                 thread_sensitive=True
-            )(chat_id),
-            stream=True,
+            )(chat_id)
+            yield {
+                "error": {
+                    "type": "prompt_injection",
+                    "content": self._prompt_injection.get_message()
+                }
+            } 
+            return
+
+        # Select tools to use
+        tool_selection_completion = await self._client.chat.completions.create(
+            model=self._model,
+            messages=[
+                {"role": "system", "content": self._system_prompt},
+                {"role": "user", "content": question}
+            ],
+            tools=self._tools_descriptions,
+            tool_choice="auto"
+        )
+        await sync_to_async(
+            self._token_usage_manager.add_used_tokens,
+            thread_sensitive=True
+        )(chat_id, tool_selection_completion.usage.total_tokens)
+        tool_selection_completion = tool_selection_completion.model_dump()
+        tool_calls = tool_selection_completion["choices"][0]["message"]["tool_calls"]
+        tool_calls = [] if tool_calls is None else tool_calls
+
+        # Use tools
+        tool_messages = []
+        tool_calls_message = {
+            "role": "assistant",
+            "tool_calls": []
+        }
+        results = await self._call_tools(tool_calls, chat_id)
+        for i, result in enumerate(results):
+            if "metadatas" in result["result"] and\
+               "no_answer" in result["result"]["metadatas"] and\
+                result["result"]["metadatas"]["no_answer"]:
+                continue
+
+            message = {
+                "role": "tool",
+                "tool_call_id": result["id"],
+                "content": result["result"]["content"]
+            }
+
+            if "metadatas" in result and "sources" in result["metadatas"]:
+                for source_metadata in result["metadatas"]["sources"]:
+                    if "source" in source_metadata:
+                        related_sources.append(source_metadata["source"])
+
+            tool_messages.append(message)
+            tool_calls_message["tool_calls"].append(tool_calls[i])
+            
+        if len(tool_calls_message["tool_calls"]) > 0:
+            messages_for_final.append(tool_calls_message)
+        if len(tool_messages) > 0:
+            messages_for_final.extend(tool_messages)
+
+        # Final prompt
+        stream_completion = await self._client.chat.completions.create(
+            model=self._model,
+            temperature=0.7,
+            messages=messages_for_final,
+            stream=True
         )
 
-        collected = []
-        async for chunk in stream:
+        # Stream answer
+        collected_messages = []
+
+        async for chunk in stream_completion:
             delta = chunk.choices[0].delta.content
             if delta:
-                collected.append(delta)
+                collected_messages.append(delta)
                 yield {"chunk": delta}
 
-        yield {"sources": related_sources}
+        if related_sources:
+            yield {"sources": related_sources}
 
-        full = "".join(collected)
+        # Save answer
+        full = ''.join(collected_messages)
         final_msg = {"role": "assistant", "content": full}
         await sync_to_async(
             self._chat_history.add_new_message,
@@ -184,6 +220,6 @@ class Agent(AgentBase):
         )(chat_id, final_msg)
 
         await sync_to_async(
-            token_usage_manager.add_used_tokens,
+            self._token_usage_manager.add_used_tokens,
             thread_sensitive=True
-        )(chat_id, len(gpt_4o_mini_token_encoding.encode(full)))
+        )(chat_id, len(self._gpt_4o_mini_token_encoding.encode(full)))
