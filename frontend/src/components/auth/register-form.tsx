@@ -92,7 +92,7 @@ function RegisterForm() {
         />
         <FormRootError />
         <Button type="submit" disabled={loading}>
-          {loading ? 'Logowanie' : 'Utwórz konto'}
+          {loading ? 'Rejestrowanie' : 'Utwórz konto'}
         </Button>
       </form>
     </Form>

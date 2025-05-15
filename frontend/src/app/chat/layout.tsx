@@ -47,6 +47,7 @@ const sidebarItems = [
 export default function ChatLayout({ children }: { children: ReactNode }) {
   return (
     <SidebarProvider
+      defaultOpen={false}
       style={
         {
           '--sidebar-width': '20rem',

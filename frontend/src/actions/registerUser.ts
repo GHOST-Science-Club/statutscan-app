@@ -15,22 +15,23 @@ async function registerUser(values: z.infer<typeof registerSchema>) {
 
   const json = await res.json();
   const errors: { type: 'email' | 'password' | 'root'; message: string }[] = [];
-
-  if (json.email) {
-    errors.push({
-      type: 'email',
-      message: json.email.join(' ') || json.email,
-    });
-  } else if (json.password) {
-    errors.push({
-      type: 'password',
-      message: json.password.join(' ') || json.password,
-    });
-  } else
-    errors.push({
-      type: 'root',
-      message: json.join(' '),
-    });
+  if (!res.ok) {
+    if (json.email) {
+      errors.push({
+        type: 'email',
+        message: json.email.join(' ') || json.email,
+      });
+    } else if (json.password) {
+      errors.push({
+        type: 'password',
+        message: json.password.join(' ') || json.password,
+      });
+    } else
+      errors.push({
+        type: 'root',
+        message: json.join(' '),
+      });
+  }
 
   if (errors.length > 0) return errors;
   if (res.statusText == 'Created') redirect('/confirm/email');

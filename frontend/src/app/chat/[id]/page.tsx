@@ -92,7 +92,7 @@ export default function ChatPage() {
 
   return (
     <main className="mx-auto flex w-full flex-col justify-center py-1 text-center">
-      <div className="mx-auto flex max-w-3xl flex-col">
+      <div className="mx-auto flex w-full max-w-3xl flex-col">
         {messages.map((msg, index) => (
           <ChatMsg
             key={index}
