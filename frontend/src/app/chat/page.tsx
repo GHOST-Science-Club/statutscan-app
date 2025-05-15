@@ -1,10 +1,15 @@
 'use client';
 import { ChatInput } from '@/components/chat/chat-input';
 import { getChatFirstMsg } from '@/actions/getChatFirstMsg';
+import { Dispatch, SetStateAction } from 'react';
 
 export default function ChatInitialPage() {
-  const onSubmit = async (question: string) => {
+  const onSubmit = async (
+    question: string,
+    stopLoading: Dispatch<SetStateAction<boolean>>,
+  ) => {
     await getChatFirstMsg({ question });
+    stopLoading(false);
   };
 
   return (
