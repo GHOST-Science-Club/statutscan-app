@@ -39,7 +39,7 @@ function ChatInput({ onSubmit }: Props) {
         id="chat-main-input"
         placeholder="Zapytaj mnie o coś"
         aria-label="Główne pole tesktowe czatu"
-        className="min-h-[56px] w-full resize-none rounded-md border-none py-4 pr-12 pl-3 leading-[1.2] text-wrap sm:pl-6"
+        className="min-h-[56px] w-full resize-none rounded-md py-4 pr-12 pl-3 leading-[1.2] text-wrap sm:pl-6"
         value={inputValue}
         onKeyDown={e => {
           if (e.key === 'Enter') {

@@ -8,33 +8,64 @@ import {
 import { useEffect, useState } from 'react';
 import { ChatInput } from '@/components/chat/chat-input';
 import useWebSocket from 'react-use-websocket';
+import { AiMsg } from '@/components/chat/ai-msg';
+
+interface ChatMessage {
+  type: 'user' | 'assistant';
+  content?: string;
+  sources?: { title?: string; source: string }[];
+}
 
 export default function ChatPage() {
-  const [messages, setMessages] = useState<string[]>([]);
   const { id } = useParams<{ id: string }>();
   const router = useRouter();
   const pathname = usePathname();
   const searchParams = useSearchParams();
   const redirected = searchParams.get('redirection') || null;
+  const [messages, setMessages] = useState<ChatMessage[]>([]);
 
   const handleMessage = (event: MessageEvent) => {
     const data = JSON.parse(event.data);
     if (data.type === 'assistant_answer') {
-      const chunk = data.message;
-      const isStreaming = data.streaming;
+      const { message, streaming } = data;
 
-      if (isStreaming) {
-        const messageChunk = JSON.parse(chunk);
-        if ('chunk' in messageChunk) {
-          setMessages(prev => [...prev, messageChunk['chunk']]);
-        }
+      if (streaming) {
+        const messageChunk = JSON.parse(message);
+        setMessages(prev => {
+          const lastMessage = prev[prev.length - 1];
+          if (messageChunk.chunk && lastMessage?.type === 'assistant') {
+            return [
+              ...prev.slice(0, -1),
+              {
+                ...lastMessage,
+                content: (lastMessage.content || '') + messageChunk.chunk,
+              },
+            ];
+          } else if (messageChunk.sources) {
+            return [
+              ...prev.slice(0, -1),
+              {
+                ...lastMessage,
+                sources: [
+                  ...(lastMessage.sources || []),
+                  ...messageChunk.sources,
+                ],
+              },
+            ];
+          } else if (messageChunk.chunk) {
+            return [
+              ...prev,
+              { type: 'assistant', content: messageChunk.chunk, sources: [] },
+            ];
+          }
+          return prev;
+        });
       }
     }
   };
 
-  const wsScheme = process.env.NODE_ENV == 'production' ? 'wss' : 'ws';
   const { sendJsonMessage } = useWebSocket(
-    `${wsScheme}://localhost:8000/ws/chat/${id}/`,
+    `${process.env.NODE_ENV == 'production' ? 'wss' : 'ws'}://localhost:8000/ws/chat/${id}/`,
     {
       onOpen: () => console.log('connected'),
       onMessage: handleMessage,
@@ -57,7 +88,16 @@ export default function ChatPage() {
 
   return (
     <>
-      <div>{messages}</div>
+      {messages.map(
+        (msg, index) =>
+          msg.type === 'assistant' && (
+            <AiMsg
+              key={index}
+              content={msg.content || ''}
+              sources={msg.sources || []}
+            />
+          ),
+      )}
       <ChatInput onSubmit={onSubmit} />
     </>
   );
