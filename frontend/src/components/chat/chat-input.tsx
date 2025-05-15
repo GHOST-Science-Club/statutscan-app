@@ -1,7 +1,7 @@
 'use client';
 
 import { ArrowUp, Loader } from 'lucide-react';
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { Textarea } from '@/components/ui/textarea';
 import { cn } from '@/lib/utils';
 import { useAutoResizeTextarea } from '@/hooks/use-auto-resize-textarea';
@@ -9,18 +9,28 @@ import { Button } from '@/components/ui/button';
 
 type Props = {
   onSubmit: (value: string) => void;
+  disabled?: boolean;
+  loadingProp?: boolean;
 };
 
-function ChatInput({ onSubmit }: Props) {
+function ChatInput({ disabled, loadingProp, onSubmit }: Props) {
   const [inputValue, setInputValue] = useState('');
-  const [loading, setLoading] = useState(false);
+  const [loading, setLoading] = useState(true);
   const { textareaRef, adjustHeight } = useAutoResizeTextarea({
     minHeight: 50,
     maxHeight: 200,
   });
 
+  useEffect(() => {
+    setLoading(false);
+  }, []);
+
+  useEffect(() => {
+    setLoading(loadingProp ?? false);
+  }, [loadingProp]);
+
   const handleSubmit = () => {
-    if (loading) return;
+    if (loading || disabled) return;
     setLoading(true);
 
     setInputValue('');
@@ -58,7 +68,7 @@ function ChatInput({ onSubmit }: Props) {
           'absolute top-1/2 right-3 -translate-y-1/2 rounded-full transition-opacity',
           inputValue ? 'opacity-100' : 'opacity-30',
         )}
-        disabled={loading}
+        disabled={loading || disabled}
         onClick={handleSubmit}
       >
         {loading ? <Loader className="animate-spin" /> : <ArrowUp />}

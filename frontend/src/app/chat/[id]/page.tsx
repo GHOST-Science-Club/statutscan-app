@@ -6,8 +6,8 @@ import {
   useSearchParams,
 } from 'next/navigation';
 import { useEffect, useState } from 'react';
-import { ChatInput } from '@/components/chat/chat-input';
 import useWebSocket from 'react-use-websocket';
+import { ChatInput } from '@/components/chat/chat-input';
 import { ChatMsg } from '@/components/chat/chat-msg';
 
 interface ChatMessage {
@@ -23,6 +23,8 @@ export default function ChatPage() {
   const searchParams = useSearchParams();
   const redirected = searchParams.get('redirection') || null;
   const [messages, setMessages] = useState<ChatMessage[]>([]);
+  const [error, setError] = useState(false);
+  const [isGenerating, setIsGenerating] = useState(false);
 
   const handleMessage = (event: MessageEvent) => {
     const data = JSON.parse(event.data);
@@ -42,6 +44,7 @@ export default function ChatPage() {
               },
             ];
           } else if (messageChunk.sources) {
+            console.log(lastMessage.sources, messageChunk.sources);
             return [
               ...prev.slice(0, -1),
               {
@@ -60,7 +63,7 @@ export default function ChatPage() {
           }
           return prev;
         });
-      }
+      } else setIsGenerating(false);
     }
   };
 
@@ -68,6 +71,10 @@ export default function ChatPage() {
     `${process.env.NODE_ENV == 'production' ? 'wss' : 'ws'}://localhost:8000/ws/chat/${id}/`,
     {
       onOpen: () => console.log('connected'),
+      onError: () => {
+        setIsGenerating(false);
+        setError(true);
+      },
       onMessage: handleMessage,
     },
   );
@@ -83,6 +90,7 @@ export default function ChatPage() {
   }, []);
 
   const onSubmit = (message: string) => {
+    setIsGenerating(true);
     setMessages(prev => [...prev, { type: 'user', content: message }]);
     sendJsonMessage({
       question: message,
@@ -102,7 +110,16 @@ export default function ChatPage() {
           />
         ))}
       </div>
-      <ChatInput onSubmit={onSubmit} />
+      {error && (
+        <p className="text-destructive text-2xl">
+          Wystąpił błąd podczas łączenia z czatem.
+        </p>
+      )}
+      <ChatInput
+        loadingProp={isGenerating}
+        disabled={error}
+        onSubmit={onSubmit}
+      />
     </main>
   );
 }

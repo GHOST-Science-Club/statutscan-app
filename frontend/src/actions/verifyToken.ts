@@ -13,7 +13,6 @@ async function verifyToken() {
       Cookie: `access=${accessToken}`,
     },
   });
-  console.log(res.status);
   return res.status === 200;
 }
 
