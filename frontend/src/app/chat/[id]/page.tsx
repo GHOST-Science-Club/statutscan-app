@@ -8,7 +8,7 @@ import {
 import { useEffect, useState } from 'react';
 import { ChatInput } from '@/components/chat/chat-input';
 import useWebSocket from 'react-use-websocket';
-import { AiMsg } from '@/components/chat/ai-msg';
+import { ChatMsg } from '@/components/chat/chat-msg';
 
 interface ChatMessage {
   type: 'user' | 'assistant';
@@ -83,22 +83,26 @@ export default function ChatPage() {
   }, []);
 
   const onSubmit = (message: string) => {
-    console.log(message);
+    setMessages(prev => [...prev, { type: 'user', content: message }]);
+    sendJsonMessage({
+      question: message,
+      chat_id: id,
+    });
   };
 
   return (
-    <>
-      {messages.map(
-        (msg, index) =>
-          msg.type === 'assistant' && (
-            <AiMsg
-              key={index}
-              content={msg.content || ''}
-              sources={msg.sources || []}
-            />
-          ),
-      )}
+    <main className="mx-auto flex w-full flex-col justify-center py-1 text-center">
+      <div className="mx-auto flex max-w-3xl flex-col">
+        {messages.map((msg, index) => (
+          <ChatMsg
+            key={index}
+            type={msg.type}
+            content={msg.content || ''}
+            sources={msg.sources || []}
+          />
+        ))}
+      </div>
       <ChatInput onSubmit={onSubmit} />
-    </>
+    </main>
   );
 }

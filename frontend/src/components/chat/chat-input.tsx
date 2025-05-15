@@ -1,17 +1,14 @@
 'use client';
 
 import { ArrowUp, Loader } from 'lucide-react';
-import { Dispatch, SetStateAction, useState } from 'react';
+import { useState } from 'react';
 import { Textarea } from '@/components/ui/textarea';
 import { cn } from '@/lib/utils';
 import { useAutoResizeTextarea } from '@/hooks/use-auto-resize-textarea';
 import { Button } from '@/components/ui/button';
 
 type Props = {
-  onSubmit: (
-    value: string,
-    stopLoading: Dispatch<SetStateAction<boolean>>,
-  ) => void;
+  onSubmit: (value: string) => void;
 };
 
 function ChatInput({ onSubmit }: Props) {
@@ -28,8 +25,8 @@ function ChatInput({ onSubmit }: Props) {
 
     setInputValue('');
     adjustHeight(true);
-
-    onSubmit(inputValue, setLoading);
+    onSubmit(inputValue);
+    setLoading(false);
   };
 
   return (

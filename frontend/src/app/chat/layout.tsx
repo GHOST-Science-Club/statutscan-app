@@ -47,7 +47,6 @@ const sidebarItems = [
 export default function ChatLayout({ children }: { children: ReactNode }) {
   return (
     <SidebarProvider
-      defaultOpen={false}
       style={
         {
           '--sidebar-width': '20rem',
@@ -62,7 +61,7 @@ export default function ChatLayout({ children }: { children: ReactNode }) {
           <Plus />
         </Button>
       </div>
-      <main className="m-auto w-full max-w-3xl text-center">{children}</main>
+      {children}
       <Button variant="primary" className="absolute right-0 m-2">
         Lorem ipsum
         <ArrowUpRight />
