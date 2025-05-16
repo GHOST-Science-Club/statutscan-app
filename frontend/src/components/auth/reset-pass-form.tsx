@@ -16,9 +16,9 @@ import {
 import { Input } from '@/components/ui/input';
 import { resetConfirmSchema, resetSchema } from '@/lib/types';
 import { redirect } from 'next/navigation';
-import { resetConfirmPassword } from '@/actions/resetConfirmPassword';
+import { resetConfirmPassword } from '@/lib/auth/resetConfirmPassword';
 import { useState } from 'react';
-import { resetPassword } from '@/actions/resetPassword';
+import { resetPassword } from '@/lib/auth/resetPassword';
 
 function ResetPassForm() {
   const [loading, setLoading] = useState(false);

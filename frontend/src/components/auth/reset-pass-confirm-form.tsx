@@ -17,7 +17,7 @@ import {
 import { Input } from '@/components/ui/input';
 import { resetConfirmSchema } from '@/lib/types';
 import { useState } from 'react';
-import { resetConfirmPassword } from '@/actions/resetConfirmPassword';
+import { resetConfirmPassword } from '@/lib/auth/resetConfirmPassword';
 import { redirect } from 'next/navigation';
 
 type Props = {

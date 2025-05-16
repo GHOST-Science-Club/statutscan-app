@@ -1,7 +1,7 @@
 import Link from 'next/link';
 import { AuthLayout } from '@/components/auth/auth-layout';
 import { Button } from '@/components/ui/button';
-import { activateUser } from '@/actions/activateUser';
+import { activateUser } from '@/lib/auth/activateUser';
 import { notFound } from 'next/navigation';
 
 type Params = {

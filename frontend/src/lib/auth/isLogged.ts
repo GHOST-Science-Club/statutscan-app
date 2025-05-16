@@ -1,6 +1,6 @@
 'use server';
-import { verifyToken } from '@/actions/verifyToken';
-import { refreshToken } from '@/actions/refreshToken';
+import { verifyToken } from '@/lib/auth/verifyToken';
+import { refreshToken } from '@/lib/auth/refreshToken';
 
 async function isLogged() {
   const firstAttempt = await verifyToken();

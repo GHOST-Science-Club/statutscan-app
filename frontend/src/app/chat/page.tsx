@@ -1,6 +1,6 @@
 'use client';
 import { ChatInput } from '@/components/chat/chat-input';
-import { getChatFirstMsg } from '@/actions/getChatFirstMsg';
+import { getChatFirstMsg } from '@/lib/chat/getChatFirstMsg';
 import { useState } from 'react';
 
 export default function ChatInitialPage() {

@@ -1,6 +1,6 @@
 import type { NextRequest } from 'next/server';
 import { NextResponse } from 'next/server';
-import { isLogged } from '@/actions/isLogged';
+import { isLogged } from '@/lib/auth/isLogged';
 
 export async function middleware(request: NextRequest) {
   const response = NextResponse.next();

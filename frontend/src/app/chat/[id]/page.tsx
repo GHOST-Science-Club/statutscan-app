@@ -9,7 +9,7 @@ import { useEffect, useState } from 'react';
 import useWebSocket from 'react-use-websocket';
 import { ChatInput } from '@/components/chat/chat-input';
 import { ChatMsg } from '@/components/chat/chat-msg';
-import { getChat } from '@/actions/getChat';
+import { getChat } from '@/lib/chat/getChat';
 
 interface ChatMessage {
   type: 'user' | 'assistant';

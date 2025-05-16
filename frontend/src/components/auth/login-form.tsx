@@ -18,7 +18,7 @@ import {
 import { Input } from '@/components/ui/input';
 import Link from 'next/link';
 import { loginSchema } from '@/lib/types';
-import { loginUser } from '@/actions/loginUser';
+import { loginUser } from '@/lib/auth/loginUser';
 import { useState } from 'react';
 
 function LoginForm() {

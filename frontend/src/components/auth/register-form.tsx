@@ -16,7 +16,7 @@ import {
 } from '@/components/ui/form';
 import { Input } from '@/components/ui/input';
 import { registerSchema } from '@/lib/types';
-import { registerUser } from '@/actions/registerUser';
+import { registerUser } from '@/lib/auth/registerUser';
 import { useState } from 'react';
 
 function RegisterForm() {

@@ -14,7 +14,7 @@ import {
   NavItems,
 } from '@/components/ui/resizable-navbar';
 import { useEffect, useState } from 'react';
-import { isLogged } from '@/actions/isLogged';
+import { isLogged } from '@/lib/auth/isLogged';
 
 function Header() {
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
