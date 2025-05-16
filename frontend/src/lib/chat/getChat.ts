@@ -13,7 +13,7 @@ async function getChat({ id }: { id: string }) {
       Authorization: `Bearer ${access}`,
     },
   });
-
+  if (!res.ok) return null;
   const json: {
     title: string;
     chat_history: {

@@ -11,6 +11,7 @@ import { getChatFirstMsg } from '@/lib/chat/getChatFirstMsg';
 import { getChat } from '@/lib/chat/getChat';
 import useWebSocket from 'react-use-websocket';
 import { ChatMsg } from '@/components/chat/chat-msg';
+import { cn } from '@/lib/utils';
 
 interface ChatMessage {
   role: 'user' | 'assistant';
@@ -26,18 +27,27 @@ export default function ChatPage() {
   const wsConnectRef = useRef(false);
   const [messages, setMessages] = useState<ChatMessage[]>([]);
   const [error, setError] = useState<string | null>(null);
+  const messagesEndRef = useRef<HTMLDivElement>(null);
+
+  useEffect(() => {
+    if (messagesEndRef.current) {
+      messagesEndRef.current.scrollIntoView({ behavior: 'smooth' });
+    }
+  }, [messages]);
 
   useEffect(() => {
     if (!chatId) return;
-    getChat({ id: chatId }).then(res =>
-      setMessages(
-        res.map(msg => ({
-          role: msg.role,
-          content: msg.content || '',
-          sources: msg.sources || [],
-        })),
-      ),
-    );
+    getChat({ id: chatId }).then(res => {
+      if (!res) setError('Nie można znaleźć czatu');
+      else
+        setMessages(
+          res.map(msg => ({
+            role: msg.role,
+            content: msg.content || '',
+            sources: msg.sources || [],
+          })),
+        );
+    });
 
     if (redirected) {
       router.push(pathname);
@@ -120,20 +130,26 @@ export default function ChatPage() {
   );
 
   return (
-    <main className="mx-auto flex w-full flex-col justify-center py-1 text-center">
-      {!chatId ? (
-        <section>
-          <h2 className="text-gradient pb-5">Zapytaj o coś</h2>
-        </section>
-      ) : (
-        <section className="mx-auto flex w-full max-w-4xl flex-col gap-5 p-2">
-          {messages.map((msg, index) => (
-            <ChatMsg key={index} type={msg.role} content={msg.content} />
-          ))}
-        </section>
-      )}
-      {error && <p className="text-destructive">{error}</p>}
-      <ChatInput onSubmit={onSubmit} />
+    <main className="mx-auto flex h-screen w-full flex-col justify-center overflow-hidden py-1 text-center">
+      <div className={cn('overflow-auto', chatId && 'h-full')}>
+        {!chatId ? (
+          <section>
+            <h2 className="text-gradient pb-5">Zapytaj o coś</h2>
+          </section>
+        ) : (
+          <section className="mx-auto flex w-full max-w-4xl flex-col gap-5 p-2">
+            {messages.map((msg, index) => (
+              <ChatMsg key={index} {...msg} />
+            ))}
+            <div ref={messagesEndRef} />
+          </section>
+        )}
+      </div>
+
+      <div>
+        {error && <p className="text-destructive">{error}</p>}
+        <ChatInput onSubmit={onSubmit} />
+      </div>
     </main>
   );
 }
