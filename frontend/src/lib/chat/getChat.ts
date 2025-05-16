@@ -15,7 +15,7 @@ async function getChat({ id }: { id: string }) {
   });
 
   const json = await res.json();
-  console.log(json);
+  return json.chat_history;
 }
 
 export { getChat };

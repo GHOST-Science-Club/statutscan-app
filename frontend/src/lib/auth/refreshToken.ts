@@ -14,7 +14,7 @@ async function refreshToken() {
       Cookie: `refresh=${refreshToken}`,
     },
   });
-
+  if (!res.ok) return;
   const json = await res.json();
   if (json.access)
     cookieStore.set('access', json.access, {

@@ -87,7 +87,15 @@ export default function ChatPage() {
         is_redirection: true,
       });
     } else {
-      getChat({ id });
+      getChat({ id }).then(res => {
+        setMessages(
+          res.map((msg: any) => ({
+            type: msg.role,
+            content: msg.content || '',
+            sources: msg.sources || [],
+          })),
+        );
+      });
     }
   }, []);
 

@@ -16,7 +16,10 @@ import Link from 'next/link';
 import { getChats } from '@/lib/chat/getChats';
 
 export async function ChatSidebar() {
-  const chats = await getChats();
+  const chats: {
+    id: string;
+    title: string;
+  }[] = await getChats();
   return (
     <Sidebar collapsible="offcanvas">
       <SidebarHeader className="flex flex-row items-end justify-end pl-4">
@@ -33,7 +36,7 @@ export async function ChatSidebar() {
       </SidebarHeader>
       <SidebarContent className="overflow-hidden">
         <ScrollArea className="h-full">
-          {chats?.length === 0 ? (
+          {!chats || chats.length === 0 ? (
             <p className="py-5 text-center text-sm">
               Nie utworzono żadnych czatów
             </p>
@@ -45,9 +48,9 @@ export async function ChatSidebar() {
                   <Link
                     key={i}
                     href={`/chat/${chat.id}`}
-                    className="text-ellipsis"
+                    className="text-ellipsis hover:underline"
                   >
-                    {chat.label}
+                    {chat.title}
                   </Link>
                 ))}
               </SidebarGroupContent>
