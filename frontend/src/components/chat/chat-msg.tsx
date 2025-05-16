@@ -11,9 +11,9 @@ function ChatMsg(props: Props) {
   const { type, content, sources } = props;
 
   return (
-    <section
+    <article
       className={cn(
-        'mx-1 my-2 max-w-full rounded-xl px-5 py-2 text-left',
+        'mx-1 my-2 w-fit rounded-xl px-5 py-2 text-left',
         type == 'user' ? 'self-end border' : 'bg-input self-start',
       )}
     >
@@ -25,7 +25,7 @@ function ChatMsg(props: Props) {
           dangerouslySetInnerHTML={{ __html: marked.parse(content) }}
         />
       )}
-    </section>
+    </article>
   );
 }
 

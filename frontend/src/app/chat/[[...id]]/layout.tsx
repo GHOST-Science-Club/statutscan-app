@@ -27,7 +27,7 @@ export default async function ChatLayout(props: Props) {
       }
     >
       <ChatSidebar />
-      <div className="absolute m-2">
+      <div className="fixed m-2">
         <SidebarTrigger className="size-9" />
         <Button aria-label="Nowy czat" variant="ghost" size="icon" asChild>
           <Link href="/chat">

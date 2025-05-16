@@ -18,10 +18,10 @@ async function getChatFirstMsg({ question }: { question: string }) {
   });
 
   const json = await res.json();
+  if (!res.ok) return json.detail;
   if (json.redirect_url) {
     redirect(json.redirect_url);
   }
-  if (json.detail) return json.detail;
 }
 
 export { getChatFirstMsg };

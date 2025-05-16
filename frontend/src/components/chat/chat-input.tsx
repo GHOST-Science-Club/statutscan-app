@@ -31,6 +31,7 @@ function ChatInput({ disabled, loadingProp, onSubmit }: Props) {
 
   const handleSubmit = () => {
     if (loading || disabled) return;
+    if (inputValue == '') return;
     setLoading(true);
 
     setInputValue('');
@@ -40,7 +41,7 @@ function ChatInput({ disabled, loadingProp, onSubmit }: Props) {
   };
 
   return (
-    <div className="relative mx-auto w-full max-w-xl px-2">
+    <div className="relative mx-auto w-full max-w-xl p-2">
       <Textarea
         ref={textareaRef}
         id="chat-main-input"

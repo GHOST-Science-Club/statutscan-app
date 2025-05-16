@@ -25,6 +25,7 @@ export default function ChatPage() {
   const pathname = usePathname();
   const wsConnectRef = useRef(false);
   const [messages, setMessages] = useState<ChatMessage[]>([]);
+  const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
     if (!chatId) return;
@@ -56,7 +57,8 @@ export default function ChatPage() {
   const onSubmit = useCallback(
     async (question: string) => {
       if (!chatId) {
-        await getChatFirstMsg({ question });
+        const error = await getChatFirstMsg({ question });
+        if (error) setError(error);
       } else {
         setMessages(prev => [...prev, { role: 'user', content: question }]);
         sendJsonMessage({
@@ -124,10 +126,13 @@ export default function ChatPage() {
           <h2 className="text-gradient pb-5">Zapytaj o coś</h2>
         </section>
       ) : (
-        messages.map((msg, index) => (
-          <ChatMsg key={index} type={msg.role} content={msg.content} />
-        ))
+        <section className="mx-auto flex w-full max-w-4xl flex-col gap-5 p-2">
+          {messages.map((msg, index) => (
+            <ChatMsg key={index} type={msg.role} content={msg.content} />
+          ))}
+        </section>
       )}
+      {error && <p className="text-destructive">{error}</p>}
       <ChatInput onSubmit={onSubmit} />
     </main>
   );
