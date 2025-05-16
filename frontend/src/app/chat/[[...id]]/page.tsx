@@ -5,7 +5,7 @@ import {
   useRouter,
   useSearchParams,
 } from 'next/navigation';
-import { useEffect, useState } from 'react';
+import { useCallback, useEffect, useRef, useState } from 'react';
 import { ChatInput } from '@/components/chat/chat-input';
 import { getChatFirstMsg } from '@/lib/chat/getChatFirstMsg';
 import { getChat } from '@/lib/chat/getChat';
@@ -19,17 +19,12 @@ interface ChatMessage {
 }
 
 export default function ChatPage() {
-  const { id } = useParams<{ id?: string[] }>();
-  const [chatId, setChatId] = useState<string | null>(null);
+  const chatId = useParams<{ id?: string[] }>().id?.[0] || null;
   const redirected = useSearchParams().get('redirection') || null;
   const router = useRouter();
   const pathname = usePathname();
-  const [startConnectWS, setStartConnectWS] = useState(false);
+  const wsConnectRef = useRef(false);
   const [messages, setMessages] = useState<ChatMessage[]>([]);
-
-  useEffect(() => {
-    if (id) setChatId(id[0]);
-  }, []);
 
   useEffect(() => {
     if (!chatId) return;
@@ -42,7 +37,7 @@ export default function ChatPage() {
         })),
       ),
     );
-    setStartConnectWS(true);
+
     if (redirected) {
       router.push(pathname);
       sendJsonMessage({
@@ -50,21 +45,30 @@ export default function ChatPage() {
         is_redirection: true,
       });
     }
+
+    wsConnectRef.current = true;
+
+    return () => {
+      wsConnectRef.current = false; // Cleanup on unmount
+    };
   }, [chatId]);
 
-  const onSubmit = async (question: string) => {
-    if (!chatId) {
-      await getChatFirstMsg({ question });
-    } else {
-      setMessages(prev => [...prev, { role: 'user', content: question }]);
-      sendJsonMessage({
-        question: question,
-        chat_id: id,
-      });
-    }
-  };
+  const onSubmit = useCallback(
+    async (question: string) => {
+      if (!chatId) {
+        await getChatFirstMsg({ question });
+      } else {
+        setMessages(prev => [...prev, { role: 'user', content: question }]);
+        sendJsonMessage({
+          question: question,
+          chat_id: chatId,
+        });
+      }
+    },
+    [chatId],
+  );
 
-  const handleMessage = (event: MessageEvent) => {
+  const handleMessage = useCallback((event: MessageEvent) => {
     const data = JSON.parse(event.data);
     if (data.type === 'assistant_answer') {
       const { message, streaming } = data;
@@ -102,16 +106,17 @@ export default function ChatPage() {
         });
       }
     }
-  };
+  }, []);
 
   const { sendJsonMessage } = useWebSocket(
-    `${process.env.NODE_ENV == 'production' ? 'wss' : 'ws'}://localhost:8000/ws/chat/${id}/`,
+    `${process.env.NODE_ENV == 'production' ? 'wss' : 'ws'}://localhost:8000/ws/chat/${chatId}/`,
     {
       onOpen: () => console.log('connected'),
       onMessage: handleMessage,
     },
-    startConnectWS,
+    wsConnectRef.current && !!chatId,
   );
+
   return (
     <main className="mx-auto flex w-full flex-col justify-center py-1 text-center">
       {!chatId ? (

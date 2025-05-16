@@ -14,7 +14,14 @@ async function getChat({ id }: { id: string }) {
     },
   });
 
-  const json = await res.json();
+  const json: {
+    title: string;
+    chat_history: {
+      role: 'user' | 'assistant';
+      content: string;
+      sources?: any;
+    }[];
+  } = await res.json();
   return json.chat_history;
 }
 
