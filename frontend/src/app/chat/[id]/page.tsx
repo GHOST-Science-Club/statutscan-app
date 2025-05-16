@@ -9,6 +9,7 @@ import { useEffect, useState } from 'react';
 import useWebSocket from 'react-use-websocket';
 import { ChatInput } from '@/components/chat/chat-input';
 import { ChatMsg } from '@/components/chat/chat-msg';
+import { getChat } from '@/actions/getChat';
 
 interface ChatMessage {
   type: 'user' | 'assistant';
@@ -44,7 +45,6 @@ export default function ChatPage() {
               },
             ];
           } else if (messageChunk.sources) {
-            console.log(lastMessage.sources, messageChunk.sources);
             return [
               ...prev.slice(0, -1),
               {
@@ -86,6 +86,8 @@ export default function ChatPage() {
         chat_id: id,
         is_redirection: true,
       });
+    } else {
+      getChat({ id });
     }
   }, []);
 
@@ -115,11 +117,13 @@ export default function ChatPage() {
           Wystąpił błąd podczas łączenia z czatem.
         </p>
       )}
-      <ChatInput
-        loadingProp={isGenerating}
-        disabled={error}
-        onSubmit={onSubmit}
-      />
+      <div className="bg-background fixed bottom-0 w-full p-2">
+        <ChatInput
+          loadingProp={isGenerating}
+          disabled={error}
+          onSubmit={onSubmit}
+        />
+      </div>
     </main>
   );
 }
