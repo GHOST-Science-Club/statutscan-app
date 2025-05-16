@@ -18,7 +18,7 @@ import { isLogged } from '@/lib/auth/isLogged';
 
 function Header() {
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
-  const [logged, setIsLogged] = useState(false);
+  const [logged, setIsLogged] = useState<boolean | null>(null);
 
   useEffect(() => {
     isLogged().then(res => setIsLogged(res));
@@ -30,7 +30,11 @@ function Header() {
       <NavBody>
         <NavbarLogo />
         <NavItems items={NAV_ITEMS} />
-        {logged ? (
+        {logged == null ? (
+          <NavbarButton variant="gradient" disabled>
+            Ładowanie...
+          </NavbarButton>
+        ) : logged ? (
           <NavbarButton variant="gradient" href="/chat">
             Czat
           </NavbarButton>
@@ -78,4 +82,5 @@ function Header() {
     </Navbar>
   );
 }
+
 export { Header };

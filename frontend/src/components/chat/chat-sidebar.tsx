@@ -33,7 +33,7 @@ export async function ChatSidebar() {
       </SidebarHeader>
       <SidebarContent className="overflow-hidden">
         <ScrollArea className="h-full">
-          {chats.length === 0 ? (
+          {chats?.length === 0 ? (
             <p className="py-5 text-center text-sm">
               Nie utworzono żadnych czatów
             </p>
