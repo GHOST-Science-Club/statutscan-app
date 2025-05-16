@@ -4,8 +4,18 @@ import { SidebarProvider, SidebarTrigger } from '@/components/ui/sidebar';
 import { ChatSidebar } from '@/components/chat/chat-sidebar';
 import { Button } from '@/components/ui/button';
 import Link from 'next/link';
+import { notFound } from 'next/navigation';
 
-export default function ChatLayout({ children }: { children: ReactNode }) {
+type Props = {
+  children: ReactNode;
+  params: Promise<{ id?: string[] }>;
+};
+
+export default async function ChatLayout(props: Props) {
+  const { children, params } = props;
+  const { id } = await params;
+  if (id && id.length > 1) notFound();
+
   return (
     <SidebarProvider
       defaultOpen={false}
