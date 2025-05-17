@@ -1,7 +1,7 @@
 'use client';
 
 import { ArrowUp, Loader } from 'lucide-react';
-import { useEffect, useState } from 'react';
+import { useState } from 'react';
 import { Textarea } from '@/components/ui/textarea';
 import { cn } from '@/lib/utils';
 import { useAutoResizeTextarea } from '@/hooks/use-auto-resize-textarea';
@@ -10,34 +10,22 @@ import { Button } from '@/components/ui/button';
 type Props = {
   onSubmit: (value: string) => void;
   disabled?: boolean;
-  loadingProp?: boolean;
+  loading?: boolean;
 };
 
-function ChatInput({ disabled, loadingProp, onSubmit }: Props) {
+function ChatInput({ disabled, loading, onSubmit }: Props) {
   const [inputValue, setInputValue] = useState('');
-  const [loading, setLoading] = useState(true);
   const { textareaRef, adjustHeight } = useAutoResizeTextarea({
     minHeight: 50,
     maxHeight: 200,
   });
 
-  useEffect(() => {
-    setLoading(false);
-  }, []);
-
-  useEffect(() => {
-    setLoading(loadingProp ?? false);
-  }, [loadingProp]);
-
   const handleSubmit = () => {
     if (loading || disabled) return;
     if (inputValue == '') return;
-    setLoading(true);
-
     setInputValue('');
     adjustHeight(true);
     onSubmit(inputValue);
-    setLoading(false);
   };
 
   return (
@@ -49,6 +37,7 @@ function ChatInput({ disabled, loadingProp, onSubmit }: Props) {
         aria-label="Główne pole tesktowe czatu"
         className="min-h-[56px] w-full resize-none rounded-md py-4 pr-12 pl-3 leading-[1.2] text-wrap sm:pl-6"
         value={inputValue}
+        disabled={disabled}
         onKeyDown={e => {
           if (e.key === 'Enter') {
             if (e.shiftKey) return;

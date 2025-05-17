@@ -26,8 +26,10 @@ export default function ChatPage() {
   const pathname = usePathname();
   const wsConnectRef = useRef(false);
   const [messages, setMessages] = useState<ChatMessage[]>([]);
-  const [error, setError] = useState<string | null>(null);
   const messagesEndRef = useRef<HTMLDivElement>(null);
+
+  const [error, setError] = useState<string | null>(null);
+  const [loading, setLoading] = useState<boolean>(true);
 
   useEffect(() => {
     if (messagesEndRef.current) {
@@ -66,6 +68,7 @@ export default function ChatPage() {
 
   const onSubmit = useCallback(
     async (question: string) => {
+      setLoading(true);
       if (!chatId) {
         const error = await getChatFirstMsg({ question });
         if (error) setError(error);
@@ -81,6 +84,7 @@ export default function ChatPage() {
   );
 
   const handleMessage = useCallback((event: MessageEvent) => {
+    setLoading(true);
     const data = JSON.parse(event.data);
     if (data.type === 'assistant_answer') {
       const { message, streaming } = data;
@@ -116,7 +120,7 @@ export default function ChatPage() {
           }
           return prev;
         });
-      }
+      } else setLoading(false);
     }
   }, []);
 
@@ -148,7 +152,7 @@ export default function ChatPage() {
 
       <div>
         {error && <p className="text-destructive">{error}</p>}
-        <ChatInput onSubmit={onSubmit} />
+        <ChatInput disabled={!!error} loading={loading} onSubmit={onSubmit} />
       </div>
     </main>
   );
