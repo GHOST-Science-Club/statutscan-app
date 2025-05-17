@@ -32,8 +32,9 @@ with a Q&A chatbot using RAG and vector databases with the necessary information
 5. Go to http://localhost:8000/swagger/
 
 ### FRONTEND
-
-1. Go to frontend directory using `cd frontend`
+**Note:** The backend must be running before starting the frontend.
+1. Navigate to the frontend directory using `cd frontend`
 2. Create file `.env` and fill it as `.env.example`
-3. Run `npm run dev` in console
-4. Project is ready on http://localhost:3000/
+3. Install dependencies: `npm install`
+4. Start the development server: `npm run dev`
+5. The project will be available at [http://localhost:3000/]
