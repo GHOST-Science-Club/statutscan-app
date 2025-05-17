@@ -1,6 +1,6 @@
 {
   "name": "frontend",
-  "version": "0.1.0",
+  "version": "0.9.0",
   "author": "benqSzaw",
   "private": true,
   "scripts": {
@@ -8,7 +8,7 @@
     "build": "next build",
     "start": "next start",
     "lint": "next lint",
-    "format": "prettier ../frontend --write"
+    "format": "prettier ./ --write"
   },
   "dependencies": {
     "@bprogress/next": "^3.2.11",

@@ -8,7 +8,6 @@ import {
 } from 'motion/react';
 import Link from 'next/link';
 import React, { useRef, useState } from 'react';
-import Image from 'next/image';
 import { Menu, X } from 'lucide-react';
 import { Logo } from '@/components/ui/logo';
 
@@ -198,7 +197,6 @@ export const MobileNavMenu = ({
   children,
   className,
   isOpen,
-  onClose,
 }: MobileNavMenuProps) => {
   return (
     <AnimatePresence>

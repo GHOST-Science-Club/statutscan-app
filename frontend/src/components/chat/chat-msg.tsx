@@ -9,7 +9,7 @@ type Props = {
 
 function ChatMsg(props: Props) {
   const { role, content, sources } = props;
-
+  console.log(sources);
   return (
     <article
       className={cn(

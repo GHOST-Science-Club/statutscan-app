@@ -6,7 +6,7 @@ const nextConfig: NextConfig = {
     ignoreDuringBuilds: true,
   },
   pageExtensions: ['js', 'jsx', 'md', 'mdx', 'ts', 'tsx'],
-  output: 'standalone', //For docker
+  output: 'standalone',
 };
 
 const withMDX = createMDX({});

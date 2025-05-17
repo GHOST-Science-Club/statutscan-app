@@ -14,9 +14,8 @@ import {
   FormMessage,
 } from '@/components/ui/form';
 import { Input } from '@/components/ui/input';
-import { resetConfirmSchema, resetSchema } from '@/lib/types';
+import { resetSchema } from '@/lib/types';
 import { redirect } from 'next/navigation';
-import { resetConfirmPassword } from '@/lib/auth/resetConfirmPassword';
 import { useState } from 'react';
 import { resetPassword } from '@/lib/auth/resetPassword';
 

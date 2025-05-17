@@ -1,7 +1,7 @@
 import { SectionLayout } from '@/components/ui/section-layout';
 import { Button } from '@/components/ui/button';
 import Link from 'next/link';
-import { AboutChatItem } from '@/components/AboutChatItem';
+import { AboutChatItem } from '@/components/about-chat-item';
 
 const cards = [
   {
