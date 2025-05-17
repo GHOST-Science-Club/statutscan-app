@@ -35,5 +35,5 @@ with a Q&A chatbot using RAG and vector databases with the necessary information
 
 1. Go to frontend directory using `cd frontend`
 2. Create file `.env` and fill it as `.env.example`
-2. Run `npm run dev` in console
-3. Project is ready on http://localhost:3000/
+3. Run `npm run dev` in console
+4. Project is ready on http://localhost:3000/
