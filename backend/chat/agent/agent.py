@@ -126,9 +126,9 @@ class Agent(AgentBase):
         related_sources = []
 
         # Detect prompt injection
-        is_prompt_injection = await self._prompt_injection.detect(question)
+        result = await self._prompt_injection.detect(question)
 
-        if is_prompt_injection:
+        if result.get("is_prompt_injection"):
             await sync_to_async(
                 self._chat_history.flag_last_message_as_prompt_injection,
                 thread_sensitive=True
@@ -136,9 +136,9 @@ class Agent(AgentBase):
             yield {
                 "error": {
                     "type": "prompt_injection",
-                    "content": self._prompt_injection.get_message()
+                    "content": result.get("message")
                 }
-            } 
+            }
             return
 
         # Select tools to use

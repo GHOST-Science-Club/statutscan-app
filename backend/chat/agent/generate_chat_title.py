@@ -5,7 +5,7 @@ from chat.agent.token_usage_manager import TokenUsageManager
 token_usage_manager = TokenUsageManager()
 
 
-def generate_chat_title(message: str, chat_id: str) -> str:
+def generate_chat_title(message: str, chat_id: str, model: str="gpt-4o-mini") -> str:
     """
     Generates a short title for a conversation based on the provided user message 
     using the OpenAI API.
@@ -20,7 +20,7 @@ def generate_chat_title(message: str, chat_id: str) -> str:
     client = OpenAI()
     
     response = client.chat.completions.create(
-        model="gpt-4o-mini",
+        model=model,
         messages=[
             {
                 "role": "system",
