@@ -7,6 +7,7 @@ from rest_framework.permissions import IsAuthenticated
 from rest_framework import mixins, viewsets
 from drf_yasg import openapi
 from drf_yasg.utils import swagger_auto_schema
+from asgiref.sync import async_to_sync
 
 from chat.agent.chat_history import ChatHistory
 from chat.agent.token_usage_manager import TokenUsageManager
