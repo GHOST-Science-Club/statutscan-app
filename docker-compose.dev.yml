@@ -1,0 +1,90 @@
+services:
+  backend:
+    container_name: statutscan-backend-dev
+    build:
+      context: ./backend
+      dockerfile: Dockerfile.dev
+    image: statutscan-backend:dev
+    working_dir: /app
+    env_file:
+      - ./backend/.envs/.env.local
+    volumes:
+      - ./backend:/app
+      - static_volume:/app/staticfiles
+      - media_volume:/app/media
+    ports:
+      - '8000:8000'
+    command: ["./entrypoint.sh"]
+    depends_on:
+      - db
+      - mongo
+      - redis
+
+  frontend:
+    container_name: statutscan-frontend-dev
+    build:
+      context: ./frontend
+      dockerfile: Dockerfile.dev
+    image: statutscan-frontend:dev
+    working_dir: /app
+    env_file:
+      - ./frontend/.env
+    volumes:
+      - ./frontend:/app
+      - /app/node_modules
+    ports:
+      - '3000:3000'
+    command: ["npm", "run", "dev"]
+    depends_on:
+      - backend
+
+  mongo:
+    container_name: statutscan-mongo
+    image: mongo:latest
+    ports:
+      - '27017:27017'
+    volumes:
+      - mongo-data:/data/db
+    healthcheck:
+      test: ["CMD", "mongo", "--eval", "db.adminCommand('ping')"]
+      interval: 5s
+      retries: 5
+
+  redis:
+    image: redis:latest
+    container_name: redis
+    env_file:
+      - ./backend/.envs/.env.local
+    environment:
+      - REDIS_HOST=redis
+      - REDIS_PORT=6379
+    ports:
+      - '6379:6379'
+    volumes:
+      - redis_data:/data
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 5s
+      timeout: 2s
+      retries: 5
+
+  db:
+    container_name: statutscan-postgres
+    image: pgvector/pgvector:pg17
+    env_file:
+      - ./backend/.envs/.env.local
+    ports:
+      - '5432:5432'
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U $POSTGRES_USER -d $POSTGRES_DB"]
+      interval: 5s
+      retries: 5
+
+volumes:
+  static_volume:
+  media_volume:
+  mongo-data:
+  postgres_data:
+  redis_data:
