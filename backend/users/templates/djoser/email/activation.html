@@ -11,104 +11,107 @@
 {{ protocol }}://{{ domain }}/{{ url|safe }}
 
 {% trans "Thanks for using our site!" %}
-
 {% blocktrans %}The {{ site_name }} team{% endblocktrans %}
 {% endblock text_body %}
 
 {% block html_body %}
 <!DOCTYPE html>
 <html lang="en">
-  <head>
-    <meta charset="utf-8" />
-    <title>{% trans "Activate your account" %}</title>
-    <style>
+<head>
+  <meta charset="utf-8" />
+  <title>{% trans "Activate your account" %}</title>
+  <meta name="color-scheme" content="light dark">
+  <meta name="supported-color-schemes" content="light dark">
+  <style>
+    body {
+      background: #fff;
+      color: #212121;
+      font-family: Arial, sans-serif;
+      margin: 0;
+      padding: 0;
+      font-size: 16px;
+      line-height: 1.6;
+    }
+    .email-box {
+      max-width: 420px;
+      margin: 36px auto;
+      background: #fff;
+      border-radius: 8px;
+      box-shadow: 0 2px 12px rgba(0,0,0,0.03);
+      padding: 32px 24px 18px 24px;
+      border: 1px solid #eee;
+    }
+    .email-title {
+      font-size: 1.35em;
+      font-weight: bold;
+      color: #ff9800;
+      text-align: center;
+      margin-bottom: 18px;
+      margin-top: 0;
+    }
+    .btn {
+      display: block;
+      margin: 28px auto 18px auto;
+      padding: 12px 0;
+      width: 100%;
+      background: #ff9800;
+      color: #fff !important;
+      border: none;
+      border-radius: 5px;
+      text-align: center;
+      font-size: 16px;
+      font-weight: 600;
+      text-decoration: none;
+      cursor: pointer;
+      transition: background .15s;
+    }
+    .btn:hover {
+      background: #e07b00;
+    }
+    .footer {
+      margin-top: 24px;
+      text-align: center;
+      color: #999;
+      font-size: 12px;
+    }
+    @media (prefers-color-scheme: dark) {
       body {
-        margin: 0;
-        padding: 0;
-        background: linear-gradient(to right, #FFD699, #FF8C00);
-        font-family: Arial, sans-serif;
-        color: #333; /* базовый текст */
+        background: #191919 !important;
+        color: #fff !important;
       }
-      .email-container {
-        width: 100%;
-        background: linear-gradient(to right, #FFD699, #FF8C00);
-        padding: 20px 0;
+      .email-box {
+        background: #232323;
+        border-color: #333;
+        box-shadow: 0 2px 16px rgba(0,0,0,0.26);
       }
-      .email-content {
-        width: 600px;
-        margin: 0 auto;
-        background-color: #ffffff;
-        border-radius: 4px;
-        overflow: hidden;
+      .footer {
+        color: #aaa;
       }
-      .email-header {
-        background-color: #222222;
-        color: #FF8C00;
-        padding: 20px;
-        text-align: center;
-      }
-      .email-body {
-        padding: 20px;
-        color: #000000;
-      }
-      .email-footer {
-        font-size: 12px;
-        background-color: #f2f2f2;
-        text-align: center;
-        padding: 10px;
-        color: #777777;
-      }
-      .btn {
-        background-color: #FF8C00;
-        color: #ffffff !important;
-        padding: 12px 20px;
-        display: inline-block;
-        border-radius: 4px;
-        margin: 10px 0;
-        text-decoration: none;
-      }
-      .btn:hover {
-        background-color: #E07B00;
-      }
-    </style>    
-  </head>
-  <body>
-    <div class="email-container">
-      <table class="email-content" cellpadding="0" cellspacing="0" border="0" align="center">
-        <tr>
-          <td class="email-header">
-            <h1>{% trans "Activate your account" %}</h1>
-          </td>
-        </tr>
-        <tr>
-          <td class="email-body">
-            <p>
-              {% blocktrans %}You're receiving this email because you need to finish 
-              the activation process on {{ site_name }}.{% endblocktrans %}
-            </p>
-            <p>
-              {% trans "Please go to the following page to activate your account:" %}
-            </p>
-            <p>
-              <a class="btn" href="{{ protocol }}://{{ domain }}/{{ url|safe }}">
-                {% trans "Activate account" %}
-              </a>
-            </p>
-            <p>
-              {% trans "Thanks for using our site!" %}
-            </p>
-            <p>
-              {% blocktrans %}The {{ site_name }} team{% endblocktrans %}
-            </p>
-          </td>
-        </tr>
-        <tr>
-          <td class="email-footer">
-            <p style="margin: 0;">© 2025 {{ site_name }}. All rights reserved.</p>
-          </td>
-        </tr>
-      </table>
+    }
+  </style>
+</head>
+<body>
+  <div class="email-box">
+    <div class="email-title">{% trans "Activate your account" %}</div>
+    <p>
+      {% blocktrans %}You received this email because you need to finish activation process on {{ site_name }}.{% endblocktrans %}
+    </p>
+    <p>
+      {% trans "Please click the button below to activate your account:" %}
+    </p>
+    <a class="btn" href="{{ protocol }}://{{ domain }}/{{ url|safe }}">
+      {% trans "Activate account" %}
+    </a>
+    <p>
+      {% trans "Thanks for using our site!" %}
+    </p>
+    <p style="margin: 0;">
+      {% blocktrans %}The {{ site_name }} team{% endblocktrans %}
+    </p>
+    <div class="footer">
+      © {% now "Y" %} {{ site_name }}
     </div>
-  </body>
+  </div>
+</body>
 </html>
 {% endblock html_body %}
