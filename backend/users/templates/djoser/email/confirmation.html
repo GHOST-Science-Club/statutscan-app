@@ -1,8 +1,16 @@
-{% load i18n static %}
+{% load i18n %}
 
 {% block subject %}
 {% blocktrans %}Your account has been created and is ready to use!{% endblocktrans %}
 {% endblock subject %}
+
+{% block text_body %}
+{% blocktrans %}Your account has been created and is now active.{% endblocktrans %}
+
+{% trans "Thank you for using our site!" %}
+
+{% blocktrans %}The {{ site_name }} team{% endblocktrans %}
+{% endblock text_body %}
 
 {% block html_body %}
 <!DOCTYPE html>
@@ -35,25 +43,27 @@
     }
     .email-box {
       max-width: 420px;
-      margin: 32px auto;
+      margin: 36px auto;
       background: #fff;
-      border-radius: 10px;
-      box-shadow: 0 2px 16px rgba(0,0,0,0.06);
-      padding: 32px 26px 20px 26px;
+      border-radius: 8px;
+      box-shadow: 0 2px 12px rgba(0,0,0,0.03);
+      padding: 32px 24px 18px 24px;
+      border: 1px solid #eee;
       color: #181818;
     }
     .email-title {
-      text-align: center;
-      font-size: 1.4em;
-      font-weight: 700;
-      margin: 0 0 18px 0;
+      font-size: 1.3em;
+      font-weight: bold;
       color: #ff9800;
+      text-align: center;
+      margin-bottom: 18px;
+      margin-top: 0;
     }
     .email-footer {
       text-align: center;
       font-size: 12px;
       color: #666;
-      margin-top: 32px;
+      margin-top: 24px;
     }
   </style>
 </head>
@@ -63,11 +73,11 @@
     <p style="margin-bottom: 20px;">
       {% blocktrans %}Your account has been created and is now active.{% endblocktrans %}
     </p>
-    <p style="margin: 0 0 20px 0;">
+    <p style="margin-bottom: 0;">
       {% trans "Thank you for using our site!" %}
     </p>
     <div class="email-footer">
-      © 2025 {{ site_name }}. All rights reserved.
+      © {% now "Y" %} {{ site_name }}. All rights reserved.
     </div>
   </div>
 </body>
