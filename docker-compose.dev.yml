@@ -29,6 +29,7 @@ services:
     working_dir: /app
     env_file:
       - ./frontend/.env
+      - ./.env.windows
     volumes:
       - ./frontend:/app
       - /app/node_modules
