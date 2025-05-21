@@ -32,6 +32,10 @@ export default function ChatPage() {
   const [loading, setLoading] = useState<boolean>(true);
 
   useEffect(() => {
+    setLoading(false);
+  }, []);
+
+  useEffect(() => {
     if (messagesEndRef.current) {
       messagesEndRef.current.scrollIntoView({ behavior: 'smooth' });
     }
