@@ -23,7 +23,6 @@ export default function ChatPage() {
   const chatId = useParams<{ id?: string[] }>().id?.[0] || null;
   const redirected = useSearchParams().get('redirection') || null;
   const router = useRouter();
-  const pathname = usePathname();
   const wsConnectRef = useRef(false);
   const [messages, setMessages] = useState<ChatMessage[]>([]);
   const messagesEndRef = useRef<HTMLDivElement>(null);
@@ -36,9 +35,7 @@ export default function ChatPage() {
   }, []);
 
   useEffect(() => {
-    if (messagesEndRef.current) {
-      messagesEndRef.current.scrollIntoView({ behavior: 'smooth' });
-    }
+    messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
   }, [messages]);
 
   useEffect(() => {
@@ -56,7 +53,7 @@ export default function ChatPage() {
     });
 
     if (redirected) {
-      router.push(pathname);
+      router.push(`/chat/${chatId}`);
       sendJsonMessage({
         chat_id: chatId,
         is_redirection: true,
@@ -64,9 +61,8 @@ export default function ChatPage() {
     }
 
     wsConnectRef.current = true;
-
     return () => {
-      wsConnectRef.current = false; // Cleanup on unmount
+      wsConnectRef.current = false;
     };
   }, [chatId]);
 
@@ -131,7 +127,8 @@ export default function ChatPage() {
   const { sendJsonMessage } = useWebSocket(
     `${process.env.NODE_ENV == 'production' ? 'wss' : 'ws'}://localhost:8000/ws/chat/${chatId}/`,
     {
-      onOpen: () => console.log('connected'),
+      onOpen: () => console.log('ws connected'),
+      onError: () => console.log('ws error'),
       onMessage: handleMessage,
     },
     wsConnectRef.current && !!chatId,

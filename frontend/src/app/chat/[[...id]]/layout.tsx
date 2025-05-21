@@ -18,7 +18,6 @@ export default async function ChatLayout(props: Props) {
 
   return (
     <SidebarProvider
-      defaultOpen={false}
       style={
         {
           '--sidebar-width': '20rem',

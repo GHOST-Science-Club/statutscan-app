@@ -1,3 +1,4 @@
+import { memo } from 'react';
 import { marked } from 'marked';
 import { cn } from '@/lib/utils';
 
@@ -7,7 +8,7 @@ type Props = {
   sources?: { title?: string; source: string }[];
 };
 
-function ChatMsg(props: Props) {
+const ChatMsg = memo(function ChatMsg(props: Props) {
   const { role, content, sources } = props;
   console.log(sources);
   return (
@@ -27,6 +28,6 @@ function ChatMsg(props: Props) {
       )}
     </article>
   );
-}
+});
 
 export { ChatMsg };
