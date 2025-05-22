@@ -1,10 +1,5 @@
 'use client';
-import {
-  useParams,
-  usePathname,
-  useRouter,
-  useSearchParams,
-} from 'next/navigation';
+import { useParams, useRouter, useSearchParams } from 'next/navigation';
 import { useCallback, useEffect, useRef, useState } from 'react';
 import { ChatInput } from '@/components/chat/chat-input';
 import { getChatFirstMsg } from '@/lib/chat/getChatFirstMsg';
@@ -23,7 +18,6 @@ export default function ChatPage() {
   const chatId = useParams<{ id?: string[] }>().id?.[0] || null;
   const redirected = useSearchParams().get('redirection') || null;
   const router = useRouter();
-  const wsConnectRef = useRef(false);
   const [messages, setMessages] = useState<ChatMessage[]>([]);
   const messagesEndRef = useRef<HTMLDivElement>(null);
 
@@ -31,18 +25,18 @@ export default function ChatPage() {
   const [loading, setLoading] = useState<boolean>(true);
 
   useEffect(() => {
-    setLoading(false);
-  }, []);
-
-  useEffect(() => {
     messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
   }, [messages]);
 
   useEffect(() => {
-    if (!chatId) return;
+    if (!chatId) {
+      setLoading(false);
+      return;
+    }
+
     getChat({ id: chatId }).then(res => {
       if (!res) setError('Nie można znaleźć czatu');
-      else
+      else {
         setMessages(
           res.map(msg => ({
             role: msg.role,
@@ -50,28 +44,29 @@ export default function ChatPage() {
             sources: msg.sources || [],
           })),
         );
+        setLoading(false);
+      }
     });
-
-    if (redirected) {
-      router.push(`/chat/${chatId}`);
-      sendJsonMessage({
-        chat_id: chatId,
-        is_redirection: true,
-      });
-    }
-
-    wsConnectRef.current = true;
-    return () => {
-      wsConnectRef.current = false;
-    };
   }, [chatId]);
+
+  useEffect(() => {
+    if (!redirected) return;
+    router.replace(`/chat/${chatId}`);
+    sendJsonMessage({
+      chat_id: chatId,
+      is_redirection: true,
+    });
+  }, [redirected]);
 
   const onSubmit = useCallback(
     async (question: string) => {
       setLoading(true);
       if (!chatId) {
         const error = await getChatFirstMsg({ question });
-        if (error) setError(error);
+        if (error) {
+          setError(error);
+          setLoading(false);
+        }
       } else {
         setMessages(prev => [...prev, { role: 'user', content: question }]);
         sendJsonMessage({
@@ -86,6 +81,12 @@ export default function ChatPage() {
   const handleMessage = useCallback((event: MessageEvent) => {
     setLoading(true);
     const data = JSON.parse(event.data);
+
+    if (data.type == 'token_limit_reached') {
+      setError(`Przekroczono limit tokenów, spróbuj po: ${data.reset_date}`);
+      setLoading(false);
+    }
+
     if (data.type === 'assistant_answer') {
       const { message, streaming } = data;
 
@@ -128,25 +129,25 @@ export default function ChatPage() {
     `${process.env.NODE_ENV == 'production' ? 'wss' : 'ws'}://localhost:8000/ws/chat/${chatId}/`,
     {
       onOpen: () => console.log('ws connected'),
-      onError: () => console.log('ws error'),
+      onError: () => setError('Nie można połączyć się z czatem'),
       onMessage: handleMessage,
     },
-    wsConnectRef.current && !!chatId,
+    !!chatId,
   );
 
   return (
     <main className="mx-auto flex h-screen w-full flex-col justify-center overflow-hidden py-1 text-center">
       <div className={cn('overflow-auto', chatId && 'h-full')}>
-        {!chatId ? (
-          <section>
-            <h2 className="text-gradient pb-5">Zapytaj o coś</h2>
-          </section>
-        ) : (
+        {chatId ? (
           <section className="mx-auto flex w-full max-w-4xl flex-col gap-5 p-2">
             {messages.map((msg, index) => (
               <ChatMsg key={index} {...msg} />
             ))}
             <div ref={messagesEndRef} />
+          </section>
+        ) : (
+          <section>
+            <h2 className="text-gradient pb-5">Zapytaj o coś</h2>
           </section>
         )}
       </div>
