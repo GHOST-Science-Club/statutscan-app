@@ -20,9 +20,9 @@ export default function ChatPage() {
   const router = useRouter();
   const [messages, setMessages] = useState<ChatMessage[]>([]);
   const messagesEndRef = useRef<HTMLDivElement>(null);
-
-  const [error, setError] = useState<string | null>(null);
-  const [loading, setLoading] = useState<boolean>(true);
+  const [chatState, setChatState] = useState<'ready' | 'loading' | string>(
+    'loading',
+  );
 
   useEffect(() => {
     messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
@@ -30,12 +30,12 @@ export default function ChatPage() {
 
   useEffect(() => {
     if (!chatId) {
-      setLoading(false);
+      setChatState('ready');
       return;
     }
 
     getChat({ id: chatId }).then(res => {
-      if (!res) setError('Nie można znaleźć czatu');
+      if (!res) setChatState('Nie można znaleźć czatu');
       else {
         setMessages(
           res.map(msg => ({
@@ -44,7 +44,7 @@ export default function ChatPage() {
             sources: msg.sources || [],
           })),
         );
-        setLoading(false);
+        setChatState('ready');
       }
     });
   }, [chatId]);
@@ -60,13 +60,10 @@ export default function ChatPage() {
 
   const onSubmit = useCallback(
     async (question: string) => {
-      setLoading(true);
+      setChatState('loading');
       if (!chatId) {
         const error = await getChatFirstMsg({ question });
-        if (error) {
-          setError(error);
-          setLoading(false);
-        }
+        if (error) setChatState(error);
       } else {
         setMessages(prev => [...prev, { role: 'user', content: question }]);
         sendJsonMessage({
@@ -79,13 +76,13 @@ export default function ChatPage() {
   );
 
   const handleMessage = useCallback((event: MessageEvent) => {
-    setLoading(true);
+    setChatState('loading');
     const data = JSON.parse(event.data);
 
-    if (data.type == 'token_limit_reached') {
-      setError(`Przekroczono limit tokenów, spróbuj po: ${data.reset_date}`);
-      setLoading(false);
-    }
+    if (data.type == 'token_limit_reached')
+      setChatState(
+        `Przekroczono limit tokenów, spróbuj po: ${data.reset_date}`,
+      );
 
     if (data.type === 'assistant_answer') {
       const { message, streaming } = data;
@@ -121,7 +118,7 @@ export default function ChatPage() {
           }
           return prev;
         });
-      } else setLoading(false);
+      } else setChatState('ready');
     }
   }, []);
 
@@ -129,7 +126,7 @@ export default function ChatPage() {
     `${process.env.NODE_ENV == 'production' ? 'wss' : 'ws'}://localhost:8000/ws/chat/${chatId}/`,
     {
       onOpen: () => console.log('ws connected'),
-      onError: () => setError('Nie można połączyć się z czatem'),
+      onError: () => setChatState('Błąd połączenia'),
       onMessage: handleMessage,
     },
     !!chatId,
@@ -153,8 +150,17 @@ export default function ChatPage() {
       </div>
 
       <div>
-        {error && <p className="text-destructive">{error}</p>}
-        <ChatInput disabled={!!error} loading={loading} onSubmit={onSubmit} />
+        {chatState !== 'ready' && chatState !== 'loading' && (
+          <p className="text-destructive">{chatState}</p>
+        )}
+        {chatState == 'loading' && (
+          <p className="text-muted-foreground">Ładowanie...</p>
+        )}
+        <ChatInput
+          disabled={chatState !== 'ready' && chatState !== 'loading'}
+          loading={chatState == 'loading'}
+          onSubmit={onSubmit}
+        />
       </div>
     </main>
   );
