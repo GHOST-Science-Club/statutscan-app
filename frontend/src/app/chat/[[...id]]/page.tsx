@@ -81,7 +81,7 @@ export default function ChatPage() {
 
     if (data.type == 'token_limit_reached')
       setChatState(
-        `Przekroczono limit tokenów, spróbuj po: ${data.reset_date}`,
+        `Osiągnięto limit wiadomości. Odnowa tokenów: ${data.reset_date}`,
       );
 
     if (data.type === 'assistant_answer') {
@@ -134,7 +134,7 @@ export default function ChatPage() {
 
   return (
     <main className="mx-auto flex h-screen w-full flex-col justify-center overflow-hidden py-1 text-center">
-      <div className={cn('overflow-auto', chatId && 'h-full')}>
+      <div className={cn('overflow-auto', chatId ? 'h-full' : 'h-fit')}>
         {chatId ? (
           <section className="mx-auto flex w-full max-w-4xl flex-col gap-5 p-2">
             {messages.map((msg, index) => (
