@@ -118,7 +118,11 @@ class Agent(AgentBase):
             self._chat_history.get_chat_last_message,
             thread_sensitive=True
         )(chat_id)
-        question = question["content"]
+
+        if question:
+            question = question["content"]
+        else:
+            question = "Co możesz dla mnie zrobić?"
 
         async for chunk in self.__process_question(chat_id, question):
             yield json.dumps(chunk)
