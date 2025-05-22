@@ -89,7 +89,9 @@ class ChatHistory:
             dict: Last message.
         """
         chat_data = self.get_chat_history_for_agent(chat_id)
-        return chat_data[-1]
+        if chat_data:
+            return chat_data[-1]
+        return None
     
     def get_chat_n_last_messages(self, chat_id: str, n_last: int) -> List[dict]:
         """
