@@ -106,19 +106,24 @@ class Agent(AgentBase):
             message
         )
 
-        async for chunk in self.__process_question(chat_id):
+        async for chunk in self.__process_question(chat_id, question):
             yield json.dumps(chunk)
 
     async def ask_quietly(self, chat_id: str) -> AsyncGenerator[str, None]:
-        async for chunk in self.__process_question(chat_id):
-            yield json.dumps(chunk)
-
-    async def __process_question(self, chat_id: str) -> AsyncGenerator[str, None]:
+        """
+        Parameters:
+            chat_id (str): chat id to get access to chat history
+        """
         question = await sync_to_async(
             self._chat_history.get_chat_last_message,
             thread_sensitive=True
         )(chat_id)
         question = question["content"]
+
+        async for chunk in self.__process_question(chat_id, question):
+            yield json.dumps(chunk)
+
+    async def __process_question(self, chat_id: str, question: str) -> AsyncGenerator[str, None]:
         messages_for_final = [
             {"role": "system", "content": self._system_prompt},
             {"role": "user", "content": question}
@@ -178,10 +183,14 @@ class Agent(AgentBase):
                 "content": result["result"]["content"]
             }
 
-            if "metadatas" in result and "sources" in result["metadatas"]:
-                for source_metadata in result["metadatas"]["sources"]:
+            if "metadatas" in result["result"] and "sources" in result["result"]["metadatas"]:
+                for source_metadata in result["result"]["metadatas"]["sources"]:
                     if "source" in source_metadata:
-                        related_sources.append(source_metadata["source"])
+                        source = {"source": source_metadata["source"]}
+                        if "title" in source_metadata:
+                            source.setdefault("title", source_metadata["title"])
+
+                        related_sources.append(source)
 
             tool_messages.append(message)
             tool_calls_message["tool_calls"].append(tool_calls[i])
