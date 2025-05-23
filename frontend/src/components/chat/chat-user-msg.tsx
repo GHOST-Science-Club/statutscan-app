@@ -10,9 +10,9 @@ const ChatUserMsg = memo(function ChatMsg(props: Props) {
   return (
     <AnimatePresence>
       <motion.article
-        initial={{ opacity: 0, y: 50 }}
+        initial={{ opacity: 0, y: 20 }}
         animate={{ opacity: 1, y: 0 }}
-        transition={{ duration: 0.3, ease: 'easeOut' }}
+        transition={{ duration: 0.2, ease: 'easeOut' }}
         className="bg-input w-fit self-end rounded-xl px-5 py-2.5 text-left"
       >
         <p className="break-words">{content}</p>

@@ -5,9 +5,8 @@ import { Plus } from 'lucide-react';
 import { SidebarProvider, SidebarTrigger } from '@/components/ui/sidebar';
 import { ChatSidebar } from '@/components/chat/chat-sidebar';
 import { Button } from '@/components/ui/button';
-import { getChat } from '@/lib/chat/getChat';
-import { getChats } from '@/lib/chat/getChats';
 import { chatIdMetadata, chatMetadata } from '@/lib/metadata';
+import { getChat, getChats } from '@/lib/api';
 
 type Props = {
   children: ReactNode;
@@ -27,10 +26,7 @@ export default async function ChatLayout(props: Props) {
   const { children, params } = props;
   const { id } = await params;
   if (id && id.length > 1) notFound();
-  const chats: {
-    id: string;
-    title: string;
-  }[] = await getChats();
+  const chats = await getChats();
 
   return (
     <SidebarProvider

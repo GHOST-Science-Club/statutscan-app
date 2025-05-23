@@ -26,7 +26,7 @@ const chatMetadata: Metadata = {
 
 const chatIdMetadata = (title: string): Metadata => ({
   ...layoutMetadata,
-  title: title,
+  title,
 });
 
 const notFoundMetadata: Metadata = {

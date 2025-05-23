@@ -1,14 +1,13 @@
 'use client';
-import { useParams, useRouter, useSearchParams } from 'next/navigation';
 import { useCallback, useEffect, useRef, useState } from 'react';
+import { useParams, useRouter, useSearchParams } from 'next/navigation';
+import useWebSocket from 'react-use-websocket';
 import { Loader } from 'lucide-react';
 import { ChatInput } from '@/components/chat/chat-input';
-import { getChatFirstMsg } from '@/lib/chat/getChatFirstMsg';
-import { getChat } from '@/lib/chat/getChat';
-import useWebSocket from 'react-use-websocket';
 import { ChatAiMsg } from '@/components/chat/chat-ai-msg';
-import { cn } from '@/lib/utils';
 import { ChatUserMsg } from '@/components/chat/chat-user-msg';
+import { cn } from '@/lib/utils';
+import { getChat, getChatFirstMsg } from '@/lib/api';
 
 interface ChatMessage {
   role: 'user' | 'assistant';
@@ -65,7 +64,7 @@ export default function ChatPage() {
     async (question: string) => {
       setChatState('loading');
       if (!chatId) {
-        const error = await getChatFirstMsg({ question });
+        const error = await getChatFirstMsg(question);
         if (error) setChatState(error);
       } else {
         setMessages(prev => [...prev, { role: 'user', content: question }]);
