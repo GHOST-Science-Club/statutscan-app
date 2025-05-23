@@ -3,17 +3,15 @@ import { AuthLayout } from '@/components/auth/auth-layout';
 import { Button } from '@/components/ui/button';
 import { activateUser } from '@/lib/auth/activateUser';
 import { notFound } from 'next/navigation';
+import { activationMetadata } from '@/lib/metadata';
 
-type Params = {
-  uid: string;
-  token: string;
+type Props = {
+  params: Promise<{ uid: string; token: string }>;
 };
 
-export default async function ActivationPage({
-  params,
-}: {
-  params: Promise<Params>;
-}) {
+export const metadata = activationMetadata;
+
+export default async function ActivationPage({ params }: Props) {
   const { uid, token } = await params;
   const ok = await activateUser({ uid, token });
   if (!ok) notFound();

@@ -1,8 +1,11 @@
-import { Logo } from '@/components/ui/logo';
-import Link from 'next/link';
-import { Button } from '@/components/ui/button';
 import Image from 'next/image';
+import Link from 'next/link';
+import { Logo } from '@/components/ui/logo';
+import { Button } from '@/components/ui/button';
+import { notFoundMetadata } from '@/lib/metadata';
 import hatImg from '@/../public/hat.png';
+
+export const metadata = notFoundMetadata;
 
 export default function NotFoundPage() {
   return (

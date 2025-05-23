@@ -3,7 +3,7 @@
 import { fetchBackend } from '@/lib/fetchBackend';
 import { cookies } from 'next/headers';
 
-async function getChat({ id }: { id: string }) {
+async function getChat(id: string) {
   const cookieStore = await cookies();
   const access = cookieStore.get('access')?.value;
 
@@ -22,7 +22,7 @@ async function getChat({ id }: { id: string }) {
       sources?: { title?: string; source: string }[];
     }[];
   } = await res.json();
-  return json.chat_history;
+  return json;
 }
 
 export { getChat };

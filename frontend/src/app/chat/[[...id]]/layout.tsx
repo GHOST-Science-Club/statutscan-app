@@ -5,12 +5,23 @@ import { Plus } from 'lucide-react';
 import { SidebarProvider, SidebarTrigger } from '@/components/ui/sidebar';
 import { ChatSidebar } from '@/components/chat/chat-sidebar';
 import { Button } from '@/components/ui/button';
+import { getChat } from '@/lib/chat/getChat';
 import { getChats } from '@/lib/chat/getChats';
+import { chatIdMetadata, chatMetadata } from '@/lib/metadata';
 
 type Props = {
   children: ReactNode;
   params: Promise<{ id?: string[] }>;
 };
+
+export async function generateMetadata({ params }: Props) {
+  const { id } = await params;
+  if (id) {
+    const chat = await getChat(id[0]);
+    return chatIdMetadata(chat ? chat.title : 'Nie znaleziono czatu');
+  }
+  return chatMetadata;
+}
 
 export default async function ChatLayout(props: Props) {
   const { children, params } = props;

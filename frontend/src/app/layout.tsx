@@ -1,18 +1,26 @@
 import './globals.css';
 import { ReactNode } from 'react';
-import type { Metadata } from 'next';
+import { Montserrat, Open_Sans } from 'next/font/google';
 import { Providers } from '@/components/providers';
-import { montserrat, openSans } from '@/lib/fonts';
+import { layoutMetadata } from '@/lib/metadata';
 
-export const metadata: Metadata = {
-  title: 'PUTagent',
+export const metadata = layoutMetadata;
+
+const montserrat = Montserrat({
+  subsets: ['latin'],
+  variable: '--font-montserrat',
+});
+
+const openSans = Open_Sans({
+  subsets: ['latin'],
+  variable: '--font-open-sans',
+});
+
+type Props = {
+  children: Readonly<ReactNode>;
 };
 
-export default function RootLayout({
-  children,
-}: Readonly<{
-  children: ReactNode;
-}>) {
+export default function RootLayout({ children }: Props) {
   return (
     <html lang="pl" suppressHydrationWarning>
       <body className={`${montserrat.variable} ${openSans.variable}`}>

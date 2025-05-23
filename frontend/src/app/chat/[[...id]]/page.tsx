@@ -37,11 +37,11 @@ export default function ChatPage() {
       return;
     }
 
-    getChat({ id: chatId }).then(res => {
+    getChat(chatId).then(res => {
       if (!res) setChatState('Nie można znaleźć czatu');
       else {
         setMessages(
-          res.map(msg => ({
+          res.chat_history.map(msg => ({
             role: msg.role,
             content: msg.content || '',
             sources: msg.sources || [],
