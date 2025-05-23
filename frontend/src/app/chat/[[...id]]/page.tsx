@@ -6,8 +6,9 @@ import { ChatInput } from '@/components/chat/chat-input';
 import { getChatFirstMsg } from '@/lib/chat/getChatFirstMsg';
 import { getChat } from '@/lib/chat/getChat';
 import useWebSocket from 'react-use-websocket';
-import { ChatMsg } from '@/components/chat/chat-msg';
+import { ChatAiMsg } from '@/components/chat/chat-ai-msg';
 import { cn } from '@/lib/utils';
+import { ChatUserMsg } from '@/components/chat/chat-user-msg';
 
 interface ChatMessage {
   role: 'user' | 'assistant';
@@ -153,7 +154,13 @@ export default function ChatPage() {
                 <span className="sr-only">Ładowanie</span>
               </div>
             ) : (
-              messages.map((msg, index) => <ChatMsg key={index} {...msg} />)
+              messages.map((msg, index) =>
+                msg.role == 'user' ? (
+                  <ChatUserMsg key={index} content={msg.content} />
+                ) : (
+                  <ChatAiMsg key={index} {...msg} />
+                ),
+              )
             )}
             <div ref={messagesEndRef} />
           </section>
