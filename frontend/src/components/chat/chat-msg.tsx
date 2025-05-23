@@ -7,10 +7,11 @@ type Props = {
   role: 'user' | 'assistant';
   content: string;
   sources?: { title?: string; source: string }[];
+  error?: boolean;
 };
 
 const ChatMsg = memo(function ChatMsg(props: Props) {
-  const { role, content, sources } = props;
+  const { role, content, sources, error } = props;
   return (
     <article
       className={cn(
@@ -23,19 +24,23 @@ const ChatMsg = memo(function ChatMsg(props: Props) {
       ) : (
         <>
           <div
-            className="prose prose-zinc dark:prose-invert min-w-full"
+            className={cn(
+              'prose prose-zinc dark:prose-invert prose-a:text-primary prose-pre:text-foreground prose-code:bg-muted prose-code:rounded-md prose-pre:bg-muted min-w-full',
+              error && 'text-destructive',
+            )}
             dangerouslySetInnerHTML={{ __html: marked.parse(content) }}
           />
           <div>
-            {sources && (
-              <div className="flex gap-1">
+            {sources && sources.length > 0 && (
+              <div className="text-muted-foreground mt-4 flex flex-col gap-1 text-sm">
+                <p>Źródła:</p>
                 {sources.map((source, i) => (
                   <Link
                     key={i}
                     href={source.source}
                     target="_blank"
                     rel="noopener noreferrer"
-                    className="text-muted-foreground text-sm underline"
+                    className="hover:text-primary text-ellipsis underline duration-300"
                   >
                     {source.title ?? source.source}
                   </Link>

@@ -1,6 +1,7 @@
 'use client';
 import { useParams, useRouter, useSearchParams } from 'next/navigation';
 import { useCallback, useEffect, useRef, useState } from 'react';
+import { Loader } from 'lucide-react';
 import { ChatInput } from '@/components/chat/chat-input';
 import { getChatFirstMsg } from '@/lib/chat/getChatFirstMsg';
 import { getChat } from '@/lib/chat/getChat';
@@ -12,6 +13,7 @@ interface ChatMessage {
   role: 'user' | 'assistant';
   content: string;
   sources?: { title?: string; source: string }[];
+  error?: boolean;
 }
 
 export default function ChatPage() {
@@ -78,7 +80,6 @@ export default function ChatPage() {
   const handleMessage = useCallback((event: MessageEvent) => {
     setChatState('loading');
     const data = JSON.parse(event.data);
-
     if (data.type == 'token_limit_reached')
       setChatState(
         `Osiągnięto limit wiadomości. Odnowa tokenów: ${data.reset_date}`,
@@ -100,6 +101,7 @@ export default function ChatPage() {
               },
             ];
           } else if (messageChunk.sources) {
+            console.log('sources', messageChunk.sources);
             return [
               ...prev.slice(0, -1),
               {
@@ -108,6 +110,15 @@ export default function ChatPage() {
                   ...(lastMessage.sources || []),
                   ...messageChunk.sources,
                 ],
+              },
+            ];
+          } else if (messageChunk.error) {
+            return [
+              ...prev,
+              {
+                role: 'assistant',
+                content: messageChunk.error.content,
+                error: true,
               },
             ];
           } else if (messageChunk.chunk) {
@@ -125,7 +136,6 @@ export default function ChatPage() {
   const { sendJsonMessage } = useWebSocket(
     `${process.env.NODE_ENV == 'production' ? 'wss' : 'ws'}://localhost:8000/ws/chat/${chatId}/`,
     {
-      onOpen: () => console.log('ws connected'),
       onError: () => setChatState('Błąd połączenia'),
       onMessage: handleMessage,
     },
@@ -137,9 +147,14 @@ export default function ChatPage() {
       <div className={cn('overflow-auto', chatId ? 'h-full' : 'h-fit')}>
         {chatId ? (
           <section className="mx-auto flex w-full max-w-4xl flex-col gap-5 p-2">
-            {messages.map((msg, index) => (
-              <ChatMsg key={index} {...msg} />
-            ))}
+            {messages.length < 1 && chatState == 'loading' ? (
+              <div className="mx-auto mt-10">
+                <Loader className="animate-spin" />
+                <span className="sr-only">Ładowanie</span>
+              </div>
+            ) : (
+              messages.map((msg, index) => <ChatMsg key={index} {...msg} />)
+            )}
             <div ref={messagesEndRef} />
           </section>
         ) : (
@@ -152,9 +167,6 @@ export default function ChatPage() {
       <div>
         {chatState !== 'ready' && chatState !== 'loading' && (
           <p className="text-destructive">{chatState}</p>
-        )}
-        {chatState == 'loading' && (
-          <p className="text-muted-foreground">Ładowanie...</p>
         )}
         <ChatInput
           disabled={chatState !== 'ready' && chatState !== 'loading'}

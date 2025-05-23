@@ -15,11 +15,14 @@ import { Logo } from '@/components/ui/logo';
 import Link from 'next/link';
 import { getChats } from '@/lib/chat/getChats';
 
-export async function ChatSidebar() {
-  const chats: {
+type Props = {
+  chats: {
     id: string;
     title: string;
-  }[] = await getChats();
+  }[];
+};
+export async function ChatSidebar(props: Props) {
+  const { chats } = props;
   return (
     <Sidebar collapsible="offcanvas">
       <SidebarHeader className="flex flex-row items-end justify-end pl-4">

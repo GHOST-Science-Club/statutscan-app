@@ -1,10 +1,11 @@
 import { CSSProperties, ReactNode } from 'react';
+import Link from 'next/link';
+import { notFound } from 'next/navigation';
 import { Plus } from 'lucide-react';
 import { SidebarProvider, SidebarTrigger } from '@/components/ui/sidebar';
 import { ChatSidebar } from '@/components/chat/chat-sidebar';
 import { Button } from '@/components/ui/button';
-import Link from 'next/link';
-import { notFound } from 'next/navigation';
+import { getChats } from '@/lib/chat/getChats';
 
 type Props = {
   children: ReactNode;
@@ -15,6 +16,10 @@ export default async function ChatLayout(props: Props) {
   const { children, params } = props;
   const { id } = await params;
   if (id && id.length > 1) notFound();
+  const chats: {
+    id: string;
+    title: string;
+  }[] = await getChats();
 
   return (
     <SidebarProvider
@@ -25,7 +30,7 @@ export default async function ChatLayout(props: Props) {
         } as CSSProperties
       }
     >
-      <ChatSidebar />
+      <ChatSidebar chats={chats} />
       <div className="fixed m-2 space-x-1">
         <SidebarTrigger className="bg-background size-9" />
         <Button
