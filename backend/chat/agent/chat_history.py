@@ -166,22 +166,27 @@ class ChatHistory:
         title = chat_data.get("title", None)
         messages = []
         for message in chat_data.get("messages", []):
-            if message.get("role") not in ["user", "assistant"]:
-                continue
-
-            if "metadata" in message and "sources" in message.get("metadata"):
-                messages.append({
-                    "role": message["role"],
-                    "content": message["content"],
-                    "metadata": {
-                        "sources": message["metadata"]["sources"]
-                    }
-                })
-            else:
+            if message.get("role") == "user":
                 messages.append({
                     "role": message["role"],
                     "content": message["content"]
                 })
+            elif message.get("role") == "assistant":
+                if "metadata" in message and "sources" in message.get("metadata"):
+                    messages.append({
+                        "role": message["role"],
+                        "content": message["content"],
+                        "metadata": {
+                            "sources": message["metadata"]["sources"]
+                        }
+                    })
+                else:
+                    messages.append({
+                        "role": message["role"],
+                        "content": message["content"]
+                    })
+            elif message.get("role") == "error":
+                messages.append(message)
         
         return messages, title
 
