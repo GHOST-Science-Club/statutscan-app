@@ -25,17 +25,39 @@ class KnowledgeBaseTool(ToolInterface):
         )(chat_id, response.usage.total_tokens)
         return response.data[0].embedding
 
-    async def use(self, question:str, chat_id: str):
+    async def use(self, question: str, chat_id: str):
         embedding = await self.__get_embedding(question, chat_id)
         documents = await sync_to_async(
             lambda: list(
                 Embeddings.objects.order_by(CosineDistance("embedding", embedding))[:self.n_results]
             )
         )()
+        contents = []
+        links = []
+        titles = []
+
+        for doc in documents:
+            contents.append(doc.content)
+            if doc.metadata["source"] not in links:
+                links.append(doc.metadata["source"])
+                if "title" in doc.metadata:
+                    titles.append(doc.metadata["title"])
+                else:
+                    titles.append(None)
+
+        content = "\n\n".join([f"{i+1}.\n{content}" for i, content in enumerate(contents)])
+        sources = []
+        for link, title in zip(links, titles):
+            source = {}
+            source.setdefault("source", link)
+            if title:
+                source.setdefault("title", title)
+            sources.append(source)
+
         result = {
-            "content": "\n\n".join([f"{i+1}.\n{document.content}" for i, document in enumerate(documents)]),
+            "content": content,
             "metadatas": {
-                "sources": [document.metadata for document in documents]
+                "sources": sources
             }
         }
         return result

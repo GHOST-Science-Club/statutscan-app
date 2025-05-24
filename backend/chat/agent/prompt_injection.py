@@ -55,8 +55,8 @@ class PromptInjection:
             "is_prompt_injection": completion.choices[0].message.parsed.is_prompt_injection,
             "message": (
                 "Niestety nie jestem w stanie odpowiedzieć na to pytanie. Fragment \""
-                f"{completion.choices[0].message.parsed.text_fragment} "
-                "\"sugeruje, że próbowałeś wpłynąć na moje zachowanie. Mogę odpowiedzieć "
+                f"{completion.choices[0].message.parsed.text_fragment}"
+                "\" sugeruje, że próbowałeś wpłynąć na moje zachowanie. Mogę odpowiedzieć "
                 "tylko na pytania związane z prawami i obowiązkami w placówkach oświatowych."
             )
         }

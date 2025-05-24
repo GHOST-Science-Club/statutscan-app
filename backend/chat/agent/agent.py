@@ -142,12 +142,17 @@ class Agent(AgentBase):
                 self._chat_history.flag_last_message_as_prompt_injection,
                 thread_sensitive=True
             )(chat_id)
-            yield {
+            prompt_injection_msg = {
                 "error": {
                     "type": "prompt_injection",
                     "content": result.get("message")
                 }
             }
+            yield prompt_injection_msg
+            await sync_to_async(
+                self._chat_history.add_new_message,
+                thread_sensitive=True
+            )(chat_id, prompt_injection_msg)
             return
 
         # Select tools to use
