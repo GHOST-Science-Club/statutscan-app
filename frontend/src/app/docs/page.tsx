@@ -26,11 +26,6 @@ export default function DocsPage() {
                 <Link href="/chat">Czat</Link>
               </Button>
             </li>
-            <li>
-              <Button variant="secondary" size="sm" asChild>
-                <Link href="/login">Zaloguj się</Link>
-              </Button>
-            </li>
           </ul>
         </nav>
         <DocumentationMdx />

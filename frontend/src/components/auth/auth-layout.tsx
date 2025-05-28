@@ -1,5 +1,6 @@
 import { ReactNode } from 'react';
-import { SocialButtons } from '@/components/auth/social-buttons';
+import { Button } from '@/components/ui/button';
+import { Icons } from '@/components/ui/icons';
 
 type Props = {
   children: ReactNode;
@@ -16,7 +17,12 @@ function AuthLayout(props: Props) {
       {description && (
         <p className="text-muted-foreground text-sm">{description}</p>
       )}
-      {social && <SocialButtons />}
+      {social && (
+        <Button variant="secondary" className="w-full">
+          <Icons icon="google" />
+          Kontynuuj z Google
+        </Button>
+      )}
     </>
   );
 }

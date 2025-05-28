@@ -49,7 +49,6 @@ async function getChats() {
       title: string;
     }[];
   } = await API.get('/chats/').json();
-  console.log(json);
   return json.chats;
 }
 
