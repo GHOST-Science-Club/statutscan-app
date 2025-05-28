@@ -23,3 +23,10 @@ CORS_ALLOWED_ORIGINS = getenv(
     "CORS_ALLOWED_ORIGINS", "http://localhost:3000, http://127.0.0.1:3000"
 ).split(",")
 CORS_ALLOW_CREDENTIALS = True
+
+REST_FRAMEWORK = {
+    "DEFAULT_AUTHENTICATION_CLASSES": [
+        "users.authentication.CustomJWTAuthentication",
+    ],
+    "DEFAULT_PERMISSION_CLASSES": ["rest_framework.permissions.IsAuthenticated"],
+}
