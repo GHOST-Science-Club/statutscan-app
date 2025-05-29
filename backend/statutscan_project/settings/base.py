@@ -83,17 +83,6 @@ CHANNEL_LAYERS = {
     },
 }
 
-DATABASES = {
-    "default": {
-        "ENGINE": f"django.db.backends.{getenv('DATABASE_ENGINE', 'postgresql')}",
-        "NAME": getenv("POSTGRES_DB"),
-        "USER": getenv("POSTGRES_USER"),
-        "PASSWORD": getenv("POSTGRES_PASSWORD"),
-        "HOST": getenv("POSTGRES_HOST"),
-        "PORT": getenv("POSTGRES_PORT"),
-    }
-}
-
 PASSWORD_HASHERS = [
     "django.contrib.auth.hashers.Argon2PasswordHasher",
     "django.contrib.auth.hashers.PBKDF2PasswordHasher",
