@@ -1,5 +1,9 @@
 #!/bin/bash
 
+if [ ! -f manage.py ]; then
+  cd backend
+fi
+
 echo "Migrating changes to database"
 python3 manage.py migrate --noinput
 
