@@ -134,7 +134,7 @@ export default function ChatPage() {
   }, []);
 
   const { sendJsonMessage } = useWebSocket(
-    `${process.env.NODE_ENV == 'production' ? 'wss' : 'ws'}://localhost:8000/ws/chat/${chatId}/`,
+    `${process.env.NODE_ENV == 'production' ? 'wss' : 'ws'}://${process.env.NEXT_PUBLIC_WS_URL}/ws/chat/${chatId}/`,
     {
       onError: () => setChatState('Błąd połączenia'),
       onMessage: handleMessage,
