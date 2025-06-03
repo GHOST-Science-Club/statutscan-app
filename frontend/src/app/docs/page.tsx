@@ -1,9 +1,12 @@
-import DocumentationMdx from '@/lib/documentation.mdx';
-import { Button } from '@/components/ui/button';
-import { Footer } from '@/components/footer';
 import Link from 'next/link';
 import { ArrowLeft } from 'lucide-react';
+import { Button } from '@/components/ui/button';
 import { MainContainer } from '@/components/ui/main-container';
+import { Footer } from '@/components/footer';
+import DocumentationMdx from '@/lib/documentation.mdx';
+import { docsMetadata } from '@/lib/metadata';
+
+export const metadata = docsMetadata;
 
 export default function DocsPage() {
   return (
@@ -21,11 +24,6 @@ export default function DocsPage() {
             <li>
               <Button variant="secondary" size="sm" asChild>
                 <Link href="/chat">Czat</Link>
-              </Button>
-            </li>
-            <li>
-              <Button variant="secondary" size="sm" asChild>
-                <Link href="/login">Zaloguj się</Link>
               </Button>
             </li>
           </ul>

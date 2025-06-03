@@ -10,8 +10,7 @@ export async function middleware(request: NextRequest) {
 
   if (request.nextUrl.pathname.startsWith('/chat')) {
     const logged = await isLogged();
-    if (!logged)
-      return NextResponse.redirect(new URL('/unauthorized', request.url));
+    if (!logged) return NextResponse.redirect(new URL('/login', request.url));
   }
 
   return NextResponse.next();

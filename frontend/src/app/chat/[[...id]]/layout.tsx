@@ -1,24 +1,35 @@
 import { CSSProperties, ReactNode } from 'react';
+import Link from 'next/link';
+import { notFound } from 'next/navigation';
 import { Plus } from 'lucide-react';
 import { SidebarProvider, SidebarTrigger } from '@/components/ui/sidebar';
 import { ChatSidebar } from '@/components/chat/chat-sidebar';
 import { Button } from '@/components/ui/button';
-import Link from 'next/link';
-import { notFound } from 'next/navigation';
+import { chatIdMetadata, chatMetadata } from '@/lib/metadata';
+import { getChat, getChats } from '@/lib/api';
 
 type Props = {
   children: ReactNode;
   params: Promise<{ id?: string[] }>;
 };
 
+export async function generateMetadata({ params }: Props) {
+  const { id } = await params;
+  if (id) {
+    const chat = await getChat(id[0]);
+    return chatIdMetadata(chat ? chat.title : 'Nie znaleziono czatu');
+  }
+  return chatMetadata;
+}
+
 export default async function ChatLayout(props: Props) {
   const { children, params } = props;
   const { id } = await params;
   if (id && id.length > 1) notFound();
+  const chats = await getChats();
 
   return (
     <SidebarProvider
-      defaultOpen={false}
       style={
         {
           '--sidebar-width': '20rem',
@@ -26,10 +37,16 @@ export default async function ChatLayout(props: Props) {
         } as CSSProperties
       }
     >
-      <ChatSidebar />
-      <div className="fixed m-2">
-        <SidebarTrigger className="size-9" />
-        <Button aria-label="Nowy czat" variant="ghost" size="icon" asChild>
+      <ChatSidebar chats={chats} />
+      <div className="fixed m-2 space-x-1">
+        <SidebarTrigger className="bg-background size-9" />
+        <Button
+          aria-label="Nowy czat"
+          variant="ghost"
+          size="icon"
+          asChild
+          className="bg-background"
+        >
           <Link href="/chat">
             <Plus />
           </Link>

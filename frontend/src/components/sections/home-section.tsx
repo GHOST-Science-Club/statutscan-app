@@ -9,7 +9,7 @@ function HomeSection() {
   return (
     <SectionLayout
       id="home"
-      className="home-gradient relative flex h-[calc(100svh-90px)] max-h-[800px] min-h-[530px] flex-col rounded-xl p-5"
+      className="home-gradient relative flex h-[calc(100svh-90px)] max-h-[600px] min-h-[530px] flex-col rounded-xl p-5"
     >
       <h1 className="mb-2">
         PUTagent<span className="text-primary"> ⎯⎯⎯⎯</span>
@@ -24,13 +24,13 @@ function HomeSection() {
           src={hatPng}
           alt="Zdjęcie czapki studenckiej"
           fill
-          className="object-contain object-right"
+          className="object-contain object-right py-5 md:py-0"
         />
       </div>
       <Button
         variant="primary"
         size="lg"
-        className="mx-auto w-fit md:mx-0"
+        className="mx-auto h-15 w-fit text-lg md:mx-0"
         asChild
       >
         <Link href="/chat">Zadaj pytanie</Link>
