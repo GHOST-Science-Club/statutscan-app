@@ -8,7 +8,7 @@
     "build": "next build",
     "start": "next start",
     "lint": "next lint",
-    "format": "prettier ./ --write"
+    "format": "prettier ./src --write"
   },
   "dependencies": {
     "@bprogress/next": "^3.2.11",
@@ -37,6 +37,7 @@
     "react-hook-form": "^7.55.0",
     "react-use-websocket": "^4.13.0",
     "tailwind-merge": "^3.2.0",
+    "wretch": "^2.11.0",
     "zod": "^3.24.2"
   },
   "devDependencies": {

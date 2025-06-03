@@ -7,7 +7,8 @@ const nextConfig: NextConfig = {
   },
   pageExtensions: ['js', 'jsx', 'md', 'mdx', 'ts', 'tsx'],
   output: 'standalone',
-  webpack: (config, { dev }) => {  // ONLY FOR DEV!!!!!!!!!!
+  webpack: (config, { dev }) => {
+    // ONLY FOR DEV!!!!!!!!!!
     if (dev) {
       config.watchOptions = {
         ignored: ['**/node_modules', '**/.next'],

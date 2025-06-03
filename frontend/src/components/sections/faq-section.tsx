@@ -15,7 +15,7 @@ function FaqSection() {
         <TextAnimate as="h3" animation="slideRight" by="word" className="mb-5">
           Najczęściej zadawane pytania
         </TextAnimate>
-        <Accordion type="multiple" className="space-y-5">
+        <Accordion type="multiple" className="space-y-2">
           {FAQ.map((faq, i) => (
             <AccordionItem
               value={`item-${i}`}

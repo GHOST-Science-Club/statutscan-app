@@ -1,5 +1,5 @@
 import { AuthLayout } from '@/components/auth/auth-layout';
-import { notFound } from 'next/navigation';
+import { confirmMetadata } from '@/lib/metadata';
 
 const validType = ['email', 'pass'];
 
@@ -11,14 +11,17 @@ export function generateStaticParams() {
 
 export const dynamicParams = false;
 
-export default async function ConfirmPage({
-  params,
-}: {
+type Props = {
   params: Promise<{ type: string }>;
-}) {
-  const { type } = await params;
-  if (!validType.includes(type as string)) notFound();
+};
 
+export async function generateMetadata({ params }: Props) {
+  const { type } = await params;
+  return confirmMetadata(type == 'email' ? 'email' : 'hasło');
+}
+
+export default async function ConfirmPage({ params }: Props) {
+  const { type } = await params;
   const heading = type === 'email' ? 'Potwierdź e-mail' : 'Resetowanie hasła';
   const subheading = type === 'email' ? 'aktywacyjny' : 'resetujący hasło';
 

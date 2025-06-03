@@ -2,7 +2,11 @@ import { ReactNode } from 'react';
 import { Logo } from '@/components/ui/logo';
 import Link from 'next/link';
 
-export default function AuthLayout({ children }: { children: ReactNode }) {
+type Props = {
+  children: Readonly<ReactNode>;
+};
+
+export default function AuthLayout({ children }: Props) {
   return (
     <>
       <Link href="/" className="absolute top-5 left-5">

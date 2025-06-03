@@ -1,77 +1,71 @@
 'use client';
-import {
-  useParams,
-  usePathname,
-  useRouter,
-  useSearchParams,
-} from 'next/navigation';
 import { useCallback, useEffect, useRef, useState } from 'react';
-import { ChatInput } from '@/components/chat/chat-input';
-import { getChatFirstMsg } from '@/lib/chat/getChatFirstMsg';
-import { getChat } from '@/lib/chat/getChat';
+import { useParams, useRouter, useSearchParams } from 'next/navigation';
 import useWebSocket from 'react-use-websocket';
-import { ChatMsg } from '@/components/chat/chat-msg';
+import { Loader } from 'lucide-react';
+import { ChatInput } from '@/components/chat/chat-input';
+import { ChatAiMsg } from '@/components/chat/chat-ai-msg';
+import { ChatUserMsg } from '@/components/chat/chat-user-msg';
 import { cn } from '@/lib/utils';
+import { getChat, getChatFirstMsg } from '@/lib/api';
 
 interface ChatMessage {
   role: 'user' | 'assistant';
   content: string;
   sources?: { title?: string; source: string }[];
+  error?: boolean;
 }
 
 export default function ChatPage() {
   const chatId = useParams<{ id?: string[] }>().id?.[0] || null;
   const redirected = useSearchParams().get('redirection') || null;
   const router = useRouter();
-  const pathname = usePathname();
-  const wsConnectRef = useRef(false);
   const [messages, setMessages] = useState<ChatMessage[]>([]);
   const messagesEndRef = useRef<HTMLDivElement>(null);
-
-  const [error, setError] = useState<string | null>(null);
-  const [loading, setLoading] = useState<boolean>(true);
+  const [chatState, setChatState] = useState<'ready' | 'loading' | string>(
+    'loading',
+  );
 
   useEffect(() => {
-    if (messagesEndRef.current) {
-      messagesEndRef.current.scrollIntoView({ behavior: 'smooth' });
-    }
+    messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
   }, [messages]);
 
   useEffect(() => {
-    if (!chatId) return;
-    getChat({ id: chatId }).then(res => {
-      if (!res) setError('Nie można znaleźć czatu');
-      else
+    if (!chatId) {
+      setChatState('ready');
+      return;
+    }
+
+    getChat(chatId).then(res => {
+      if (!res) setChatState('Nie można znaleźć czatu');
+      else {
         setMessages(
-          res.map(msg => ({
+          res.chat_history.map(msg => ({
             role: msg.role,
             content: msg.content || '',
             sources: msg.sources || [],
           })),
         );
+        setChatState('ready');
+      }
     });
-
-    if (redirected) {
-      router.push(pathname);
-      sendJsonMessage({
-        chat_id: chatId,
-        is_redirection: true,
-      });
-    }
-
-    wsConnectRef.current = true;
-
-    return () => {
-      wsConnectRef.current = false; // Cleanup on unmount
-    };
   }, [chatId]);
+
+  useEffect(() => {
+    if (!redirected) return;
+    router.replace(`/chat/${chatId}`);
+    sendJsonMessage({
+      chat_id: chatId,
+      is_redirection: true,
+    });
+  }, [redirected]);
 
   const onSubmit = useCallback(
     async (question: string) => {
-      setLoading(true);
+      setChatState('loading');
       if (!chatId) {
-        const error = await getChatFirstMsg({ question });
-        if (error) setError(error);
+        const error = await getChatFirstMsg(question);
+        if (error) setChatState(error);
       } else {
         setMessages(prev => [...prev, { role: 'user', content: question }]);
         sendJsonMessage({
@@ -84,8 +78,13 @@ export default function ChatPage() {
   );
 
   const handleMessage = useCallback((event: MessageEvent) => {
-    setLoading(true);
+    setChatState('loading');
     const data = JSON.parse(event.data);
+    if (data.type == 'token_limit_reached')
+      setChatState(
+        `Osiągnięto limit wiadomości. Odnowa tokenów: ${data.reset_date}`,
+      );
+
     if (data.type === 'assistant_answer') {
       const { message, streaming } = data;
 
@@ -102,6 +101,7 @@ export default function ChatPage() {
               },
             ];
           } else if (messageChunk.sources) {
+            console.log('sources', messageChunk.sources);
             return [
               ...prev.slice(0, -1),
               {
@@ -112,6 +112,15 @@ export default function ChatPage() {
                 ],
               },
             ];
+          } else if (messageChunk.error) {
+            return [
+              ...prev,
+              {
+                role: 'assistant',
+                content: messageChunk.error.content,
+                error: true,
+              },
+            ];
           } else if (messageChunk.chunk) {
             return [
               ...prev,
@@ -120,39 +129,56 @@ export default function ChatPage() {
           }
           return prev;
         });
-      } else setLoading(false);
+      } else setChatState('ready');
     }
   }, []);
 
   const { sendJsonMessage } = useWebSocket(
-    `${process.env.NODE_ENV == 'production' ? 'wss' : 'ws'}://localhost:8000/ws/chat/${chatId}/`,
+    `${process.env.NODE_ENV == 'production' ? 'wss' : 'ws'}://${process.env.NEXT_PUBLIC_WS_URL}/ws/chat/${chatId}/`,
     {
-      onOpen: () => console.log('connected'),
+      onError: () => setChatState('Błąd połączenia'),
       onMessage: handleMessage,
     },
-    wsConnectRef.current && !!chatId,
+    !!chatId,
   );
 
   return (
     <main className="mx-auto flex h-screen w-full flex-col justify-center overflow-hidden py-1 text-center">
-      <div className={cn('overflow-auto', chatId && 'h-full')}>
-        {!chatId ? (
-          <section>
-            <h2 className="text-gradient pb-5">Zapytaj o coś</h2>
+      <div className={cn('overflow-auto', chatId ? 'h-full' : 'h-fit')}>
+        {chatId ? (
+          <section className="mx-auto flex w-full max-w-4xl flex-col gap-5 p-2">
+            {messages.length < 1 && chatState == 'loading' ? (
+              <div className="mx-auto mt-10">
+                <Loader className="animate-spin" />
+                <span className="sr-only">Ładowanie</span>
+              </div>
+            ) : (
+              messages.map((msg, index) =>
+                msg.role == 'user' ? (
+                  <ChatUserMsg key={index} content={msg.content} />
+                ) : (
+                  <ChatAiMsg key={index} {...msg} />
+                ),
+              )
+            )}
+            <div ref={messagesEndRef} />
           </section>
         ) : (
-          <section className="mx-auto flex w-full max-w-4xl flex-col gap-5 p-2">
-            {messages.map((msg, index) => (
-              <ChatMsg key={index} {...msg} />
-            ))}
-            <div ref={messagesEndRef} />
+          <section>
+            <h2 className="text-gradient pb-5">Zapytaj o coś</h2>
           </section>
         )}
       </div>
 
       <div>
-        {error && <p className="text-destructive">{error}</p>}
-        <ChatInput disabled={!!error} loading={loading} onSubmit={onSubmit} />
+        {chatState !== 'ready' && chatState !== 'loading' && (
+          <p className="text-destructive">{chatState}</p>
+        )}
+        <ChatInput
+          disabled={chatState !== 'ready' && chatState !== 'loading'}
+          loading={chatState == 'loading'}
+          onSubmit={onSubmit}
+        />
       </div>
     </main>
   );

@@ -1,6 +1,9 @@
 import Link from 'next/link';
 import { AuthLayout } from '@/components/auth/auth-layout';
 import { ResetPassForm } from '@/components/auth/reset-pass-form';
+import { resetPasswordMetadata } from '@/lib/metadata';
+
+export const metadata = resetPasswordMetadata;
 
 export default function ResetPasswordPage() {
   return (

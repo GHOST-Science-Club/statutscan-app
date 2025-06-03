@@ -1,6 +1,9 @@
 import Link from 'next/link';
 import { AuthLayout } from '@/components/auth/auth-layout';
 import { LoginForm } from '@/components/auth/login-form';
+import { loginMetadata } from '@/lib/metadata';
+
+export const metadata = loginMetadata;
 
 export default function LoginPage() {
   return (

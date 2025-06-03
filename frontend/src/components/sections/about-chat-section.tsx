@@ -48,7 +48,7 @@ function AboutChatSection() {
         </span>{' '}
         znaleźć odpowiedzi na pytania związane z edukacją w Polsce
       </h3>
-      <div className="mt-6 grid grid-cols-1 gap-8 overflow-hidden sm:grid-cols-2 lg:grid-cols-4">
+      <div className="mt-6 grid grid-cols-1 gap-3 overflow-hidden sm:grid-cols-2 lg:grid-cols-4">
         {cards.map((card, index) => (
           <AboutChatItem key={index} index={index} {...card} />
         ))}
