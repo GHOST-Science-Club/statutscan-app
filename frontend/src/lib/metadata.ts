@@ -39,6 +39,10 @@ const loginMetadata: Metadata = {
   ...layoutMetadata,
   title: 'Logowanie',
 };
+const loginGoogleMetadata: Metadata = {
+  ...layoutMetadata,
+  title: 'Logowanie',
+};
 const registerMetadata: Metadata = {
   ...layoutMetadata,
   title: 'Rejestracja',
@@ -63,6 +67,7 @@ export {
   chatIdMetadata,
   notFoundMetadata,
   loginMetadata,
+  loginGoogleMetadata,
   registerMetadata,
   resetPasswordMetadata,
   activationMetadata,
