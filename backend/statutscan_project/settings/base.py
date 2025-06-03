@@ -1,16 +1,15 @@
 from pathlib import Path
 from dotenv import load_dotenv
 from os import getenv, path
-from datetime import timedelta, date
 
 BASE_DIR = Path(__file__).resolve(strict=True).parent.parent.parent
 
-local_env_file = path.join(BASE_DIR, ".envs", ".env.production")
+prod_env_file = path.join(BASE_DIR, ".envs", ".env.production")
 
-if path.isfile(local_env_file):
-    load_dotenv(local_env_file)
+if path.isfile(prod_env_file):
+    load_dotenv(prod_env_file)
 
-DAPHNE_APP = ["daphne"]  # must be listed before django.contrib.staticfiles
+DAPHNE_APP = ["daphne"]
 
 DJANGO_APPS = [
     "django.contrib.admin",
@@ -70,24 +69,18 @@ TEMPLATES = [
 
 ASGI_APPLICATION = "statutscan_project.asgi.application"
 
+REDIS_HOST = getenv("REDIS_HOST")
+REDIS_PORT = getenv("REDIS_PORT")
+REDIS_PASSWORD = getenv("REDIS_PASSWORD")
+REDIS_URL = f"rediss://:{REDIS_PASSWORD}@{REDIS_HOST}:{REDIS_PORT}/0"
+
 CHANNEL_LAYERS = {
     "default": {
         "BACKEND": "channels_redis.core.RedisChannelLayer",
         "CONFIG": {
-            "hosts": [(getenv("REDIS_HOST", "redis"), int(getenv("REDIS_PORT", 6379)))],
+            "hosts": [REDIS_URL],
         },
     },
-}
-
-DATABASES = {
-    "default": {
-        "ENGINE": f"django.db.backends.{getenv('DATABASE_ENGINE', 'postgresql')}",
-        "NAME": getenv("POSTGRES_DB"),
-        "USER": getenv("POSTGRES_USER"),
-        "PASSWORD": getenv("POSTGRES_PASSWORD"),
-        "HOST": getenv("POSTGRES_HOST"),
-        "PORT": getenv("POSTGRES_PORT"),
-    }
 }
 
 PASSWORD_HASHERS = [
@@ -131,9 +124,6 @@ STATIC_URL = "static/"
 STATIC_ROOT = BASE_DIR / "staticfiles"
 MEDIA_URL = "/media/"
 MEDIA_ROOT = BASE_DIR / "media"
-# STATICFILES_DIRS = [
-#     BASE_DIR / 'static'
-# ]
 
 AUTHENTICATION_BACKENDS = [
     "social_core.backends.google.GoogleOAuth2",
@@ -179,26 +169,17 @@ DJOSER = {
     },
 }
 
-REST_FRAMEWORK = {
-    "DEFAULT_AUTHENTICATION_CLASSES": [
-        "users.authentication.CustomJWTAuthentication",
-    ],
-    "DEFAULT_PERMISSION_CLASSES": ["rest_framework.permissions.IsAuthenticated"],
-}
-
-
 DEFAULT_AUTO_FIELD = "django.db.models.BigAutoField"
 
 AUTH_USER_MODEL = "users.CustomUser"
 
-
 AUTH_COOKIE = "access"
 AUTH_COOKIE_MAX_AGE = 60 * 5
 AUTH_COOKIE_REFRESH_MAX_AGE = 60 * 60 * 24
-AUTH_COOKIE_SECURE = getenv("AUTH_COOKIE_SECURE", "True") == "True"
+AUTH_COOKIE_SECURE = True
 AUTH_COOKIE_HTTP_ONLY = True
 AUTH_COOKIE_PATH = "/"
-AUTH_COOKIE_SAMESITE = "None"
+AUTH_COOKIE_SAMESITE = "Lax"
 
 SOCIAL_AUTH_GOOGLE_OAUTH2_KEY = getenv("GOOGLE_AUTH_KEY")
 SOCIAL_AUTH_GOOGLE_OAUTH2_SECRET = getenv("GOOGLE_AUTH_SECRET_KEY")
@@ -216,4 +197,4 @@ EMAIL_PORT = getenv("EMAIL_PORT")
 EMAIL_USE_TLS = getenv("EMAIL_USE_TLS")
 EMAIL_HOST_USER = getenv("EMAIL_HOST_USER")
 EMAIL_HOST_PASSWORD = getenv("EMAIL_HOST_PASSWORD")
-DEFAULT_FROM_EMAIL = getenv("DEFAULT_FROM_EMAILł")
+DEFAULT_FROM_EMAIL = getenv("DEFAULT_FROM_EMAIL")
