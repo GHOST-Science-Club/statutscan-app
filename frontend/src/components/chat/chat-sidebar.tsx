@@ -1,3 +1,5 @@
+import Link from 'next/link';
+import { CircleHelp, Plus } from 'lucide-react';
 import {
   Sidebar,
   SidebarContent,
@@ -9,11 +11,8 @@ import {
   SidebarTrigger,
 } from '@/components/ui/sidebar';
 import { Button } from '@/components/ui/button';
-import { CircleHelp, Plus } from 'lucide-react';
 import { ScrollArea } from '@/components/ui/scroll-area';
 import { Logo } from '@/components/ui/logo';
-import Link from 'next/link';
-import { getChats } from '@/lib/chat/getChats';
 
 type Props = {
   chats: {
@@ -21,6 +20,7 @@ type Props = {
     title: string;
   }[];
 };
+
 export async function ChatSidebar(props: Props) {
   const { chats } = props;
   return (
