@@ -32,6 +32,11 @@ jobs:
           api_location: "" # Api source code path - optional
           # output_location: "/dist" # Built app content directory - optional
           ###### End of Repository/Build Configurations ######
+        env:
+          API_URL: ${{ secrets.NEXT_STATIC_WEB_APP_API_URL}}
+          NEXT_PUBLIC_WS_URL: ${{ secrets.NEXT_STATIC_WEB_APP_PUBLIC_WS_URL}}
+          HOST: ${{ secrets.NEXT_STATIC_WEB_APP_HOST}}
+          NEXT_TELEMETRY_DISABLED: 1
 
   close_pull_request_job:
     if: github.event_name == 'pull_request' && github.event.action == 'closed'
