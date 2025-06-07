@@ -133,8 +133,11 @@ export default function ChatPage() {
     }
   }, []);
 
+  const protocol = process.env.NODE_ENV === 'production' ? 'wss' : 'ws';
+  const wsUrl = process.env.NEXT_PUBLIC_WS_URL || 'localhost:8000';
+
   const { sendJsonMessage } = useWebSocket(
-    `${process.env.NODE_ENV == 'production' ? 'wss' : 'ws'}://${process.env.NEXT_PUBLIC_WS_URL}/ws/chat/${chatId}/`,
+    `${protocol}://${wsUrl}/${protocol}/chat/${chatId}/`,
     {
       onError: () => setChatState('Błąd połączenia'),
       onMessage: handleMessage,
