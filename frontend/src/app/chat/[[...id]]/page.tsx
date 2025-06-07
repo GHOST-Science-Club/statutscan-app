@@ -137,7 +137,7 @@ export default function ChatPage() {
   const wsUrl = process.env.NEXT_PUBLIC_WS_URL || 'localhost:8000';
 
   const { sendJsonMessage } = useWebSocket(
-    `${protocol}://${wsUrl}/${protocol}/chat/${chatId}/`,
+    `${protocol}://${wsUrl}/ws/chat/${chatId}/`,
     {
       onError: () => setChatState('Błąd połączenia'),
       onMessage: handleMessage,
