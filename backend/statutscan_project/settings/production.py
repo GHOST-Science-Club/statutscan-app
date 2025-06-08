@@ -14,9 +14,9 @@ DEBUG = getenv("DEBUG", "False").lower() in ["true", "1", "yes"]
 
 ALLOWED_HOSTS = getenv("ALLOWED_HOSTS", "statutscan.com").split(",")
 
-CSRF_TRUSTED_ORIGINS = getenv("CSRF_TRUSTED_ORIGINS", "https://statutscan.com").split(",")
+CSRF_TRUSTED_ORIGINS = [s for s in getenv("CSRF_TRUSTED_ORIGINS", "").split(",") if s]
 
-CORS_ALLOWED_ORIGINS = getenv("CORS_ALLOWED_ORIGINS", "https://statutscan.com").split(",")
+CORS_ALLOWED_ORIGINS = [s for s in getenv("CORS_ALLOWED_ORIGINS", "").split(",") if s]
 CORS_ALLOW_CREDENTIALS = True
 
 SECURE_SSL_REDIRECT = True
