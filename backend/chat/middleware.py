@@ -20,6 +20,9 @@ class JWTAuthMiddleware:
 
         headers = dict(scope.get("headers") or [])
         raw_cookie = headers.get(b"cookie", b"").decode()
+        
+        print('MIDDLEWARE HEADERS:', headers)
+        print('RAW COOKIE:', raw_cookie)
 
         if raw_cookie:
             cookie = SimpleCookie()
