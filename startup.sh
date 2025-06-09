@@ -21,7 +21,8 @@ echo "[Django] Collecting static files"
 python3 manage.py collectstatic --noinput
 
 echo "[Django] Running application"
-uvicorn statutscan_project.asgi:application --host 0.0.0.0 --port 8000
+# Run app in the background
+uvicorn statutscan_project.asgi:application --host 0.0.0.0 --port 8000 &
 
 cd ..
 
@@ -33,6 +34,7 @@ echo "[Next.js] Installing dependencies"
 npm install
 
 echo "[Next.js] Running application"
+# Run app in the background
 npm start -- -p 3000 &
 
 # Wait for all background processes
