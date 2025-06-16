@@ -1,7 +1,7 @@
 'use client';
 
 import Link from 'next/link';
-import { NAV_ITEMS } from '@/lib/data';
+import { NAV_ITEMS } from '@/lib/links';
 import {
   MobileNav,
   MobileNavHeader,

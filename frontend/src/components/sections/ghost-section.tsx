@@ -56,22 +56,11 @@ function GhostSection() {
           <h3>Organizacja studencka przy Politechnice Poznaskiej</h3>
           <br />
           <p>
-            Lorem ipsum dolor sit amet consectetur. Mi sagittis pretium varius
-            est nisi euismod dignissim. Ultrices turpis nec pellentesque dui
-            tellus egestas sed pellentesque tortor. Tellus dolor eleifend
-            volutpat purus sit netus auctor. Bibendum cras malesuada suspendisse
-            pellentesque a ullamcorper.
-            <br />
-            <br />
-            At fermentum libero elementum id. Posuere eget nec interdum mauris
-            pellentesque adipiscing neque. Enim ut porta velit amet id ante. Sed
-            tempor porttitor urna sociis et enim nulla. Placerat ac senectus
-            vivamus in laoreet posuere interdum.
-            <br />
-            <br /> Maecenas quis ut sit interdum etiam nec urna mollis ipsum.
-            Vitae pellentesque diam diam ut nibh et. Purus nullam posuere
-            sodales elit pellentesque. Pellentesque viverra neque viverra
-            commodo lacus aliquam.
+            Jesteśmy członkami społeczności koła naukowego GHOST. Działania,
+            które podejmujemy w kole są dla nas nie tylko możliwością do nauki,
+            ale również do wywierania wpływu na otoczenie. Projekt StatutScan
+            jest tego przykładem. Naszym celem jest wywrzeć wpływ na Polski
+            system edukacji i pomóc uczniom z ich problemami z administracją.
           </p>
         </div>
       </div>

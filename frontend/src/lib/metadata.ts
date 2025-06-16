@@ -14,11 +14,6 @@ const layoutMetadata: Metadata = {
   },
 };
 
-const docsMetadata: Metadata = {
-  ...layoutMetadata,
-  title: 'Dokumentacja',
-};
-
 const chatMetadata: Metadata = {
   ...layoutMetadata,
   title: 'Czat',
@@ -60,9 +55,23 @@ const confirmMetadata = (type: string): Metadata => ({
   title: `Potwierdź ${type}`,
 });
 
+const aboutMetadata: Metadata = {
+  ...layoutMetadata,
+  title: 'Dokumentacja',
+};
+
+const authorsMetadata: Metadata = {
+  ...layoutMetadata,
+  title: 'O autorach',
+};
+
+const docsMetadata: Metadata = {
+  ...layoutMetadata,
+  title: 'O projekcie',
+};
+
 export {
   layoutMetadata,
-  docsMetadata,
   chatMetadata,
   chatIdMetadata,
   notFoundMetadata,
@@ -72,4 +81,7 @@ export {
   resetPasswordMetadata,
   activationMetadata,
   confirmMetadata,
+  aboutMetadata,
+  authorsMetadata,
+  docsMetadata,
 };
