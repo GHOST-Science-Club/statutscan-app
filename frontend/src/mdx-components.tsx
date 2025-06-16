@@ -3,6 +3,9 @@ import type { MDXComponents } from 'mdx/types';
 export function useMDXComponents(components: MDXComponents): MDXComponents {
   return {
     ...components,
+    img: ({ src, alt, ...props }) => {
+      return <img src={src} alt={alt} className="mx-auto" {...props} />;
+    },
     code: ({ children, ...props }) => {
       return (
         <code
