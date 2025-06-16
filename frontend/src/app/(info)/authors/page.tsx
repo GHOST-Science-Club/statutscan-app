@@ -48,7 +48,7 @@ const persons = [
 export default function AuthorsPage() {
   return (
     <>
-      <h1 className="my-2">O autorach</h1>
+      <h1>O autorach</h1>
       <div className="my-5 space-y-10">
         {persons.map((person, index) => (
           <div

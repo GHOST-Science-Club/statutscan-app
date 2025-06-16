@@ -34,10 +34,6 @@ const FOOTER_LINKS = [
 
 const INFO_LINKS = [
   {
-    name: 'Strona główna',
-    link: '/',
-  },
-  {
     name: 'Czat',
     link: '/chat',
   },

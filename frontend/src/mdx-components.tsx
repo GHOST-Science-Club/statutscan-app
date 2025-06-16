@@ -25,7 +25,7 @@ export function useMDXComponents(components: MDXComponents): MDXComponents {
       </a>
     ),
     wrapper: ({ children }) => (
-      <div className="**:border-border prose-neutral prose prose-sm dark:prose-invert **:text-foreground marker:text-foreground prose-headings:font-heading **:font-text w-full max-w-none p-5 sm:px-20">
+      <div className="**:border-border prose-neutral prose prose-sm dark:prose-invert **:text-foreground marker:text-foreground prose-headings:font-heading **:font-text w-full max-w-none">
         {children}
       </div>
     ),
