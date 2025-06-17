@@ -6,7 +6,7 @@ from channels.routing import ProtocolTypeRouter, URLRouter
 from channels.security.websocket import OriginValidator
 
 os.environ.setdefault(
-    "DJANGO_SETTINGS_MODULE", "statutscan_project.settings.settings"
+    "DJANGO_SETTINGS_MODULE", "statutscan_project.settings.production"
 )
 django_asgi_app = get_asgi_application()
 
