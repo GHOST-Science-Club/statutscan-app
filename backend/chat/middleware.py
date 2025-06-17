@@ -23,11 +23,14 @@ class JWTAuthMiddleware:
         raw_cookie = headers.get(b"cookie", b"").decode()
         token = None
 
+        print(f"Raw cookie: {raw_cookie}")
         if raw_cookie:
             cookie = SimpleCookie()
             cookie.load(raw_cookie)
             if "access" in cookie:
                 token = cookie["access"].value
+
+        print(f"Token after cookie: {token}")
 
         if not token:
             query_string = scope.get("query_string", b"").decode()
@@ -36,14 +39,22 @@ class JWTAuthMiddleware:
             if token_list:
                 token = token_list[0]
 
+        print(f"Token after url params: {token}")
+
         if token:
             try:
                 validated_token = await sync_to_async(
                     JWTAuthentication().get_validated_token
                 )(token)
+
+                print(f"Validated token: {validated_token}")
+
                 user = await sync_to_async(JWTAuthentication().get_user)(
                     validated_token
                 )
+
+                print(f"User: {user}")
+
                 scope["user"] = user
             except Exception:
                 pass
