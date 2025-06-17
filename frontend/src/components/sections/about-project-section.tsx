@@ -28,7 +28,7 @@ const cards = [
   {
     title: 'Rozwiązanie techniczne',
     description:
-      'Lorem ipsum dolor sit amet consectetur. Mi sagittis pretium varius est nisi euismod dignissim. Ultrices turpis nec pellentesque',
+      'W naszym asystencie wykorzystujemy nowoczesne technologie, zapewniając innowacyjność i najwyższą jakość.',
     footer: (
       <Button className="mt-5" variant="secondary" asChild>
         <Link href="/docs">Zobacz więcej</Link>
@@ -37,9 +37,9 @@ const cards = [
   },
 ];
 
-function AboutChatSection() {
+function AboutProjectSection() {
   return (
-    <SectionLayout id="chat" title="O CZACIE">
+    <SectionLayout id="project" title="O Projekcie">
       <h3>
         PUTagent to zaawansowany chatbot oparty na sztucznej inteligencji, który
         <span className="text-gradient">
@@ -56,4 +56,4 @@ function AboutChatSection() {
     </SectionLayout>
   );
 }
-export { AboutChatSection };
+export { AboutProjectSection };

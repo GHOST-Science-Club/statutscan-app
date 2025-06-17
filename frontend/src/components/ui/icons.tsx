@@ -1,5 +1,5 @@
 type Props = {
-  icon: 'google' | 'microsoft' | 'form_error';
+  icon: 'google' | 'form_error';
 };
 function Icons({ icon }: Props) {
   switch (icon) {
@@ -28,37 +28,6 @@ function Icons({ icon }: Props) {
             d="M22.3055 10.0415H21.5V10H12.5V14H18.1515C17.7571 15.1082 17.0467 16.0766 16.108 16.7855L16.1095 16.7845L19.2045 19.4035C18.9855 19.6025 22.5 17 22.5 12C22.5 11.3295 22.431 10.675 22.3055 10.0415Z"
             fill="#1976D2"
           />
-        </svg>
-      );
-    case 'microsoft':
-      return (
-        <svg
-          width="16"
-          height="16"
-          viewBox="0 0 16 16"
-          fill="none"
-          xmlns="http://www.w3.org/2000/svg"
-        >
-          <g clipPath="url(#clip0_439_1263)">
-            <path d="M7.60413 7.60413H0V0H7.60413V7.60413Z" fill="#F1511B" />
-            <path
-              d="M15.9986 7.60413H8.39453V0H15.9986V7.60413Z"
-              fill="#80CC28"
-            />
-            <path
-              d="M7.60394 16.0001H0V8.396H7.60394V16.0001Z"
-              fill="#00ADEF"
-            />
-            <path
-              d="M15.9986 16.0001H8.39453V8.396H15.9986V16.0001Z"
-              fill="#FBBC09"
-            />
-          </g>
-          <defs>
-            <clipPath id="clip0_439_1263">
-              <rect width="16" height="16" fill="white" />
-            </clipPath>
-          </defs>
         </svg>
       );
     case 'form_error':
