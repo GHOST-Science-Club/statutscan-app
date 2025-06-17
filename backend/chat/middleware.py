@@ -23,6 +23,7 @@ class JWTAuthMiddleware:
         raw_cookie = headers.get(b"cookie", b"").decode()
         token = None
 
+        print(f"Middleware headers: {headers}")
         print(f"Raw cookie: {raw_cookie}")
         if raw_cookie:
             cookie = SimpleCookie()
