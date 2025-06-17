@@ -1,0 +1,91 @@
+import { docsMetadata } from '../../../lib/metadata';
+export const metadata = docsMetadata;
+
+# Agent
+
+Agent LLM w aplikacji wykorzystuje API OpenAI i modele oferowane od OpenAI są ro również jedyne finalnie wykorzystane w projekcie. Jest on wspierany przez szereg komponentów infrastrukturalnych umożliwiających przechowywanie kontekstu, analizę wektorową oraz detekcję prompt injection.
+
+Do przechowywania historii rozmów z użytkownikiem agent wykorzystuje MongoDB. Poza samą treścią wiadomości przechowywane są również metadane jak na przykład źródła informacji, z których korzystał agent, albo informacja o tym, że dana wiadomość to prompt injection. Wiedza agenta opiera się na dokumentach przechowywanych w PostgreSQL z rozszerzeniem pgvector, co umożliwia tworzenie i wyszukiwanie wektorowych reprezentacji danych. Dzięki temu agent może wyszukiwać powiązane dokumenty na podstawie cosine similarity.
+
+Poniższy diagram przedstawia prompt chain agenta:
+
+<div className="hidden dark:block">![](/info/docs/prompt_chain_dark.svg)</div>
+<div className="block dark:hidden">![](/info/docs/prompt_chain_light.svg)</div>
+
+Powyższy prompt chain można opisać w następujący sposób.
+
+- Użytkownik zadaje pytanie, które zostaje zapisane w historii czatu.
+- System dokonuje detekcji prompt injection - czyli próby manipulacji treścią zapytania, które mogłoby wpłynąć na niepożądane działanie modelu Jeśli prompt injection zostanie wykryty, użytkownik zostaje o tym poinformwany oraz jego wiadomość w historii czatu zostaje oznaczona jako prompt injection.
+- Jeśli nie, agent podejmuje decyzję, które narzędzia ma wykorzystać w zależności od kontekstu zadanego pytania. Do dyspozycji ma dwa narzędzie - dostęp do historii czatu, oraz dostęp do bazy wiedzy.
+- W przypadku bazy wiedzy pytanie jest embeddowane i na podstawie embeddingu są wyszukiwane dokumenty powiązane z pytaniem. W przypadku historii czatu wyciągane jest `n` ostatnich wiadomości, z który są wyciągane informacje powiązane z pytaniem.
+- Na tej podstawie agent tworzony jest finalny prompt, który zawiera oryginalne pytanie użytkownika oraz wyniki uzyskane z narzędzi.
+- Wynik końcowy jest streamowany w czasie rzeczywistym do użytkownika jako odpowiedź.
+
+# Strona internetowa
+
+Aplikacja została stworzona z wykorzystaniem frameworka Django wraz z Django REST Framework (DRF) po stronie backendu oraz Next.js po stronie frontendowej. Całość została zhostowana w chmurze Microsoft Azure.
+
+Na załączonym schemacie przedstawiono architekturę aplikacji w chmurze:
+
+<div className="hidden dark:block">
+  ![](/info/docs/azure_architecture_dark.svg)
+</div>
+<div className="block dark:hidden">
+  ![](/info/docs/azure_architecture_light.svg)
+</div>
+
+- Django z DRF działa w ramach Azure App Services jako główny backend aplikacji.
+- Next.js jest wdrożony jako Azure Static Web Apps, obsługując interfejs użytkownika oraz wywołania API.
+- CosmosDB przechowuje historię czatów użytkowników.
+- PostgreSQL przechowuje dane o użytkownikach oraz z rozszerzeniem pgvector pełni funkcję bazy wektorowej do przechowywania dokumentów, które są bazą wiedzy dla agenta.
+- Azure Cache for Redis służy jako rozproszona baza danych w pamięci i jest wykorzystywana do obsługi połączeń socketowych – klient łączy się z backendem za pomocą socketów, co umożliwia transmisję tekstu na żywo w czasie rzeczywistym.
+
+# Scaping danych
+
+Głównym celem scrapingu danych w projekcie **Statutscan / PUTagent** było pozyskanie aktualnych informacji dotyczących spraw organizacyjno-administracyjnych w celu zasilenia bazą wiedzy systemu wspierającego studentów.
+
+## Kryteria wyboru źródeł
+
+W pierwszej iteracji projektu, źródła informacji zostały wybrane manualnie, z uwzględnieniem następujących kryteriów:
+
+- **Dostępność danych** – jawność źródeł, brak zabezpieczeń typu CAPTCHA, brak zakazów w plikach `robots.txt`,
+- **Potencjalna użyteczność** – oceniano, czy dane są przydatne do odpowiadania na pytania dotyczące np. logowania do usług, organizacji semestru, zarządzania kontem studenckim, procedur administracyjnych.
+
+## Narzędzia i technologie
+
+Do scrapingu i przetwarzania dokumentów wykorzystano następujące technologie i biblioteki Pythona:
+
+### Strony statyczne (HTML)
+
+- `requests` + `BeautifulSoup` – do pobierania i parsowania kodu HTML,
+- `html2text` – konwersja treści HTML do formatu Markdown.
+
+### Dokumenty PDF
+
+- `PyMuPDF` – do przetwarzania PDF-ów zawierających tekst,
+- `easyOCR` – do optycznego rozpoznawania tekstu (OCR) w przypadku PDF-ów zawierających jedynie obrazy.
+
+### Konwersja do bazy wiedzy
+
+- W przypadku treści pozyskanej przez OCR, zastosowano model językowy GPT-4o-mini, który przekształcał dane do postaci uproszczonego Markdowna, zgodnego ze standardem repozytorium wiedzy.
+
+## Struktura przetwarzania
+
+1. Identyfikacja zasobów (adresy URL, ścieżki do dokumentów),
+2. Pobieranie zawartości (HTML lub PDF),
+3. Ekstrakcja i czyszczenie tekstu,
+4. Konwersja do Markdown,
+5. Analiza tekstu (metryki, klasyfikacja)
+6. Zasilenie bazy wiedzy
+
+## Monitoring i statystyki
+
+- Statystyki aktualnej bazy dokumentów (liczba źródeł, daty aktualizacji) są dostępne w specjalnie przygotowanym **Dashboardzie**,
+- Wszystkie dokumenty wchodzące w skład bazy wiedzy zostały sprawdzone manualnie poprawiając niedoskonałości powstałe w procesie przetwarzanie
+
+## Uwagi prawne i etyczne
+
+- Wszystkie przetwarzane źródła były publicznie dostępne i nie wymagały logowania,
+- Projekt nie obciążał nadmiernie serwera uczelni (ustawiono opóźnienia między żądaniami oraz cache danych)
+
+Kod odpowiedzialny za scraping jest dostępny [tutaj](https://github.com/GHOST-Science-Club/statutscan-data-scraping).

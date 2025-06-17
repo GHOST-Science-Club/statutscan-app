@@ -23,21 +23,3 @@ CORS_ALLOWED_ORIGINS = getenv(
     "CORS_ALLOWED_ORIGINS", "http://localhost:3000, http://127.0.0.1:3000"
 ).split(",")
 CORS_ALLOW_CREDENTIALS = True
-
-REST_FRAMEWORK = {
-    "DEFAULT_AUTHENTICATION_CLASSES": [
-        "users.authentication.CustomJWTAuthentication",
-    ],
-    "DEFAULT_PERMISSION_CLASSES": ["rest_framework.permissions.IsAuthenticated"],
-}
-
-DATABASES = {
-    "default": {
-        "ENGINE": f"django.db.backends.{getenv('DATABASE_ENGINE', 'postgresql')}",
-        "NAME": getenv("POSTGRES_DB"),
-        "USER": getenv("POSTGRES_USER"),
-        "PASSWORD": getenv("POSTGRES_PASSWORD"),
-        "HOST": getenv("POSTGRES_HOST"),
-        "PORT": getenv("POSTGRES_PORT"),
-    }
-}
