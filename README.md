@@ -1,8 +1,4 @@
-- [Overview](#overview)
-- [Setup and Configuration](#setup-and-configuration)
-- [BACKEND \& FRONTEND](#backend--frontend)
-  - [BACKEND localy](#backend-localy)
-  - [FRONTEND localy](#frontend-localy)
+![release version](https://img.shields.io/github/v/release/GHOST-Science-Club/statutscan-app)
 
 ## Overview
 
@@ -10,19 +6,28 @@
 to access, explains rules and procedures, and helps students communicate with administration. It is a web application
 with a Q&A chatbot using RAG and vector databases with the necessary information sources.
 
-**Demonstration video of the previous version of the project:**
+[Link to the project website](https://calm-desert-09ff95e03.6.azurestaticapps.net)
 
-[![Youtube](https://i.postimg.cc/XYVqJ23V/statutscan-demo-thumbnail.png)](https://www.youtube.com/watch?v=3IKxKgnEjdY)
+## Technologies used
+<p align="center">
+    <img src="https://skillicons.dev/icons?i=django"/>
+    <img src="https://skillicons.dev/icons?i=next"/>
+    <img src="https://github.com/user-attachments/assets/ccb2f267-2a32-44ea-a272-2d112db38d10" width="48px" height="48px"/>
+    <img src="https://skillicons.dev/icons?i=docker"/>
+    <img src="https://skillicons.dev/icons?i=postgresql"/>
+    <img src="https://skillicons.dev/icons?i=mongo"/>
+    <img src="https://skillicons.dev/icons?i=redis"/>
+    <img src="https://skillicons.dev/icons?i=azure"/>
+</p>
 
 ## Setup and Configuration
 
-1. **Clone the Repository**
+#### Clone the Repository
+```bash
+git clone https://github.com/GHOST-Science-Club/statutscan-app.git .
+```
 
-   ```bash
-   git clone https://github.com/GHOST-Science-Club/statutscan-app.git .
-    ```
-
-## BACKEND & FRONTEND
+#### BACKEND & FRONTEND
 1. Navigate to the backend directory: `cd backend` 
 2. Inside the .envs folder, create two environment files:
     - `.env.local` (fill it as `.env.example`)
@@ -40,7 +45,7 @@ with a Q&A chatbot using RAG and vector databases with the necessary information
 
 ---
 
-### BACKEND localy
+#### BACKEND localy
 
 1. Go to backend directory using `cd backend`
 2. Create in `.envs` folder 2 files:
@@ -50,10 +55,20 @@ with a Q&A chatbot using RAG and vector databases with the necessary information
 4. Run `make build` in console
 5. Go to http://localhost:8000/swagger/
 
-### FRONTEND localy
+#### FRONTEND localy
 **Note:** The backend must be running before starting the frontend.
 1. Navigate to the frontend directory using `cd frontend`
 2. Create file `.env` and fill it as `.env.example`
 3. Install dependencies: `npm install`
 4. Start the development server: `npm run dev`
 5. The project will be available at [http://localhost:3000/]
+
+## Team
+- Maksymilian Norkiewicz
+- Jędrzej Ogrodowski
+- Ilya Yanukovich
+- Beniamin Szawracki
+- Darya Murzich
+
+## Contact
+✉️ maksymiliannorkiewicz@gmail.com
