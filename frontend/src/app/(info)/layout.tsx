@@ -28,12 +28,7 @@ export default function InfoLayout({ children }: Props) {
             </Link>
             <DropdownMenu>
               <DropdownMenuTrigger className="sm:hidden" asChild>
-                <Button
-                  variant="secondary"
-                  size="icon"
-                  asChild
-                  aria-label="Menu"
-                >
+                <Button variant="secondary" size="icon" aria-label="Menu">
                   <Menu />
                 </Button>
               </DropdownMenuTrigger>
