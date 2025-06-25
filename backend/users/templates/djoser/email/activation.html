@@ -1,17 +1,17 @@
 {% load i18n %}
 
 {% block subject %}
-{% blocktrans %}Activate your account on {{ site_name }}{% endblocktrans %}
+{% blocktrans %}Aktywuj swoje konto na {{ site_name }}{% endblocktrans %}
 {% endblock subject %}
 
 {% block text_body %}
-{% blocktrans %}You received this email because you need to finish activation process on {{ site_name }}.{% endblocktrans %}
+{% blocktrans %}Otrzymałeś tą wiadomość, ponieważ musisz dokończyć proces aktywacji na {{ site_name }}.{% endblocktrans %}
 
-{% trans "Please go to the following page to activate your account:" %}
+{% trans "Proszę przejdź do poniższej strony aby aktywować swoje konto:" %}
 {{ protocol }}://{{ domain }}/{{ url|safe }}
 
-{% trans "Thanks for using our site!" %}
-{% blocktrans %}The {{ site_name }} team{% endblocktrans %}
+{% trans "Dziękujemy za użycie naszej strony!" %}
+{% blocktrans %}Zespół {{ site_name }}{% endblocktrans %}
 {% endblock text_body %}
 
 {% block html_body %}
@@ -19,7 +19,7 @@
 <html lang="en">
 <head>
   <meta charset="utf-8" />
-  <title>{% trans "Activate your account" %}</title>
+  <title>{% trans "Aktywuj swoje konto" %}</title>
   <meta name="color-scheme" content="light dark">
   <meta name="supported-color-schemes" content="light dark">
   <style>
@@ -92,21 +92,21 @@
 </head>
 <body>
   <div class="email-box">
-    <div class="email-title">{% trans "Activate your account" %}</div>
+    <div class="email-title">{% trans "Aktywuj swoje konto" %}</div>
     <p>
-      {% blocktrans %}You received this email because you need to finish activation process on {{ site_name }}.{% endblocktrans %}
+      {% blocktrans %}Otrzymałeś tą wiadomość, ponieważ musisz dokończyć proces aktywacji na {{ site_name }}.{% endblocktrans %}
     </p>
     <p>
-      {% trans "Please click the button below to activate your account:" %}
+      {% trans "Proszę kliknij przycisk, aby aktywować Twoje konto:" %}
     </p>
     <a class="btn" href="{{ protocol }}://{{ domain }}/{{ url|safe }}">
-      {% trans "Activate account" %}
+      {% trans "Aktywuj konto" %}
     </a>
     <p>
-      {% trans "Thanks for using our site!" %}
+      {% trans "Dziękujemy za użycie naszej strony!" %}
     </p>
     <p style="margin: 0;">
-      {% blocktrans %}The {{ site_name }} team{% endblocktrans %}
+      {% blocktrans %}Zespół {{ site_name }}{% endblocktrans %}
     </p>
     <div class="footer">
       © {% now "Y" %} {{ site_name }}

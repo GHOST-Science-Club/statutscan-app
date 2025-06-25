@@ -1,1 +1,1 @@
-{% blocktrans %}Activate your account on {{ site_name }}{% endblocktrans %}
+{% blocktrans %}Aktywuj swoje konto na {{ site_name }}{% endblocktrans %}
