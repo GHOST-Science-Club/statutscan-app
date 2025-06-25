@@ -52,6 +52,12 @@ async function getChats() {
   return json.chats;
 }
 
-export { getChatFirstMsg, getChat, getChats };
+async function deleteChat(id: string) {
+  const API = await api();
+  const res = await API.delete(`/chat/${id}/`).res();
+  return res.ok;
+}
+
+export { getChatFirstMsg, getChat, getChats, deleteChat };
 
 export { api };
