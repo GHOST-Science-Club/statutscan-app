@@ -1,15 +1,15 @@
 {% load i18n %}
 
 {% block subject %}
-{% blocktrans %}Your account has been created and is ready to use!{% endblocktrans %}
+{% blocktrans %}Twoje konto zostało stworzone i jest teraz gotowej do użycia!{% endblocktrans %}
 {% endblock subject %}
 
 {% block text_body %}
-{% blocktrans %}Your account has been created and is now active.{% endblocktrans %}
+{% blocktrans %}Twoje konto zostało stworzone i jest teraz aktywne.{% endblocktrans %}
 
-{% trans "Thank you for using our site!" %}
+{% trans "Dziękuję za użycie naszej strony!" %}
 
-{% blocktrans %}The {{ site_name }} team{% endblocktrans %}
+{% blocktrans %}Zespół {{ site_name }}{% endblocktrans %}
 {% endblock text_body %}
 
 {% block html_body %}
@@ -17,7 +17,7 @@
 <html lang="en">
 <head>
   <meta charset="utf-8" />
-  <title>{% trans "Your account is active" %}</title>
+  <title>{% trans "Twoje konto jest aktywne" %}</title>
   <meta name="color-scheme" content="light dark">
   <meta name="supported-color-schemes" content="light dark">
   <style>
@@ -69,15 +69,15 @@
 </head>
 <body>
   <div class="email-box">
-    <div class="email-title">{% trans "Your account is active" %}</div>
+    <div class="email-title">{% trans "Twoje konto jest aktywne" %}</div>
     <p style="margin-bottom: 20px;">
-      {% blocktrans %}Your account has been created and is now active.{% endblocktrans %}
+      {% blocktrans %}Twoje konto zostało stworzone i jest teraz aktywne.{% endblocktrans %}
     </p>
     <p style="margin-bottom: 0;">
-      {% trans "Thank you for using our site!" %}
+      {% trans "Dziękuję za użycie naszej strony!" %}
     </p>
     <div class="email-footer">
-      © {% now "Y" %} {{ site_name }}. All rights reserved.
+      © {% now "Y" %} {{ site_name }}. Wszystkie prawa zastrzeżone.
     </div>
   </div>
 </body>
