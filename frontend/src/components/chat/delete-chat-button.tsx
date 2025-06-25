@@ -3,6 +3,7 @@ import { useRouter, usePathname, redirect } from 'next/navigation';
 import { Trash2 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { deleteChat } from '@/lib/api';
+import { toast } from 'sonner';
 
 function DeleteChatButton({ chatId }: { chatId: string }) {
   const router = useRouter();
@@ -10,12 +11,11 @@ function DeleteChatButton({ chatId }: { chatId: string }) {
   const handleOnClick = async () => {
     const success = await deleteChat(chatId);
     if (success) {
-      console.log(pathname);
-      if (`/chat/${chatId}` == pathname) {
-        redirect('/chat');
-      }
-      router.refresh();
+      toast.success('Czat został usunięty');
+      if (`/chat/${chatId}` == pathname) redirect('/chat');
+      else router.refresh();
     }
+    toast.error('Nie udało się usunąć czatu');
   };
 
   return (
