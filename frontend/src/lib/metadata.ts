@@ -3,13 +3,13 @@ import { Metadata } from 'next';
 const layoutMetadata: Metadata = {
   metadataBase: new URL(process.env.HOST || 'http://localhost:3000'),
   title: {
-    template: '%s | PUTAgent',
-    default: 'PUTAgent | AI Chat pomagający studentom',
+    template: '%s | StatutScan',
+    default: 'StatutScan | AI Chat pomagający studentom',
   },
   description:
-    'PUTagent to zaawansowany chatbot oparty na sztucznej inteligencji, który pomaga studentom i kandydatom na studia znaleźć odpowiedzi na pytania związane z edukacją w Polsce',
+    'StatutScan to zaawansowany chatbot oparty na sztucznej inteligencji, który pomaga studentom i kandydatom na studia znaleźć odpowiedzi na pytania związane z edukacją w Polsce',
   openGraph: {
-    title: 'PUTAgent | AI Chat pomagający studentom',
+    title: 'StatutScan | AI Chat pomagający studentom',
     type: 'website',
   },
 };

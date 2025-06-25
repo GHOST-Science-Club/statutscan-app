@@ -27,7 +27,7 @@ function Logo(props: Props) {
       <div className="flex items-center gap-2">
         {svg}
         <span className="font-heading text-foreground text-lg select-none">
-          PUTagent
+          StatutScan
         </span>
       </div>
     );
