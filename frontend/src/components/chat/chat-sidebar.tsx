@@ -3,6 +3,7 @@ import { Plus } from 'lucide-react';
 import {
   Sidebar,
   SidebarContent,
+  SidebarFooter,
   SidebarGroup,
   SidebarGroupContent,
   SidebarGroupLabel,
@@ -13,6 +14,7 @@ import { Button } from '@/components/ui/button';
 import { ScrollArea } from '@/components/ui/scroll-area';
 import { Logo } from '@/components/ui/logo';
 import { DeleteChatButton } from '@/components/chat/delete-chat-button';
+import { logoutUser } from '@/lib/auth/logoutUser';
 
 type Props = {
   chats: {
@@ -65,6 +67,16 @@ export async function ChatSidebar(props: Props) {
           )}
         </ScrollArea>
       </SidebarContent>
+      <SidebarFooter>
+        <Button
+          onClick={logoutUser}
+          variant="outline"
+          size="sm"
+          className="ml-auto w-fit"
+        >
+          Wyloguj się
+        </Button>
+      </SidebarFooter>
     </Sidebar>
   );
 }
