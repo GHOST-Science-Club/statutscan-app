@@ -7,10 +7,10 @@
 {% block text_body %}
 {% blocktrans %}Otrzymałeś tą wiadomość, ponieważ musisz dokończyć proces aktywacji na {{ site_name }}.{% endblocktrans %}
 
-{% trans "Proszę przejdź to poniższej strony aby aktywować swoje konto:" %}
+{% trans "Proszę przejdź do poniższej strony aby aktywować swoje konto:" %}
 {{ protocol }}://{{ domain }}/{{ url|safe }}
 
-{% trans "Dziękuję za użycie naszej strony!" %}
+{% trans "Dziękujemy za użycie naszej strony!" %}
 {% blocktrans %}Zespół {{ site_name }}{% endblocktrans %}
 {% endblock text_body %}
 
@@ -103,7 +103,7 @@
       {% trans "Aktywuj konto" %}
     </a>
     <p>
-      {% trans "Dziękuję za użycie naszej strony!" %}
+      {% trans "Dziękujemy za użycie naszej strony!" %}
     </p>
     <p style="margin: 0;">
       {% blocktrans %}Zespół {{ site_name }}{% endblocktrans %}
