@@ -1,6 +1,7 @@
 import Image from 'next/image';
-import { aboutMetadata } from '@/lib/metadata';
-export const metadata = aboutMetadata;
+import { authorsMetadata } from '@/lib/metadata';
+
+export const metadata = authorsMetadata;
 
 import DaryaImg from '@/../public/info/authors/Darya_Murzich.png';
 import IlyaImg from '@/../public/info/authors/ilya_yanukovich.png';
