@@ -37,6 +37,7 @@ function ChatInput({ disabled, loading, onSubmit }: Props) {
         aria-label="Główne pole tesktowe czatu"
         className="min-h-[56px] w-full resize-none rounded-md py-4 pr-12 pl-3 leading-[1.2] text-wrap sm:pl-6"
         value={inputValue}
+        maxLength={3000}
         disabled={disabled}
         onKeyDown={e => {
           if (e.key === 'Enter') {
