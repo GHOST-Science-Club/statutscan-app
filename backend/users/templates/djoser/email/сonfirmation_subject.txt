@@ -1,1 +1,1 @@
-{% blocktrans %}Your changes on {{ site_name }} are confirmed{% endblocktrans %}
+{% blocktrans %}Toje zmiany na {{ site_name }} zostały potwierdzone{% endblocktrans %}

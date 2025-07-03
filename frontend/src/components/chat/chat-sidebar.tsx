@@ -1,5 +1,5 @@
 import Link from 'next/link';
-import { CircleHelp, Plus } from 'lucide-react';
+import { Plus } from 'lucide-react';
 import {
   Sidebar,
   SidebarContent,
@@ -13,6 +13,8 @@ import {
 import { Button } from '@/components/ui/button';
 import { ScrollArea } from '@/components/ui/scroll-area';
 import { Logo } from '@/components/ui/logo';
+import { DeleteChatButton } from '@/components/chat/delete-chat-button';
+import { logoutUser } from '@/lib/auth/logoutUser';
 
 type Props = {
   chats: {
@@ -48,13 +50,17 @@ export async function ChatSidebar(props: Props) {
               <SidebarGroupLabel>Wszystkie czaty</SidebarGroupLabel>
               <SidebarGroupContent className="flex flex-col gap-2 text-ellipsis">
                 {chats.map((chat, i) => (
-                  <Link
-                    key={i}
-                    href={`/chat/${chat.id}`}
-                    className="text-ellipsis hover:underline"
-                  >
-                    {chat.title}
-                  </Link>
+                  <div key={i} className="flex items-center justify-between">
+                    <Button variant="ghost" className="flex-grow" asChild>
+                      <Link
+                        href={`/chat/${chat.id}`}
+                        className="text-ellipsis hover:underline"
+                      >
+                        {chat.title}
+                      </Link>
+                    </Button>
+                    <DeleteChatButton chatId={chat.id} />
+                  </div>
                 ))}
               </SidebarGroupContent>
             </SidebarGroup>
@@ -63,12 +69,12 @@ export async function ChatSidebar(props: Props) {
       </SidebarContent>
       <SidebarFooter>
         <Button
-          aria-label="Pomoc"
-          variant="ghost"
-          size="icon"
-          className="ml-auto"
+          onClick={logoutUser}
+          variant="outline"
+          size="sm"
+          className="ml-auto w-fit"
         >
-          <CircleHelp />
+          Wyloguj się
         </Button>
       </SidebarFooter>
     </Sidebar>

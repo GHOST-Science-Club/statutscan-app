@@ -18,7 +18,7 @@ const cards = [
   {
     title: 'Otwartość',
     description:
-      'Jesteśmy otwarci na Twoje sugestie i ciągle ulepszamy PUTagent, aby jak najlepiej odpowiadał na Twoje potrzeby',
+      'Jesteśmy otwarci na Twoje sugestie i ciągle ulepszamy StatutScan, aby jak najlepiej odpowiadał na Twoje potrzeby',
     footer: (
       <Button className="mt-5" variant="secondary">
         <Link href="/#contact">Skontaktuj się</Link>
@@ -41,7 +41,8 @@ function AboutProjectSection() {
   return (
     <SectionLayout id="project" title="O Projekcie">
       <h3>
-        PUTagent to zaawansowany chatbot oparty na sztucznej inteligencji, który
+        StatutScan to zaawansowany chatbot oparty na sztucznej inteligencji,
+        który
         <span className="text-gradient">
           {' '}
           pomaga studentom i kandydatom na studia

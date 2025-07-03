@@ -12,11 +12,11 @@ function HomeSection() {
       className="home-gradient relative flex h-[calc(100svh-90px)] max-h-[600px] min-h-[530px] flex-col rounded-xl p-5"
     >
       <h1 className="mb-2">
-        PUTagent<span className="text-primary"> ⎯⎯⎯⎯</span>
+        StatutScan<span className="text-primary"> ⎯⎯⎯⎯</span>
         <br /> wsparcie <span className="text-gradient">studenckie</span>
       </h1>
       <TextAnimate duration={0.5} className="text-muted-foreground">
-        Projekt PUTagent został stworzony z inicjatywy organizacji studenckiej
+        Projekt StatutScan został stworzony z inicjatywy organizacji studenckiej
         GHOST przy Politechnice Poznańskiej
       </TextAnimate>
       <div className="relative flex-1">

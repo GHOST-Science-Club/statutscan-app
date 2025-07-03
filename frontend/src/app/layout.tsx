@@ -2,6 +2,7 @@ import './globals.css';
 import { ReactNode } from 'react';
 import { Montserrat, Open_Sans } from 'next/font/google';
 import { Providers } from '@/components/providers';
+import { Toaster } from '@/components/ui/sonner';
 import { layoutMetadata } from '@/lib/metadata';
 
 export const metadata = layoutMetadata;
@@ -25,6 +26,7 @@ export default function RootLayout({ children }: Props) {
     <html lang="pl" suppressHydrationWarning>
       <body className={`${montserrat.variable} ${openSans.variable}`}>
         <Providers>{children}</Providers>
+        <Toaster />
       </body>
     </html>
   );
