@@ -1,6 +1,9 @@
 build-all:
 	docker compose --env-file ./backend/.envs/.env.local -f docker-compose.dev.yml up --build -d --remove-orphans
 
+build-with-logs:
+	docker compose --env-file ./backend/.envs/.env.local -f docker-compose.dev.yml up --build --remove-orphans
+
 up-all:
 	docker compose --env-file ./backend/.envs/.env.local -f docker-compose.dev.yml up -d
 
