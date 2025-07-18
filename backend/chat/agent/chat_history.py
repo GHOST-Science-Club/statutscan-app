@@ -11,9 +11,8 @@ from chat.agent.prompt_injection import PromptInjection
 
 class ChatHistory:
     def __init__(self):
-        self._mongo_connection = apps.get_app_config('chat').mongo_connection
-        self._chat_history = self._mongo_connection.get_chat_history()
-        self._prompt_injection = PromptInjection()
+        self.__mongo_connection = apps.get_app_config('chat').mongo_connection
+        self.__chat_history = self.__mongo_connection.get_chat_history()
 
     def create_new_chat(self, email: str, question: str) -> str:
         """
@@ -34,7 +33,7 @@ class ChatHistory:
             "role": "user",
             "content": question
         }]
-        self._chat_history.insert_one({
+        self.__chat_history.insert_one({
             "_id": ObjectId(chat_id),
             "email": email,
             "creation_date": creation_date,
@@ -51,7 +50,7 @@ class ChatHistory:
             chat_id (str): The chat ID to which the message should be added.
             message (dict): The message to be added to the chat.
         """
-        self._chat_history.update_one(
+        self.__chat_history.update_one(
             {"_id": ObjectId(chat_id)},
             {"$push": {"messages": message}}
         )
@@ -75,7 +74,7 @@ class ChatHistory:
                 return False
 
         # check chat existance
-        chat_data = self._chat_history.find_one({"_id": ObjectId(chat_id)})
+        chat_data = self.__chat_history.find_one({"_id": ObjectId(chat_id)})
         return bool(chat_data)
     
     def get_chat_last_message(self, chat_id: str) -> dict:
@@ -120,7 +119,7 @@ class ChatHistory:
         Returns:
             List[dict]: A list of messages formatted for the agent.
         """
-        chat_data = self._chat_history.find_one(
+        chat_data = self.__chat_history.find_one(
             {"_id": ObjectId(chat_id)},
             {"messages": 1}
         )
@@ -155,7 +154,7 @@ class ChatHistory:
         Returns:
             Tuple[List[dict], str]: A tuple containing the list of transformed messages and the chat title.
         """
-        chat_data = self._chat_history.find_one(
+        chat_data = self.__chat_history.find_one(
             {"_id": ObjectId(chat_id)},
             {"messages": 1, "title": 1}
         )
@@ -200,7 +199,7 @@ class ChatHistory:
         Returns:
             List[dict]: A list of chat summaries for the user.
         """
-        chats = self._chat_history.find(
+        chats = self.__chat_history.find(
             {"email": email},
             {"_id": 1, "title": 1, "creation_date": 1}
         )
@@ -218,7 +217,7 @@ class ChatHistory:
             chat_id (str): The chat ID to delete.
         """
         try:
-            self._chat_history.delete_one(
+            self.__chat_history.delete_one(
                 {"_id": ObjectId(chat_id)}
             )
         except:
@@ -232,7 +231,7 @@ class ChatHistory:
         Args:
             chat_id (str): The unique identifier of the chat document in the database.
         """
-        chat_data = self._chat_history.find_one(
+        chat_data = self.__chat_history.find_one(
             {"_id": ObjectId(chat_id)},
             {"messages": 1}
         )
@@ -253,7 +252,7 @@ class ChatHistory:
             messages[i].get("metadatas").setdefault("prompt_injection", True)
             break
 
-        self._chat_history.update_one(
+        self.__chat_history.update_one(
             {"_id": ObjectId(chat_id)},
             {"$set": {"messages": messages}}
         )
@@ -267,5 +266,5 @@ class ChatHistory:
         except InvalidId:
             return None
 
-        rec = self._chat_history.find_one({"_id": _id}, {"email": 1})
+        rec = self.__chat_history.find_one({"_id": _id}, {"email": 1})
         return rec.get("email") if rec else None

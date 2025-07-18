@@ -8,13 +8,13 @@ from chat.agent.token_usage_manager import TokenUsageManager
 
 class ChatHistoryTool(ToolInterface):
     def __init__(self, n_last_messages: int=5, model: str="gpt-4o-mini", max_output_tokens: int=200):
-        self.n_last_messages = n_last_messages
-        self.model = model
-        self.max_output_tokens = max_output_tokens
-        self._client = AsyncOpenAI()
-        self._chat_history = ChatHistory()
-        self._token_usage_manager = TokenUsageManager()
-        self._tool_system_prompt = (
+        self.__n_last_messages = n_last_messages
+        self.__model = model
+        self.__max_output_tokens = max_output_tokens
+        self.__client = AsyncOpenAI()
+        self.__chat_history = ChatHistory()
+        self.__token_usage_manager = TokenUsageManager()
+        self.__tool_system_prompt = (
             "You are a helpful assistant whose job is to summarize the chat history."
             "Extract the information needed to answer the user's question. "
             "If chat doesn't contain information needed to answer the question answer "
@@ -22,7 +22,7 @@ class ChatHistoryTool(ToolInterface):
         )
 
     async def use(self, question: str, chat_id: str):
-        history = self._chat_history.get_chat_n_last_messages(chat_id, self.n_last_messages)
+        history = self.__chat_history.get_chat_n_last_messages(chat_id, self.__n_last_messages)
         
         if len(history) <= 1:
             result = {
@@ -34,18 +34,18 @@ class ChatHistoryTool(ToolInterface):
             return result
 
         messages = [
-            {"role": "system", "content": self._tool_system_prompt},
+            {"role": "system", "content": self.__tool_system_prompt},
             {"role": "user", "content": f"User question: {question}"},
             *history
         ]
-        response = await self._client.chat.completions.create(
-            model=self.model,
+        response = await self.__client.chat.completions.create(
+            model=self.__model,
             messages=messages,
             temperature=0.5,
-            max_tokens=self.max_output_tokens
+            max_tokens=self.__max_output_tokens
         )
         await sync_to_async(
-            self._token_usage_manager.add_used_tokens,
+            self.__token_usage_manager.add_used_tokens,
             thread_sensitive=True
         )(chat_id, response.usage.total_tokens)
         result = {

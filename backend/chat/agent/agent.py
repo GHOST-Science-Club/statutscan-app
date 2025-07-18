@@ -69,9 +69,9 @@ class Agent(AgentBase):
         super().__init__(model, system_prompt)
         if system_prompt is None:
             self._system_prompt = "You are helpfull assistant, who help students with administrative problems."
-        self._client = AsyncOpenAI()
-        self._token_usage_manager = TokenUsageManager()
-        self._gpt_4o_mini_token_encoding = tiktoken.encoding_for_model(self._model)
+        self.__client = AsyncOpenAI()
+        self.__token_usage_manager = TokenUsageManager()
+        self.__gpt_4o_mini_token_encoding = tiktoken.encoding_for_model(self._model)
 
     async def _call_tool(self, name, chat_id, args):
         for tool in self._tools:
@@ -156,7 +156,7 @@ class Agent(AgentBase):
             return
 
         # Select tools to use
-        tool_selection_completion = await self._client.chat.completions.create(
+        tool_selection_completion = await self.__client.chat.completions.create(
             model=self._model,
             messages=[
                 {"role": "system", "content": self._system_prompt},
@@ -166,7 +166,7 @@ class Agent(AgentBase):
             tool_choice="auto"
         )
         await sync_to_async(
-            self._token_usage_manager.add_used_tokens,
+            self.__token_usage_manager.add_used_tokens,
             thread_sensitive=True
         )(chat_id, tool_selection_completion.usage.total_tokens)
         tool_selection_completion = tool_selection_completion.model_dump()
@@ -210,7 +210,7 @@ class Agent(AgentBase):
             messages_for_final.extend(tool_messages)
 
         # Final prompt
-        stream_completion = await self._client.chat.completions.create(
+        stream_completion = await self.__client.chat.completions.create(
             model=self._model,
             temperature=0.7,
             messages=messages_for_final,
@@ -238,6 +238,6 @@ class Agent(AgentBase):
         )(chat_id, final_msg)
 
         await sync_to_async(
-            self._token_usage_manager.add_used_tokens,
+            self.__token_usage_manager.add_used_tokens,
             thread_sensitive=True
-        )(chat_id, len(self._gpt_4o_mini_token_encoding.encode(full)))
+        )(chat_id, len(self.__gpt_4o_mini_token_encoding.encode(full)))
