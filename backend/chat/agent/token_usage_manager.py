@@ -11,7 +11,7 @@ from users.models import CustomUser
 class TokenUsageManager:
     def __init__(self):
         self.__token_limit = 10_000
-        self.__cooldown_time = 24  # hours
+        self.__cooldown_time = 24 # hours
         self.__mongo_connection = apps.get_app_config("chat").mongo_connection
         self.__chat_history = self.__mongo_connection.get_chat_history()
 
